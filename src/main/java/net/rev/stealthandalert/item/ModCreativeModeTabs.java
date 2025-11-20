@@ -22,6 +22,7 @@ public class ModCreativeModeTabs {
                     .displayItems((itemDisplayParameters, output) -> {
                         output.accept(ModItems.PEBBLE);
                         output.accept(ModItems.CLAMOR_BELL);
+                        output.accept(ModItems.SHADOW_CRYSTAL);
                     }).build());
 
     public static final Supplier<CreativeModeTab> STEALTH_AND_ALERT_BLOCK_TAB = CREATIVE_MOD_TAB.register("block_tab",
@@ -31,6 +32,7 @@ public class ModCreativeModeTabs {
                     .displayItems((itemDisplayParameters, output) -> {
                         output.accept(ModBlocks.PEBBLE_BLOCK);
                         output.accept(ModBlocks.SHADOW_ORE);
+                        output.accept(ModBlocks.DEEPSLATE_SHADOW_ORE);
                     }).build());
 
     public static void register(IEventBus eventBus) {

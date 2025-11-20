@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "stealth_and_alert:pebble_block"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "stealth_and_alert:blocks/pebble_block"
+}
