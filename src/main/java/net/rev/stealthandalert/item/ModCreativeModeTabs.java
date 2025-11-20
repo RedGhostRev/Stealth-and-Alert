@@ -28,13 +28,13 @@ public class ModCreativeModeTabs {
                     }).build());
 
     public static final Supplier<CreativeModeTab> STEALTH_AND_ALERT_BLOCK_TAB = CREATIVE_MOD_TAB.register("block_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModBlocks.SHADOW_ORE.get()))
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModBlocks.SHADOW_CRYSTAL_ORE.get()))
                     .withTabsBefore(ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "item_tab"))
                     .title(Component.translatable("itemGroup.stealth_and_alert.block_tab"))
                     .displayItems((itemDisplayParameters, output) -> {
                         output.accept(ModBlocks.PEBBLE_BLOCK);
-                        output.accept(ModBlocks.SHADOW_ORE);
-                        output.accept(ModBlocks.DEEPSLATE_SHADOW_ORE);
+                        output.accept(ModBlocks.SHADOW_CRYSTAL_ORE);
+                        output.accept(ModBlocks.DEEPSLATE_SHADOW_CRYSTAL_ORE);
                     }).build());
 
     public static void register(IEventBus eventBus) {

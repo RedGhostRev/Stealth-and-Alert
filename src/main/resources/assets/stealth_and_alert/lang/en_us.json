@@ -7,8 +7,8 @@
   "item.stealth_and_alert.shadow_berries": "Shadow Berries",
 
   "block.stealth_and_alert.pebble_block": "Pebble Block",
-  "block.stealth_and_alert.shadow_ore": "Shadow Ore",
-  "block.stealth_and_alert.deepslate_shadow_ore": "Deepslate Shadow Ore",
+  "block.stealth_and_alert.shadow_crystal_ore": "Shadow Crystal Ore",
+  "block.stealth_and_alert.deepslate_shadow_crystal_ore": "Deepslate Shadow Crystal Ore",
 
   "itemGroup.stealth_and_alert.item_tab": "Stealth and Alert Items",
   "itemGroup.stealth_and_alert.block_tab": "Stealth and Alert Blocks"

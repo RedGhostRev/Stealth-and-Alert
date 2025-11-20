@@ -22,11 +22,11 @@ public class ModBlocks {
             () -> new Block(BlockBehaviour.Properties.of()
                     .strength(4F).requiresCorrectToolForDrops().sound(SoundType.STONE)));
 
-    public static final DeferredBlock<Block> SHADOW_ORE = registerBlock("shadow_ore",
+    public static final DeferredBlock<Block> SHADOW_CRYSTAL_ORE = registerBlock("shadow_crystal_ore",
             () -> new DropExperienceBlock(UniformInt.of(2, 4),
                     BlockBehaviour.Properties.of().strength(3F).requiresCorrectToolForDrops().sound(SoundType.STONE)));
 
-    public static final DeferredBlock<Block> DEEPSLATE_SHADOW_ORE = registerBlock("deepslate_shadow_ore",
+    public static final DeferredBlock<Block> DEEPSLATE_SHADOW_CRYSTAL_ORE = registerBlock("deepslate_shadow_crystal_ore",
             () -> new DropExperienceBlock(UniformInt.of(3, 6),
                     BlockBehaviour.Properties.of().strength(4F).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)));
 

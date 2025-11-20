@@ -26,7 +26,7 @@
                   }
                 }
               ],
-              "name": "stealth_and_alert:shadow_ore"
+              "name": "stealth_and_alert:deepslate_shadow_crystal_ore"
             },
             {
               "type": "minecraft:item",
@@ -57,5 +57,5 @@
       "rolls": 1.0
     }
   ],
-  "random_sequence": "stealth_and_alert:blocks/shadow_ore"
+  "random_sequence": "stealth_and_alert:blocks/deepslate_shadow_crystal_ore"
 }

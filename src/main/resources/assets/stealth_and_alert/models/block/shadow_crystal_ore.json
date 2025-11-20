@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "stealth_and_alert:block/shadow_ore"
+    "all": "stealth_and_alert:block/shadow_crystal_ore"
   }
 }
