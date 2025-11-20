@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "stealth_and_alert:shadow_crystal"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "id": "stealth_and_alert:shadow_crystal_shard"
+  }
+}

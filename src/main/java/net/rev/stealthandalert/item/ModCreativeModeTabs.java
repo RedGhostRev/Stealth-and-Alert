@@ -23,6 +23,8 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.PEBBLE);
                         output.accept(ModItems.CLAMOR_BELL);
                         output.accept(ModItems.SHADOW_CRYSTAL);
+                        output.accept(ModItems.SHADOW_CRYSTAL_SHARD);
+                        output.accept(ModItems.SHADOW_BERRIES);
                     }).build());
 
     public static final Supplier<CreativeModeTab> STEALTH_AND_ALERT_BLOCK_TAB = CREATIVE_MOD_TAB.register("block_tab",

@@ -2,6 +2,9 @@
   "item.stealth_and_alert.clamor_bell": "Clamor Bell",
   "item.stealth_and_alert.pebble": "Pebble",
   "item.stealth_and_alert.shadow_crystal": "Shadow Crystal",
+  "item.stealth_and_alert.shadow_crystal_shard": "Shadow Crystal Shard",
+
+  "item.stealth_and_alert.shadow_berries": "Shadow Berries",
 
   "block.stealth_and_alert.pebble_block": "Pebble Block",
   "block.stealth_and_alert.shadow_ore": "Shadow Ore",

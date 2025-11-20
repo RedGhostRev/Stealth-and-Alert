@@ -9,14 +9,20 @@ import net.rev.stealthandalert.StealthAndAlert;
 public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(StealthAndAlert.MOD_ID);
 
-    public static final DeferredItem<Item> CLAMOR_BELL = ITEMS.register("clamor_bell",
+    public static final DeferredItem<Item> PEBBLE = ITEMS.register("pebble",
             () -> new Item(new Item.Properties()));
 
-    public static final DeferredItem<Item> PEBBLE = ITEMS.register("pebble",
+    public static final DeferredItem<Item> CLAMOR_BELL = ITEMS.register("clamor_bell",
             () -> new Item(new Item.Properties()));
 
     public static final DeferredItem<Item> SHADOW_CRYSTAL = ITEMS.register("shadow_crystal",
             () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> SHADOW_CRYSTAL_SHARD = ITEMS.register("shadow_crystal_shard",
+            () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> SHADOW_BERRIES = ITEMS.register("shadow_berries",
+            () -> new Item(new Item.Properties().food(ModFoodProperties.SHADOW_BERRIES)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

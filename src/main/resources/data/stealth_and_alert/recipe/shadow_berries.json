@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:sweet_berries"
+    },
+    "@": {
+      "item": "stealth_and_alert:shadow_crystal_shard"
+    }
+  },
+  "pattern": [
+    " @ ",
+    "@#@",
+    " @ "
+  ],
+  "result": {
+    "count": 1,
+    "id": "stealth_and_alert:shadow_berries"
+  }
+}
