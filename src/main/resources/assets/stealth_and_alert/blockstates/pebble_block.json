@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "stealth_and_alert:block/pebble_block"
+    }
+  }
+}
