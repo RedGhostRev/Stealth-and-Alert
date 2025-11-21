@@ -1,0 +1,12 @@
+{
+  "block.stealth_and_alert.deepslate_shadow_crystal_ore": "Deepslate Shadow Crystal Ore",
+  "block.stealth_and_alert.pebble_block": "Pebble Block",
+  "block.stealth_and_alert.shadow_crystal_ore": "Shadow Crystal Ore",
+  "item.stealth_and_alert.clamor_bell": "Clamor Bell",
+  "item.stealth_and_alert.pebble": "Pebble",
+  "item.stealth_and_alert.shadow_berries": "Shadow Berries",
+  "item.stealth_and_alert.shadow_crystal": "Shadow Crystal",
+  "item.stealth_and_alert.shadow_crystal_shard": "Shadow Crystal Shard",
+  "itemGroup.stealth_and_alert.blocks_tab": "Stealth and Alert - Blocks",
+  "itemGroup.stealth_and_alert.items_tab": "Stealth and Alert - Items"
+}

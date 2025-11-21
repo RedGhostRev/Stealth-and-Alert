@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:bell"
+    },
+    "D": {
+      "item": "minecraft:dried_kelp"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    " S ",
+    "DBD",
+    " D "
+  ],
+  "result": {
+    "count": 1,
+    "id": "stealth_and_alert:clamor_bell"
+  }
+}
