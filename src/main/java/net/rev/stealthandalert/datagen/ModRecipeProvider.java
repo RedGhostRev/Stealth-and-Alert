@@ -58,6 +58,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('B', Items.SWEET_BERRIES)
                 .unlockedBy("has_shadow_crystal_shard", has(ModItems.SHADOW_CRYSTAL_SHARD))
                 .save(recipeOutput);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SHADOW_CRYSTAL_DAGGER)
+                .pattern(" S ")
+                .pattern(" C ")
+                .pattern(" T ")
+                .define('S', ModItems.SHADOW_CRYSTAL_SHARD)
+                .define('C', ModItems.SHADOW_CRYSTAL)
+                .define('T', Items.STICK)
+                .unlockedBy("has_shadow_crystal", has(ModItems.SHADOW_CRYSTAL))
+                .save(recipeOutput);
 
         oreSmelting(recipeOutput, SHADOW_CRYSTAL_ORES, RecipeCategory.MISC, ModItems.SHADOW_CRYSTAL, 1.0F, 200, "shadow_crystal");
         oreBlasting(recipeOutput, SHADOW_CRYSTAL_ORES, RecipeCategory.MISC, ModItems.SHADOW_CRYSTAL, 1.0F, 100, "shadow_crystal");

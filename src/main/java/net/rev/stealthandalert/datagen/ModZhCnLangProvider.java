@@ -17,11 +17,15 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.SHADOW_CRYSTAL, "暗影水晶");
         add(LangKeys.SHADOW_CRYSTAL_SHARD, "暗影水晶碎片");
         add(LangKeys.SHADOW_BERRIES, "暗影浆果");
+        add(LangKeys.SHADOW_CRYSTAL_DAGGER, "暗影水晶匕首");
 
         // 方块
         add(LangKeys.PEBBLE_BLOCK, "石子块");
         add(LangKeys.SHADOW_CRYSTAL_ORE, "暗影水晶矿石");
         add(LangKeys.DEEPSLATE_SHADOW_ORE, "深层暗影水晶矿石");
+
+        // 工具提示
+        add(LangKeys.TOOLTIP_CAN_STAB, "§c背刺§e时造成双倍伤害");
 
         // 创造模式物品栏
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "潜行与警戒 - 物品");

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "stealth_and_alert:shadow_crystal"
+    },
+    "S": {
+      "item": "stealth_and_alert:shadow_crystal_shard"
+    },
+    "T": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    " S ",
+    " C ",
+    " T "
+  ],
+  "result": {
+    "count": 1,
+    "id": "stealth_and_alert:shadow_crystal_dagger"
+  }
+}

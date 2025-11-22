@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "stealth_and_alert:item/shadow_crystal_dagger"
+  }
+}

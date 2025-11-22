@@ -6,7 +6,9 @@
   "item.stealth_and_alert.pebble": "Pebble",
   "item.stealth_and_alert.shadow_berries": "Shadow Berries",
   "item.stealth_and_alert.shadow_crystal": "Shadow Crystal",
+  "item.stealth_and_alert.shadow_crystal_dagger": "Shadow Crystal Dagger",
   "item.stealth_and_alert.shadow_crystal_shard": "Shadow Crystal Shard",
   "itemGroup.stealth_and_alert.blocks_tab": "Stealth and Alert - Blocks",
-  "itemGroup.stealth_and_alert.items_tab": "Stealth and Alert - Items"
+  "itemGroup.stealth_and_alert.items_tab": "Stealth and Alert - Items",
+  "tooltip.stealth_and_alert.can_stab": "§eDeels double damage when §cbackstabbing"
 }

@@ -11,11 +11,15 @@ public class LangKeys {
     public static final String SHADOW_CRYSTAL = "item." + MOD_ID + ".shadow_crystal";
     public static final String SHADOW_CRYSTAL_SHARD = "item." + MOD_ID + ".shadow_crystal_shard";
     public static final String SHADOW_BERRIES = "item." + MOD_ID + ".shadow_berries";
+    public static final String SHADOW_CRYSTAL_DAGGER = "item." + MOD_ID + ".shadow_crystal_dagger";
 
     // Blocks
     public static final String PEBBLE_BLOCK = "block." + MOD_ID + ".pebble_block";
     public static final String SHADOW_CRYSTAL_ORE = "block." + MOD_ID + ".shadow_crystal_ore";
     public static final String DEEPSLATE_SHADOW_ORE = "block." + MOD_ID + ".deepslate_shadow_crystal_ore";
+
+    // Tooltips
+    public static final String TOOLTIP_CAN_STAB = "tooltip." + MOD_ID + ".can_stab";
 
     // Creative Tabs
     public static final String STEALTH_AND_ALERT_ITEMS_TAB = "itemGroup." + MOD_ID + ".items_tab";

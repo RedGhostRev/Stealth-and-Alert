@@ -1,0 +1,8 @@
+{
+  "remove": [
+    "#stealth_and_alert:needs_shadow_crystal_tool"
+  ],
+  "values": [
+    "#minecraft:incorrect_for_iron_tool"
+  ]
+}

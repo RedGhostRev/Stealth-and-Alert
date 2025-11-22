@@ -6,7 +6,9 @@
   "item.stealth_and_alert.pebble": "石子",
   "item.stealth_and_alert.shadow_berries": "暗影浆果",
   "item.stealth_and_alert.shadow_crystal": "暗影水晶",
+  "item.stealth_and_alert.shadow_crystal_dagger": "暗影水晶匕首",
   "item.stealth_and_alert.shadow_crystal_shard": "暗影水晶碎片",
   "itemGroup.stealth_and_alert.blocks_tab": "潜行与警戒 - 方块",
-  "itemGroup.stealth_and_alert.items_tab": "潜行与警戒 - 物品"
+  "itemGroup.stealth_and_alert.items_tab": "潜行与警戒 - 物品",
+  "tooltip.stealth_and_alert.can_stab": "§c背刺§e时造成双倍伤害"
 }
