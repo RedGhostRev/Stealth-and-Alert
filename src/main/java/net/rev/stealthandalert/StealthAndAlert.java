@@ -1,6 +1,8 @@
 package net.rev.stealthandalert;
 
+import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.block.ModBlocks;
+import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.item.ModCreativeModeTabs;
 import net.rev.stealthandalert.item.ModItems;
 import org.slf4j.Logger;
@@ -57,11 +59,13 @@ public class StealthAndAlert {
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
 
+        ModAttachments.register(modEventBus);
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, CommonConfigs.SPEC);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
