@@ -30,5 +30,15 @@ public class ModEnUsLangProvider extends LanguageProvider {
         // Creative Tabs
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "Stealth and Alert - Items");
         add(LangKeys.STEALTH_AND_ALERT_BLOCKS_TAB, "Stealth and Alert - Blocks");
+
+        // Debug Texts
+        add(LangKeys.DEBUG_ALERT_STATE_IDLE, "§7IDLE");
+        add(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS, "§fSUSPICIOUS");
+        add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§6SEARCHING");
+        add(LangKeys.DEBUG_ALERT_STATE_FIGHTING, "§cFIGHTING");
+        add(LangKeys.DEBUG_ALERT_STATE_UNKNOWN, "UNKNOWN");
+        add(LangKeys.DEBUG_TARGET_ALERT_LEVEL, "§bALERT_LEVEL: %.1f%%");
+        add(LangKeys.DEBUG_ALERT_STATE_TICKS, "§eALERT_STATE_TICKS: %d");
+        add(LangKeys.DEBUG_PATIENCE_TICKS, "§dPATIENCE_TICKS: %d");
     }
 }

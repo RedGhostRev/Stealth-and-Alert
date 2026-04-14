@@ -1,8 +1,19 @@
 {
+  "remove": [
+    "minecraft:zombie_horse",
+    "minecraft:skeleton_horse"
+  ],
   "values": [
     "#minecraft:zombies",
     "#minecraft:skeletons",
+    "#minecraft:illager",
     "minecraft:creeper",
+    "minecraft:slime",
+    "minecraft:witch",
+    "minecraft:silverfish",
+    "minecraft:piglin",
+    "minecraft:piglin_brute",
+    "minecraft:hoglin",
     "minecraft:spider",
     "minecraft:cave_spider"
   ]

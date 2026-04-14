@@ -21,8 +21,17 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
     protected void addTags(HolderLookup.Provider provider) {
         tag(ModTags.Entities.SEEKERS)
                 .addTag(EntityTypeTags.ZOMBIES)
+                .remove(EntityType.ZOMBIE_HORSE)
                 .addTag(EntityTypeTags.SKELETONS)
+                .remove(EntityType.SKELETON_HORSE)
+                .addTag(EntityTypeTags.ILLAGER)
                 .add(EntityType.CREEPER)
+                .add(EntityType.SLIME)
+                .add(EntityType.WITCH)
+                .add(EntityType.SILVERFISH)
+                .add(EntityType.PIGLIN)
+                .add(EntityType.PIGLIN_BRUTE)
+                .add(EntityType.HOGLIN)
                 .add(EntityType.SPIDER)
                 .add(EntityType.CAVE_SPIDER);
 

@@ -21,5 +21,17 @@ public class CommonConfigs {
             BUILDER.comment("敌人向下看的垂直视野范围（角度）。例如，60代表敌人能看到在它下方60度范围内的玩家。")
                     .defineInRange("detectionVerticalDownFOV", 60.0, 1.0, 90.0);
 
+    public static final ModConfigSpec.IntValue PATIENCE_TICKS =
+            BUILDER.comment("敌人失去对玩家的兴趣前的耐心时间，主要用于敌人无法到达最后已知位置时。单位：tick（0.05秒）")
+                    .defineInRange("patienceTicks", 600, 300, 1200);
+
+    public static final ModConfigSpec.IntValue DETECTION_REACTION_TICKS =
+            BUILDER.comment("敌人从看到到真正察觉玩家所需的反应时间。单位：tick（0.05秒）")
+                    .defineInRange("detectionReactionTicks", 10, 0, 100);
+
+    public static final ModConfigSpec.BooleanValue DEBUG_MODE =
+            BUILDER.comment("是否开启调试模式。开启后，敌人头顶会显示警戒状态信息。")
+                    .define("debugMode", false);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

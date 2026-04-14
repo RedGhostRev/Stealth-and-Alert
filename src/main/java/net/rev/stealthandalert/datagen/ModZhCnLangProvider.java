@@ -30,5 +30,15 @@ public class ModZhCnLangProvider extends LanguageProvider {
         // 创造模式物品栏
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "潜行与警戒 - 物品");
         add(LangKeys.STEALTH_AND_ALERT_BLOCKS_TAB, "潜行与警戒 - 方块");
+
+        // 调试文本
+        add(LangKeys.DEBUG_ALERT_STATE_IDLE, "§7空闲");
+        add(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS, "§f怀疑");
+        add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§6搜寻");
+        add(LangKeys.DEBUG_ALERT_STATE_FIGHTING, "§c战斗");
+        add(LangKeys.DEBUG_ALERT_STATE_UNKNOWN, "未知");
+        add(LangKeys.DEBUG_TARGET_ALERT_LEVEL, "§b警觉度：%.1f%%");
+        add(LangKeys.DEBUG_ALERT_STATE_TICKS, "§e状态切换计时：%d");
+        add(LangKeys.DEBUG_PATIENCE_TICKS, "§d耐心值：%d");
     }
 }
