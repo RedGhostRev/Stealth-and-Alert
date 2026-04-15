@@ -16,7 +16,6 @@ import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.config.CommonConfigs;
-import net.rev.stealthandalert.datagen.LangKeys;
 import net.rev.stealthandalert.util.ModTags;
 import net.rev.stealthandalert.util.StealthUtils;
 
@@ -72,7 +71,6 @@ public class StealthEvents {
             boolean canSee = player != null && !player.isCreative() && !player.isSpectator() && StealthUtils.hasLineOfSight(mob, player);
             // 处理警戒AI
             if (player != null) StealthUtils.tickPerception(mob, player, canSee);
-            debug(mob, player);
         }
 
         AlertData data = mob.getData(ModAttachments.ALERT_DATA);
@@ -156,55 +154,6 @@ public class StealthEvents {
                     mob.getLookControl().setLookAt(pos.x, pos.y + 1.6, pos.z, 30.0F, 30.0F);
                 }
             });
-        }
-    }
-
-    // DEBUG内容
-    private static void debug(Mob mob, Player player) {
-        if (CommonConfigs.DEBUG_MODE.get()) {
-            AlertData data = mob.getData(ModAttachments.ALERT_DATA);
-            MutableComponent stateName = switch (data.state()) {
-                case AlertData.IDLE -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_IDLE);
-                case AlertData.SUSPICIOUS -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS);
-                case AlertData.SEARCHING -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_SEARCHING);
-                case AlertData.FIGHTING -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_FIGHTING);
-                default -> Component.translatable(LangKeys.DEBUG_UNKNOWN);
-            };
-            MutableComponent targetStateName = switch (data.targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED)) {
-                case AlertData.UNTRACKED -> Component.translatable(LangKeys.DEBUG_TARGET_ALERT_STATE_UNTRACKED);
-                case AlertData.AWARE -> Component.translatable(LangKeys.DEBUG_TARGET_ALERT_STATE_AWARE);
-                case AlertData.TRACKING -> Component.translatable(LangKeys.DEBUG_TARGET_ALERT_STATE_TRACKING);
-                default -> Component.translatable(LangKeys.DEBUG_UNKNOWN);
-            };
-            Component primaryName;
-            UUID uuid = data.primaryTarget().orElse(null);
-            if (uuid == null) {
-                primaryName = Component.translatable(LangKeys.DEBUG_PRIMARY_TARGET_NULL);
-            } else {
-                Player primaryPlayer = mob.level().getPlayerByUUID(uuid);
-                primaryName = primaryPlayer == null ? Component.translatable(LangKeys.DEBUG_PRIMARY_TARGET_NULL) : primaryPlayer.getName();
-            }
-
-            float currentLevel = player != null ? data.targetProgress().getOrDefault(player.getUUID(), 0.0F) : 0.0F;
-
-            Component debugText = stateName
-                    .append(" ")
-                    .append(targetStateName)
-                    .append(" ")
-                    .append(primaryName)
-                    .append(" ")
-                    .append(Component.translatable(LangKeys.DEBUG_TARGET_ALERT_LEVEL, currentLevel))
-                    .append(" ")
-                    .append(Component.translatable(LangKeys.DEBUG_ALERT_STATE_TICKS, data.stateTicks()))
-                    .append(" ")
-                    .append(Component.translatable(LangKeys.DEBUG_PATIENCE_TICKS, data.patienceTicks()));
-            mob.setCustomName(debugText);
-            mob.setCustomNameVisible(true);
-        } else {
-            if (mob.hasCustomName()) {
-                mob.setCustomName(null);
-                mob.setCustomNameVisible(false);
-            }
         }
     }
 }

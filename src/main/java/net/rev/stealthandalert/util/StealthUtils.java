@@ -6,9 +6,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.config.CommonConfigs;
+import net.rev.stealthandalert.network.S2CAlertDataPacket;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -211,7 +213,7 @@ public class StealthUtils {
         newStatesMap.put(uuid, newPState);
         newReactionsMap.put(uuid, newReaction);
 
-        mob.setData(ModAttachments.ALERT_DATA, new AlertData(
+        data = new AlertData(
                 newState,
                 newProgressMap,
                 newStatesMap,
@@ -220,7 +222,13 @@ public class StealthUtils {
                 newPrimary,
                 newStateTicks,
                 Math.max(0, newPatienceTicks)
-        ));
+        );
+
+        mob.setData(ModAttachments.ALERT_DATA, data);
+
+        if (!mob.level().isClientSide()) {
+            PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), data));
+        }
     }
 
     // 三点检查

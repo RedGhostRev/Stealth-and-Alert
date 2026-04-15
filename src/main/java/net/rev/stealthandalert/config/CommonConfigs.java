@@ -15,7 +15,7 @@ public class CommonConfigs {
 
     public static final ModConfigSpec.DoubleValue DETECTION_VERTICAL_UP_FOV =
             BUILDER.comment("敌人向上看的垂直视野范围（角度）。例如，45代表敌人能看到在它上方45度范围内的玩家。")
-                    .defineInRange("detectionVerticalUpFOV", 40.0, 1.0, 90.0);
+                    .defineInRange("detectionVerticalUpFOV", 45.0, 1.0, 90.0);
 
     public static final ModConfigSpec.DoubleValue DETECTION_VERTICAL_DOWN_FOV =
             BUILDER.comment("敌人向下看的垂直视野范围（角度）。例如，60代表敌人能看到在它下方60度范围内的玩家。")

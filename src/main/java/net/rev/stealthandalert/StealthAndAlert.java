@@ -2,6 +2,7 @@ package net.rev.stealthandalert;
 
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.block.ModBlocks;
+import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.item.ModCreativeModeTabs;
 import net.rev.stealthandalert.item.ModItems;
@@ -66,6 +67,7 @@ public class StealthAndAlert {
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, CommonConfigs.SPEC);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfigs.SPEC);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
