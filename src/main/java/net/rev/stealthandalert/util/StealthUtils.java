@@ -46,43 +46,87 @@ public class StealthUtils {
         AlertData data = mob.getData(ModAttachments.ALERT_DATA);
         UUID uuid = player.getUUID();
 
+        // 敌人对单独玩家的状态
         Map<UUID, Float> newProgressMap = new HashMap<>(data.targetProgress());
+        Map<UUID, Integer> newStatesMap = new HashMap<>(data.targetStates());
+        Map<UUID, Integer> newReactionsMap = new HashMap<>(data.targetReactions());
         float currentLevel = newProgressMap.getOrDefault(uuid, 0.0F);
-        float newLevel;
+        int currentPState = newStatesMap.getOrDefault(uuid, AlertData.UNTRACKED);
+        int currentReaction = newReactionsMap.getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt());
+        float newLevel = currentLevel;
+        int newPState = currentPState;
+        int newReaction = currentReaction;
+
+        // 敌人的全局状态
         int newState = data.state();
         int newStateTicks = data.stateTicks(); // 状态切换计时器
         int newPatienceTicks = data.patienceTicks(); // 耐心值计时器
-        // LKP（最后已知位置）
-        Optional<Vec3> lkp = data.lastSeenPos();
+        Optional<Vec3> lkp = data.lastSeenPos(); // LKP（最后已知位置）
 
         if (canSee) {
             // 如果看到了玩家
-            // 警戒值每刻涨1.0点（每秒涨20.0点），最大100.0
-            newLevel = Math.min(100.0F, currentLevel + 1.0F);
-            // 更新LKP
-            lkp = Optional.of(player.position());
-            // 重置计时器为0
-            newStateTicks = 0;
-            // 重置耐心值
-            newPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt();
+            newStateTicks = 0; // 重置计时器为0
+            newPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt(); // 重置耐心值
+
+            if (currentPState == AlertData.UNTRACKED) {
+                // 反应期
+                if (currentReaction > 0) {
+                    newReaction--;
+                    newLevel = 0.0F;
+                } else {
+                    newPState = AlertData.AWARE;
+                }
+            }
+
+            if (newPState == AlertData.AWARE) {
+                // 涨条期
+                newLevel = Math.min(100.0F, currentLevel + 1.0F);
+                lkp = Optional.of(player.position());
+
+                if (newLevel >= 100.0F) {
+                    newPState = AlertData.TRACKING;
+                }
+            }
+
+            if (newPState == AlertData.TRACKING) {
+                // 追踪期
+                newLevel = 100.0F;
+                lkp = Optional.of(player.position());
+                newState = AlertData.FIGHTING;
+            }
+
         } else {
-            // 如果看不到玩家，每刻回落0.5点
+            // 如果看不到玩家
             newLevel = Math.max(0.0F, currentLevel - 0.5F);
+
+            if (currentPState == AlertData.TRACKING) {
+                newPState = AlertData.AWARE;
+            }
+
+            if (newLevel <= 0.0F) {
+                newPState = AlertData.UNTRACKED;
+                newReaction = CommonConfigs.DETECTION_REACTION_TICKS.getAsInt();
+            }
         }
-        newProgressMap.put(uuid, newLevel);
 
         // TODO 实现警戒条和警戒状态的解耦
-        if (newLevel >= 100.0F) {
-            // 如果玩家的警戒条满了，使怪物进入战斗状态
-            newState = AlertData.FIGHTING;
-        } else if (newLevel >= 50.0F && newState < AlertData.SEARCHING) {
-            // 如果玩家的警戒条过半，且怪物处于怀疑或更低状态，使怪物进入搜寻状态
-            newState = AlertData.SEARCHING;
-        } else if (newLevel > 0.0F && newState <= AlertData.IDLE) {
-            // 如果玩家的警戒条不空，且怪物处于闲逛状态，使怪物进入怀疑状态
-            newState = AlertData.SUSPICIOUS;
+        // 对于每个玩家
+        if (newPState >= AlertData.AWARE) {
+            // 如果这个玩家让条满了，且怪物还没有进入战斗
+            if (newLevel >= 100.0F && newState < AlertData.FIGHTING) {
+                newState = AlertData.FIGHTING;
+            }
+            // 如果这个玩家条过半了，且怪物小于搜寻状态
+            else if (newLevel >= 50.0F && newState < AlertData.SEARCHING) {
+                newState = AlertData.SEARCHING;
+            }
+            // 如果这个玩家刚起条，且怪物还在闲逛
+            else if (newLevel > 0.0F && newState < AlertData.SUSPICIOUS) {
+                newState = AlertData.SUSPICIOUS;
+            }
         }
 
+        // 敌人警戒状态和玩家观测状态的回落
         boolean canStartReset = false; // 开始重置LKP记忆吗？
         // 如果敌人看不到玩家
         if (!canSee) {
@@ -106,18 +150,22 @@ public class StealthUtils {
                     newState = AlertData.IDLE; // 计时结束，状态重置
                     lkp = Optional.empty(); // 清除LKP
                     newStateTicks = 0;
+                    newPState = AlertData.UNTRACKED;
                     newPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt(); // 重置耐心值
                 }
             }
         }
 
+        newProgressMap.put(uuid, newLevel);
+        newStatesMap.put(uuid, newPState);
+        newReactionsMap.put(uuid, newReaction);
 
         mob.setData(ModAttachments.ALERT_DATA, new AlertData(
                 newState,
                 newProgressMap,
-                data.targetStates(),
+                newStatesMap,
+                newReactionsMap,
                 lkp,
-                data.reactionTicks(),
                 newStateTicks,
                 Math.max(0, newPatienceTicks)
         ));

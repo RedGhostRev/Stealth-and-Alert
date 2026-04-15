@@ -36,7 +36,10 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS, "§fSUSPICIOUS");
         add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§6SEARCHING");
         add(LangKeys.DEBUG_ALERT_STATE_FIGHTING, "§cFIGHTING");
-        add(LangKeys.DEBUG_ALERT_STATE_UNKNOWN, "UNKNOWN");
+        add(LangKeys.DEBUG_TARGET_ALERT_STATE_UNTRACKED, "§7UNTRACKED");
+        add(LangKeys.DEBUG_TARGET_ALERT_STATE_AWARE, "§fAWARE");
+        add(LangKeys.DEBUG_TARGET_ALERT_STATE_TRACKING, "§cTRACKING");
+        add(LangKeys.DEBUG_UNKNOWN, "UNKNOWN");
         add(LangKeys.DEBUG_TARGET_ALERT_LEVEL, "§bALERT_LEVEL: %.1f%%");
         add(LangKeys.DEBUG_ALERT_STATE_TICKS, "§eALERT_STATE_TICKS: %d");
         add(LangKeys.DEBUG_PATIENCE_TICKS, "§dPATIENCE_TICKS: %d");

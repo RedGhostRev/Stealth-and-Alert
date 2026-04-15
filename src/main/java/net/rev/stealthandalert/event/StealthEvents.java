@@ -39,10 +39,10 @@ public class StealthEvents {
             event.setNewAboutToBeSetTarget(null);
             return;
         }
-
-        if (!StealthUtils.hasLineOfSight(mob, target)) {
-            event.setNewAboutToBeSetTarget(null);
-        }
+//
+//        if (!StealthUtils.hasLineOfSight(mob, target)) {
+//            event.setNewAboutToBeSetTarget(null);
+//        }
     }
 
     @SubscribeEvent
@@ -55,7 +55,7 @@ public class StealthEvents {
 
         // TODO 扩展目标实体为整个SEEKERS标签内的实体
         double range = CommonConfigs.MAX_DETECTION_RANGE.get();
-        // 玩家能被处理，当且仅当玩家不是创造模式、不是旁观者模式，且玩家位于以生物最大视距为半径的球体内
+        // 玩家能被处理，当且仅当且玩家位于以生物最大视距为半径的球体内
         List<Player> players = mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(range), player -> mob.distanceToSqr(player) <= range * range);
         for (Player player : players) {
             boolean canSee = player != null && !player.isCreative() && !player.isSpectator() && StealthUtils.hasLineOfSight(mob, player);
@@ -71,20 +71,31 @@ public class StealthEvents {
         }
 
         AlertData data = mob.getData(ModAttachments.ALERT_DATA);
+        int pState = data.targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED); // 敌人对玩家的观测状态
 
         // 怪物看见玩家怎么办？
         if (canSee) {
-            if (data.state() > AlertData.IDLE && data.state() < AlertData.FIGHTING) {
-                // 如果怪物处于怀疑或搜寻状态，使怪物一直看向玩家
-                mob.getLookControl().setLookAt(player.getX(), player.getEyeY(), player.getZ(), 30.0F, 30.0F);
-
-                if (!mob.getNavigation().isDone()) {
-                    mob.getNavigation().stop();
+            if (pState >= AlertData.AWARE) {
+                // 如果玩家已经被察觉到了
+                if (data.state() > AlertData.IDLE && data.state() < AlertData.FIGHTING) {
+                    // 如果怪物处于怀疑或搜寻状态
+                    mob.getLookControl().setLookAt(player.getX(), player.getEyeY(), player.getZ(), 30.0F, 30.0F);
+                    if (!mob.getNavigation().isDone()) {
+                        mob.getNavigation().stop();
+                    }
+                } else if (data.state() == AlertData.FIGHTING) {
+                    // 如果怪物处于战斗状态
+                    mob.getLookControl().setLookAt(player.getX(), player.getEyeY(), player.getZ(), 30.0F, 30.0F);
+                    if (pState == AlertData.TRACKING) {
+                        // 如果玩家处于TRACKING状态
+                        mob.setTarget(player);
+                    } else {
+                        if (mob.getTarget() == player) mob.setTarget(null);
+                        if (!mob.getNavigation().isDone()) {
+                            mob.getNavigation().stop();
+                        }
+                    }
                 }
-            } else if (data.state() >= AlertData.FIGHTING) {
-                // 如果怪物处于战斗状态
-                //mob.getLookControl().setLookAt(player.getX(), player.getEyeY(), player.getZ(), 30.0F, 30.0F);
-                mob.setTarget(player);
             }
         }
 
@@ -116,12 +127,20 @@ public class StealthEvents {
                 case AlertData.SUSPICIOUS -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS);
                 case AlertData.SEARCHING -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_SEARCHING);
                 case AlertData.FIGHTING -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_FIGHTING);
-                default -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_UNKNOWN);
+                default -> Component.translatable(LangKeys.DEBUG_UNKNOWN);
+            };
+            MutableComponent targetStateName = switch (data.targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED)) {
+                case AlertData.UNTRACKED -> Component.translatable(LangKeys.DEBUG_TARGET_ALERT_STATE_UNTRACKED);
+                case AlertData.AWARE -> Component.translatable(LangKeys.DEBUG_TARGET_ALERT_STATE_AWARE);
+                case AlertData.TRACKING -> Component.translatable(LangKeys.DEBUG_TARGET_ALERT_STATE_TRACKING);
+                default -> Component.translatable(LangKeys.DEBUG_UNKNOWN);
             };
 
             float currentLevel = player != null ? data.targetProgress().getOrDefault(player.getUUID(), 0.0F) : 0.0F;
 
             Component debugText = stateName
+                    .append(" ")
+                    .append(targetStateName)
                     .append(" ")
                     .append(Component.translatable(LangKeys.DEBUG_TARGET_ALERT_LEVEL, currentLevel))
                     .append(" ")

@@ -36,7 +36,10 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS, "§f怀疑");
         add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§6搜寻");
         add(LangKeys.DEBUG_ALERT_STATE_FIGHTING, "§c战斗");
-        add(LangKeys.DEBUG_ALERT_STATE_UNKNOWN, "未知");
+        add(LangKeys.DEBUG_TARGET_ALERT_STATE_UNTRACKED, "§7未察觉");
+        add(LangKeys.DEBUG_TARGET_ALERT_STATE_AWARE, "§f察觉");
+        add(LangKeys.DEBUG_TARGET_ALERT_STATE_TRACKING, "§c追踪");
+        add(LangKeys.DEBUG_UNKNOWN, "未知");
         add(LangKeys.DEBUG_TARGET_ALERT_LEVEL, "§b警觉度：%.1f%%");
         add(LangKeys.DEBUG_ALERT_STATE_TICKS, "§e状态切换计时：%d");
         add(LangKeys.DEBUG_PATIENCE_TICKS, "§d耐心值：%d");
