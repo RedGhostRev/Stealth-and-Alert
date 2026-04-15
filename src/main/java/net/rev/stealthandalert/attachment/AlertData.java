@@ -16,6 +16,7 @@ public record AlertData(
         Map<UUID, Integer> targetStates,
         Map<UUID, Integer> targetReactions,
         Optional<Vec3> lastSeenPos,
+        Optional<UUID> primaryTarget,
         int stateTicks,
         int patienceTicks) {
 
@@ -37,19 +38,12 @@ public record AlertData(
                     Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT).fieldOf("target_states").forGetter(AlertData::targetStates),
                     Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT).fieldOf("target_reactions").forGetter(AlertData::targetReactions),
                     Vec3.CODEC.optionalFieldOf("last_pos").forGetter(AlertData::lastSeenPos),
+                    UUIDUtil.STRING_CODEC.optionalFieldOf("primary_target").forGetter(AlertData::primaryTarget),
                     Codec.INT.fieldOf("state_ticks").forGetter(AlertData::stateTicks),
                     Codec.INT.fieldOf("patience_ticks").forGetter(AlertData::patienceTicks)
             ).apply(instance, AlertData::new)
     );
 
-    public static final AlertData DEFAULT = new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
-
-    public AlertData withState(int newState, int ticks) {
-        return new AlertData(newState, this.targetProgress, this.targetStates, this.targetReactions, this.lastSeenPos, ticks, CommonConfigs.PATIENCE_TICKS.getAsInt());
-    }
-
-    public AlertData updateTarget(UUID uuid, float level, int pState) {
-        return this;
-    }
+    public static final AlertData DEFAULT = new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
 }
 

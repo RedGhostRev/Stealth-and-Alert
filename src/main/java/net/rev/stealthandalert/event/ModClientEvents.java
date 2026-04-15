@@ -10,6 +10,7 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderNameTagEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.datagen.LangKeys;

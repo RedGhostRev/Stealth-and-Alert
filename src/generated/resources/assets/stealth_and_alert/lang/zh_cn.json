@@ -9,6 +9,7 @@
   "debug.stealth_and_alertalert_state_ticks": "§e状态切换计时：%d",
   "debug.stealth_and_alertalert_unknown": "未知",
   "debug.stealth_and_alertdebug_patience_ticks": "§d耐心值：%d",
+  "debug.stealth_and_alertprimary_target_null": "无主要目标",
   "debug.stealth_and_alerttarget_alert_level": "§b警觉度：%.1f%%",
   "debug.stealth_and_alerttarget_alert_state_aware": "§f察觉",
   "debug.stealth_and_alerttarget_alert_state_tracking": "§c追踪",

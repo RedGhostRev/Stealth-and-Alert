@@ -5,6 +5,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -19,6 +21,8 @@ import net.rev.stealthandalert.util.ModTags;
 import net.rev.stealthandalert.util.StealthUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
 public class StealthEvents {
@@ -39,10 +43,17 @@ public class StealthEvents {
             event.setNewAboutToBeSetTarget(null);
             return;
         }
-//
-//        if (!StealthUtils.hasLineOfSight(mob, target)) {
-//            event.setNewAboutToBeSetTarget(null);
-//        }
+
+        int pState = data.targetStates().getOrDefault(target.getUUID(), AlertData.UNTRACKED);
+        if (pState < AlertData.TRACKING) {
+            event.setNewAboutToBeSetTarget(null);
+            return;
+        }
+
+        UUID primaryUUID = data.primaryTarget().orElse(null);
+        if (primaryUUID != null && !primaryUUID.equals(target.getUUID())) {
+            event.setNewAboutToBeSetTarget(null);
+        }
     }
 
     @SubscribeEvent
@@ -60,15 +71,24 @@ public class StealthEvents {
         for (Player player : players) {
             boolean canSee = player != null && !player.isCreative() && !player.isSpectator() && StealthUtils.hasLineOfSight(mob, player);
             // 处理警戒AI
-            handleAlert(mob, player, canSee);
+            if (player != null) StealthUtils.tickPerception(mob, player, canSee);
+            debug(mob, player);
+        }
+
+        AlertData data = mob.getData(ModAttachments.ALERT_DATA);
+        UUID primaryUUID = data.primaryTarget().orElseGet(() -> null);
+
+        if (primaryUUID != null) {
+            Player primaryPlayer = mob.level().getPlayerByUUID(primaryUUID);
+            if (primaryPlayer != null) {
+                boolean canSeePrimary = !primaryPlayer.isCreative() && !primaryPlayer.isSpectator() && StealthUtils.hasLineOfSight(mob, primaryPlayer);
+                handleAlert(mob, primaryPlayer, canSeePrimary);
+            }
         }
     }
 
     private static void handleAlert(Mob mob, Player player, Boolean canSee) {
         // 只要玩家理论上能被感知，则判断实际能否被观测到并执行感知系统
-        if (player != null) {
-            StealthUtils.tickPerception(mob, player, canSee);
-        }
 
         AlertData data = mob.getData(ModAttachments.ALERT_DATA);
         int pState = data.targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED); // 敌人对玩家的观测状态
@@ -79,17 +99,26 @@ public class StealthEvents {
                 // 如果玩家已经被察觉到了
                 if (data.state() > AlertData.IDLE && data.state() < AlertData.FIGHTING) {
                     // 如果怪物处于怀疑或搜寻状态
-                    mob.getLookControl().setLookAt(player.getX(), player.getEyeY(), player.getZ(), 30.0F, 30.0F);
+                    mob.goalSelector.getAvailableGoals().removeIf(wrappedGoal ->
+                            wrappedGoal.getGoal() instanceof RandomLookAroundGoal ||
+                                    wrappedGoal.getGoal() instanceof LookAtPlayerGoal
+                    );
+                    mob.getLookControl().setLookAt(player, 30.0F, 30.0F);
                     if (!mob.getNavigation().isDone()) {
                         mob.getNavigation().stop();
                     }
                 } else if (data.state() == AlertData.FIGHTING) {
                     // 如果怪物处于战斗状态
-                    mob.getLookControl().setLookAt(player.getX(), player.getEyeY(), player.getZ(), 30.0F, 30.0F);
                     if (pState == AlertData.TRACKING) {
                         // 如果玩家处于TRACKING状态
                         mob.setTarget(player);
                     } else {
+                        mob.goalSelector.getAvailableGoals().removeIf(wrappedGoal ->
+                                wrappedGoal.getGoal() instanceof RandomLookAroundGoal ||
+                                        wrappedGoal.getGoal() instanceof LookAtPlayerGoal
+                        );
+                        mob.getLookControl().setLookAt(player, 30.0F, 30.0F);
+                        // 再次确保玩家在非TRACKING状态下不会被攻击
                         if (mob.getTarget() == player) mob.setTarget(null);
                         if (!mob.getNavigation().isDone()) {
                             mob.getNavigation().stop();
@@ -109,19 +138,31 @@ public class StealthEvents {
                     // 如果怪物处于搜寻或战斗状态
                     // 如果距离LKP还有一段距离，则继续走
                     if (mob.distanceToSqr(pos) > 2.25) { // 1.5格的平方
+                        mob.goalSelector.getAvailableGoals().removeIf(wrappedGoal ->
+                                wrappedGoal.getGoal() instanceof RandomLookAroundGoal ||
+                                        wrappedGoal.getGoal() instanceof LookAtPlayerGoal
+                        );
+                        mob.getLookControl().setLookAt(pos.x, pos.y + 1.6, pos.z, 30.0F, 30.0F);
                         mob.getNavigation().moveTo(pos.x, pos.y, pos.z, 1.1);
                     } else {
                         mob.getNavigation().stop();
                     }
                 } else if (data.state() == AlertData.SUSPICIOUS) {
                     // 如果怪物处于怀疑状态，则凝视LKP
+                    mob.goalSelector.getAvailableGoals().removeIf(wrappedGoal ->
+                            wrappedGoal.getGoal() instanceof RandomLookAroundGoal ||
+                                    wrappedGoal.getGoal() instanceof LookAtPlayerGoal
+                    );
                     mob.getLookControl().setLookAt(pos.x, pos.y + 1.6, pos.z, 30.0F, 30.0F);
                 }
             });
         }
+    }
 
-        // DEBUG内容
+    // DEBUG内容
+    private static void debug(Mob mob, Player player) {
         if (CommonConfigs.DEBUG_MODE.get()) {
+            AlertData data = mob.getData(ModAttachments.ALERT_DATA);
             MutableComponent stateName = switch (data.state()) {
                 case AlertData.IDLE -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_IDLE);
                 case AlertData.SUSPICIOUS -> Component.translatable(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS);
@@ -135,12 +176,22 @@ public class StealthEvents {
                 case AlertData.TRACKING -> Component.translatable(LangKeys.DEBUG_TARGET_ALERT_STATE_TRACKING);
                 default -> Component.translatable(LangKeys.DEBUG_UNKNOWN);
             };
+            Component primaryName;
+            UUID uuid = data.primaryTarget().orElse(null);
+            if (uuid == null) {
+                primaryName = Component.translatable(LangKeys.DEBUG_PRIMARY_TARGET_NULL);
+            } else {
+                Player primaryPlayer = mob.level().getPlayerByUUID(uuid);
+                primaryName = primaryPlayer == null ? Component.translatable(LangKeys.DEBUG_PRIMARY_TARGET_NULL) : primaryPlayer.getName();
+            }
 
             float currentLevel = player != null ? data.targetProgress().getOrDefault(player.getUUID(), 0.0F) : 0.0F;
 
             Component debugText = stateName
                     .append(" ")
                     .append(targetStateName)
+                    .append(" ")
+                    .append(primaryName)
                     .append(" ")
                     .append(Component.translatable(LangKeys.DEBUG_TARGET_ALERT_LEVEL, currentLevel))
                     .append(" ")

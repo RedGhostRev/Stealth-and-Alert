@@ -62,12 +62,15 @@ public class StealthUtils {
         int newStateTicks = data.stateTicks(); // 状态切换计时器
         int newPatienceTicks = data.patienceTicks(); // 耐心值计时器
         Optional<Vec3> lkp = data.lastSeenPos(); // LKP（最后已知位置）
+        Optional<UUID> newPrimary = data.primaryTarget(); // 主目标
 
         if (canSee) {
             // 如果看到了玩家
             newStateTicks = 0; // 重置计时器为0
             newPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt(); // 重置耐心值
+            boolean shouldUpdateLKP = false; // 要不要更新LKP？
 
+            // 对于每个单独的玩家来说
             if (currentPState == AlertData.UNTRACKED) {
                 // 反应期
                 if (currentReaction > 0) {
@@ -81,8 +84,6 @@ public class StealthUtils {
             if (newPState == AlertData.AWARE) {
                 // 涨条期
                 newLevel = Math.min(100.0F, currentLevel + 1.0F);
-                lkp = Optional.of(player.position());
-
                 if (newLevel >= 100.0F) {
                     newPState = AlertData.TRACKING;
                 }
@@ -91,8 +92,50 @@ public class StealthUtils {
             if (newPState == AlertData.TRACKING) {
                 // 追踪期
                 newLevel = 100.0F;
-                lkp = Optional.of(player.position());
                 newState = AlertData.FIGHTING;
+            }
+
+            // 当玩家被察觉后，开始处理LKP竞争更新问题
+            if (newPState >= AlertData.AWARE) {
+                if (lkp.isEmpty()) {
+                    shouldUpdateLKP = true; // 如果LKP为空，可以更新
+                } else {
+                    float globalMaxLevel = newLevel;
+                    for (Float level : newProgressMap.values()) {
+                        if (level > globalMaxLevel) globalMaxLevel = level;
+                    }
+
+                    // 如果我的警觉值达到了全场最高
+                    if (newLevel >= globalMaxLevel) {
+                        // 找出所有处于最高警觉值的玩家中最近的
+                        double minNearbyDistSq = mob.distanceToSqr(player);
+                        boolean anotherCloser = false;
+
+                        for (Map.Entry<UUID, Float> entry : newProgressMap.entrySet()) {
+                            UUID otherId = entry.getKey();
+                            // 如果有人警觉值跟我一样
+                            if (!otherId.equals(uuid) && entry.getValue() >= globalMaxLevel) {
+                                Player otherPlayer = mob.level().getPlayerByUUID(otherId);
+                                if (otherPlayer != null) {
+                                    double otherDistSq = mob.distanceToSqr(otherPlayer);
+                                    if (otherDistSq < minNearbyDistSq) {
+                                        anotherCloser = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // 如果没人比我更近，那么我获得LKP更新权，而且我成为了主目标
+                        if (!anotherCloser) {
+                            shouldUpdateLKP = true;
+                            newPrimary = Optional.of(uuid);
+                        }
+                    }
+                }
+            }
+            if (shouldUpdateLKP) {
+                lkp = Optional.of(player.position());
             }
 
         } else {
@@ -109,8 +152,10 @@ public class StealthUtils {
             }
         }
 
+        newProgressMap.put(uuid, newLevel);
+
         // TODO 实现警戒条和警戒状态的解耦
-        // 对于每个玩家
+        // 对于怪物全局状态
         if (newPState >= AlertData.AWARE) {
             // 如果这个玩家让条满了，且怪物还没有进入战斗
             if (newLevel >= 100.0F && newState < AlertData.FIGHTING) {
@@ -126,16 +171,21 @@ public class StealthUtils {
             }
         }
 
-        // 敌人警戒状态和玩家观测状态的回落
+        // 敌人警戒状态的回落
+
+        float globalMaxLevel = 0.0F;
+        for (Map.Entry<UUID, Float> entry : newProgressMap.entrySet()) {
+            globalMaxLevel = Math.max(globalMaxLevel, entry.getValue());
+        }
+
         boolean canStartReset = false; // 开始重置LKP记忆吗？
         // 如果敌人看不到玩家
         if (!canSee) {
-            if (newLevel <= 0.0F && newState > AlertData.IDLE) {
+            // 全局回落
+            if (globalMaxLevel <= 0.0F && newState > AlertData.IDLE) {
                 if (newState == AlertData.SEARCHING || newState == AlertData.FIGHTING) {
-                    // 如果是搜寻或战斗状态，必须满足：走到了LKP附近或者敌人耐心值耗尽
                     canStartReset = (lkp.isPresent() && mob.distanceToSqr(lkp.get()) < 4.0) || --newPatienceTicks <= 1;
                 } else {
-                    // 怀疑状态：只有条空且没看到人，
                     canStartReset = true;
                 }
             }
@@ -149,14 +199,15 @@ public class StealthUtils {
                 if (newStateTicks <= 1) {
                     newState = AlertData.IDLE; // 计时结束，状态重置
                     lkp = Optional.empty(); // 清除LKP
+                    newPrimary = Optional.empty(); // 清除主目标
                     newStateTicks = 0;
-                    newPState = AlertData.UNTRACKED;
+                    newPState = AlertData.UNTRACKED; // 强制默认化玩家的观测状态
                     newPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt(); // 重置耐心值
                 }
             }
         }
 
-        newProgressMap.put(uuid, newLevel);
+
         newStatesMap.put(uuid, newPState);
         newReactionsMap.put(uuid, newReaction);
 
@@ -166,6 +217,7 @@ public class StealthUtils {
                 newStatesMap,
                 newReactionsMap,
                 lkp,
+                newPrimary,
                 newStateTicks,
                 Math.max(0, newPatienceTicks)
         ));

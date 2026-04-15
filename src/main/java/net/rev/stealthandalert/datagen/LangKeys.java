@@ -30,10 +30,11 @@ public class LangKeys {
     public static final String DEBUG_ALERT_STATE_SUSPICIOUS = "debug." + MOD_ID + "alert_state_suspicious";
     public static final String DEBUG_ALERT_STATE_SEARCHING = "debug." + MOD_ID + "alert_state_searching";
     public static final String DEBUG_ALERT_STATE_FIGHTING = "debug." + MOD_ID + "alert_state_fighting";
-    public static final String DEBUG_UNKNOWN = "debug." + MOD_ID + "alert_unknown";
     public static final String DEBUG_TARGET_ALERT_STATE_UNTRACKED = "debug." + MOD_ID + "target_alert_state_untracked";
     public static final String DEBUG_TARGET_ALERT_STATE_AWARE = "debug." + MOD_ID + "target_alert_state_aware";
     public static final String DEBUG_TARGET_ALERT_STATE_TRACKING = "debug." + MOD_ID + "target_alert_state_tracking";
+    public static final String DEBUG_PRIMARY_TARGET_NULL = "debug." + MOD_ID + "primary_target_null";
+    public static final String DEBUG_UNKNOWN = "debug." + MOD_ID + "alert_unknown";
     public static final String DEBUG_TARGET_ALERT_LEVEL = "debug." + MOD_ID + "target_alert_level";
     public static final String DEBUG_ALERT_STATE_TICKS = "debug." + MOD_ID + "alert_state_ticks";
     public static final String DEBUG_PATIENCE_TICKS = "debug." + MOD_ID + "debug_patience_ticks";
