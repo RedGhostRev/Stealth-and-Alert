@@ -8,20 +8,22 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.config.CommonConfigs;
+import net.rev.stealthandalert.network.S2CAlertDataPacket;
 import net.rev.stealthandalert.util.ModTags;
 import net.rev.stealthandalert.util.StealthUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
 public class StealthEvents {
@@ -56,6 +58,58 @@ public class StealthEvents {
     }
 
     @SubscribeEvent
+    public static void onMobHurt(LivingIncomingDamageEvent event) {
+        if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide()) return;
+        if (!mob.getType().is(ModTags.Entities.SEEKERS)) return;
+
+        if (event.getSource().getEntity() instanceof Player player) {
+            if (player.isCreative() || player.isSpectator()) return;
+
+            AlertData data = mob.getData(ModAttachments.ALERT_DATA);
+            UUID uuid = player.getUUID();
+
+            Map<UUID, Float> progressMap = new HashMap<>(data.targetProgress());
+            Map<UUID, Integer> statesMap = new HashMap<>(data.targetStates());
+            Map<UUID, Integer> reactionsMap = new HashMap<>(data.targetReactions());
+
+            LivingEntity currentTarget = mob.getTarget();
+            int currentPState = statesMap.getOrDefault(uuid, AlertData.UNTRACKED);
+
+            // 判定：是否在打别人
+            boolean isFightingOthers = (data.state() == AlertData.FIGHTING) && currentTarget != null && currentTarget != player;
+
+            // 只有当该玩家还没达到 TRACKING 状态时才更新数据
+            if (currentPState < AlertData.TRACKING) {
+                progressMap.put(uuid, 100.0F);
+                statesMap.put(uuid, AlertData.TRACKING);
+                reactionsMap.put(uuid, 0);
+
+                // 根据是否正在打别人，决定全局状态
+                int nextState = isFightingOthers ? data.state() : AlertData.SEARCHING;
+                Optional<Vec3> nextLKP = isFightingOthers ? data.lastSeenPos() : Optional.of(player.position());
+                Optional<UUID> nextPrimary = isFightingOthers ? data.primaryTarget() : Optional.of(uuid);
+
+                // 写回
+                AlertData newData = new AlertData(
+                        nextState,
+                        progressMap,
+                        statesMap,
+                        reactionsMap,
+                        nextLKP,
+                        nextPrimary,
+                        data.stateTicks(),
+                        data.patienceTicks()
+                );
+
+                mob.setData(ModAttachments.ALERT_DATA, newData);
+
+                // 确保客户端UI响应
+                PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
+            }
+        }
+    }
+
+    @SubscribeEvent
     // FIXME 可能有潜在的性能问题
     public static void onEntityTick(EntityTickEvent.Post event) {
         // 快速失败
@@ -65,14 +119,24 @@ public class StealthEvents {
 
         // TODO 扩展目标实体为整个SEEKERS标签内的实体
         double range = CommonConfigs.MAX_DETECTION_RANGE.get();
+
+        // 处理记忆
+        Set<UUID> trackedPlayers = new HashSet<>(mob.getData(ModAttachments.ALERT_DATA).targetStates().keySet());
         // 玩家能被处理，当且仅当且玩家位于以生物最大视距为半径的球体内
         List<Player> players = mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(range), player -> mob.distanceToSqr(player) <= range * range);
         for (Player player : players) {
-            boolean canSee = player != null && !player.isCreative() && !player.isSpectator() && StealthUtils.hasLineOfSight(mob, player);
-            // 处理警戒AI
-            if (player != null) StealthUtils.tickPerception(mob, player, canSee);
+            trackedPlayers.add(player.getUUID());
         }
 
+        for (UUID uuid : trackedPlayers) {
+            Player player = mob.level().getPlayerByUUID(uuid);
+            if (player == null) continue;
+
+            boolean canSee = players.contains(player) && !player.isCreative() && !player.isSpectator() && StealthUtils.hasLineOfSight(mob, player);
+            StealthUtils.tickPerception(mob, player, canSee);
+        }
+
+        // 主要目标
         AlertData data = mob.getData(ModAttachments.ALERT_DATA);
         UUID primaryUUID = data.primaryTarget().orElseGet(() -> null);
 

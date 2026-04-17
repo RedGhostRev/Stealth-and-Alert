@@ -85,7 +85,7 @@ public class StealthUtils {
 
             if (newPState == AlertData.AWARE) {
                 // 涨条期
-                newLevel = Math.min(100.0F, currentLevel + 1.0F);
+                newLevel = Math.min(100.0F, currentLevel + 1.2F);
                 if (newLevel >= 100.0F) {
                     newPState = AlertData.TRACKING;
                 }
@@ -209,9 +209,15 @@ public class StealthUtils {
             }
         }
 
-
-        newStatesMap.put(uuid, newPState);
-        newReactionsMap.put(uuid, newReaction);
+        // 如果满足以下条件，就清空生物对单个玩家的总体记忆
+        if (newLevel <= 0.0F && newState <= AlertData.UNTRACKED && newReaction >= CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()) {
+            newProgressMap.remove(uuid);
+            newStatesMap.remove(uuid);
+            newReactionsMap.remove(uuid);
+        } else {
+            newStatesMap.put(uuid, newPState);
+            newReactionsMap.put(uuid, newReaction);
+        }
 
         data = new AlertData(
                 newState,
