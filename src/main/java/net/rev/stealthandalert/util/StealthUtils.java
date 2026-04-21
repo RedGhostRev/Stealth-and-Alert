@@ -12,10 +12,7 @@ import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class StealthUtils {
     private StealthUtils() {
@@ -41,6 +38,130 @@ public class StealthUtils {
         return canSeeAnyPart(observer, target, eyePos);
     }
 
+    // 新感知系统
+    public static void processStealthTick(Mob mob) {
+
+        // A: 获取原始数据快照
+        AlertData oldData = mob.getData(ModAttachments.ALERT_DATA);
+
+        // B: 门卫检查
+        if (mob.level().players().isEmpty() && oldData.targetReactions().isEmpty()) return;
+
+        // 继承记忆名单
+        Set<UUID> trackedPlayers = new HashSet<>(oldData.targetReactions().keySet());
+
+        // 扫描周围物理范围内的玩家，加入处理名单
+        double range = CommonConfigs.MAX_DETECTION_RANGE.get();
+        List<Player> nearbyPlayers = mob.level().getEntitiesOfClass(Player.class,
+                mob.getBoundingBox().inflate(range),
+                p -> mob.distanceToSqr(p) <= range * range);
+
+        for (Player p : nearbyPlayers) {
+            trackedPlayers.add(p.getUUID());
+        }
+
+        // C: 一：个体并行计算
+        // 临时结果容器
+        Map<UUID, StealthEngine.IndividualResult> resultsMap = new HashMap<>();
+        boolean anyoneVisible = false;
+
+        for (UUID uuid : trackedPlayers) {
+            Player player = mob.level().getPlayerByUUID(uuid);
+            if (player == null) continue;
+
+            boolean canSee = shouldArouseAlert(mob, player);
+            if (canSee) anyoneVisible = true;
+
+            StealthEngine.IndividualResult res = StealthEngine.updateIndividual(
+                    oldData.targetProgress().getOrDefault(uuid, 0.0F),
+                    oldData.targetReactions().getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()),
+                    oldData.targetStates().getOrDefault(uuid, AlertData.UNTRACKED),
+                    canSee
+            );
+            resultsMap.put(uuid, res);
+        }
+
+        // D: 二：全局协调计算
+        StealthEngine.GlobalResult gRes = StealthEngine.updateGlobalContext(
+                mob,
+                oldData,
+                resultsMap,
+                anyoneVisible
+        );
+
+        // E: 打包
+        AlertData newData = assembleData(resultsMap, gRes);
+
+        // F: 写回并同步
+        mob.setData(ModAttachments.ALERT_DATA, newData);
+        if (!mob.level().isClientSide()) {
+            PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
+        }
+
+        // 处理敌人针对主目标的行为
+        UUID primaryUuid = newData.primaryTarget().orElseGet(() -> null);
+        if (primaryUuid != null) {
+            Player primaryPlayer = mob.level().getPlayerByUUID(primaryUuid);
+            if (primaryPlayer != null) {
+                boolean canSeePrimary = shouldArouseAlert(mob, primaryPlayer);
+                StealthActionHandler.execute(mob, newData, canSeePrimary);
+            }
+        }
+    }
+
+    // “引起警戒”的检查
+    public static boolean shouldArouseAlert(Mob mob, Player player) {
+        // 1.基础物理状态检查
+        if (player == null || !player.isAlive() || mob == null || !mob.isAlive()) {
+            return false;
+        }
+
+        // 2.模式检查
+        if (player.isCreative() || player.isSpectator()) {
+            return false;
+        }
+
+        // 3.视线检查
+        if (!StealthUtils.hasLineOfSight(mob, player)) {
+            return false;
+        }
+
+        // TODO 意图检查
+
+        return true;
+    }
+
+    // 打包数据
+    private static AlertData assembleData(Map<UUID, StealthEngine.IndividualResult> res, StealthEngine.GlobalResult gRes) {
+        Map<UUID, Float> progress = new HashMap<>();
+        Map<UUID, Integer> states = new HashMap<>();
+        Map<UUID, Integer> reactions = new HashMap<>();
+
+        // lres意思为Lambda表达式中的参数，代表每个玩家的个体结果
+        res.forEach((uuid, lres) -> {
+            boolean isDeadData = lres.level() <= 0.0F &&
+                    lres.pState() == AlertData.UNTRACKED &&
+                    lres.reaction() >= CommonConfigs.DETECTION_REACTION_TICKS.getAsInt();
+            if (!isDeadData) {
+                progress.put(uuid, lres.level());
+                states.put(uuid, lres.pState());
+                reactions.put(uuid, lres.reaction());
+            }
+        });
+
+        return new AlertData(
+                gRes.state(),
+                progress,
+                states,
+                reactions,
+                gRes.lkp(),
+                gRes.primaryTarget(),
+                gRes.stateTicks(),
+                gRes.patienceTicks()
+        );
+    }
+
+/*
     // 感知系统
     // TODO 更标准、完善的状态机；将player对应参数的生物类型推广
     public static void tickPerception(Mob mob, Player player, boolean canSee) {
@@ -236,6 +357,7 @@ public class StealthUtils {
             PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), data));
         }
     }
+*/
 
     // 三点检查
     private static boolean canSeeAnyPart(Mob observer, Entity target, Vec3 start) {

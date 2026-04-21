@@ -1,12 +1,7 @@
 package net.rev.stealthandalert.event;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,12 +13,14 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
-import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
 import net.rev.stealthandalert.util.ModTags;
 import net.rev.stealthandalert.util.StealthUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
 public class StealthEvents {
@@ -110,6 +107,15 @@ public class StealthEvents {
     }
 
     @SubscribeEvent
+    public static void onEntityTick(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof Mob mob)) return;
+        if (mob.level().isClientSide()) return;
+        if (!(mob.getType().is(ModTags.Entities.SEEKERS))) return;
+
+        StealthUtils.processStealthTick(mob);
+    }
+
+/*    @SubscribeEvent
     // FIXME 可能有潜在的性能问题
     public static void onEntityTick(EntityTickEvent.Post event) {
         // 快速失败
@@ -219,6 +225,6 @@ public class StealthEvents {
                 }
             });
         }
-    }
+    }*/
 }
 

@@ -8,7 +8,6 @@ import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.item.custom.DaggerItem;
 
 import java.util.List;
-import java.util.Set;
 
 public class ModItems {
 

@@ -1,18 +1,13 @@
 package net.rev.stealthandalert.event;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.rev.stealthandalert.StealthAndAlert;
-import net.rev.stealthandalert.attachment.AlertData;
-import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.util.ModTags;
 
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
