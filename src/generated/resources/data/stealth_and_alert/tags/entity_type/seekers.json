@@ -4,6 +4,7 @@
     "minecraft:skeleton_horse"
   ],
   "values": [
+    "#stealth_and_alert:conditional_seekers",
     "#minecraft:zombies",
     "#minecraft:skeletons",
     "#minecraft:illager",
@@ -11,10 +12,7 @@
     "minecraft:slime",
     "minecraft:witch",
     "minecraft:silverfish",
-    "minecraft:piglin",
     "minecraft:piglin_brute",
-    "minecraft:hoglin",
-    "minecraft:spider",
-    "minecraft:cave_spider"
+    "minecraft:hoglin"
   ]
 }

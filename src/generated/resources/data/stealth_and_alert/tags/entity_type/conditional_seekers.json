@@ -1,0 +1,14 @@
+{
+  "values": [
+    "minecraft:spider",
+    "minecraft:cave_spider",
+    "minecraft:piglin",
+    "minecraft:enderman",
+    "minecraft:zombified_piglin",
+    "minecraft:dolphin",
+    "minecraft:wolf",
+    "minecraft:polar_bear",
+    "minecraft:panda",
+    "minecraft:iron_golem"
+  ]
+}

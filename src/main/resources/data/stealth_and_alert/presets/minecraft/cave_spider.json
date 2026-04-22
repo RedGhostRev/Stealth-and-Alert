@@ -1,0 +1,10 @@
+{
+  "logic_list": [
+    "stealth_and_alert:provocation",
+    "stealth_and_alert:light_sensitive"
+  ],
+  "params": {
+    "stealth_and_alert:light_sensitive.threshold": "11",
+    "stealth_and_alert:light_sensitive.invert": "false"
+  }
+}

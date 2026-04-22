@@ -103,7 +103,7 @@ public class ModClientEvents {
         }
         int stateTicks = data.stateTicks();
         int patienceTicks = data.patienceTicks();
-
+        int myMemory = data.lastDamageTicks().getOrDefault(myUUID, 0);
         float myLevel = data.targetProgress().getOrDefault(myUUID, 0.0F);
         int myPState = data.targetStates().getOrDefault(myUUID, AlertData.UNTRACKED);
         Component pStateText = switch (myPState) {
@@ -117,6 +117,8 @@ public class ModClientEvents {
                 .append(pStateText)
                 .append(" ")
                 .append(primaryName)
+                .append(" ")
+                .append(Component.translatable(LangKeys.DEBUG_HATRED_MEMORY, myMemory))
                 .append(" ")
                 .append(Component.translatable(LangKeys.DEBUG_TARGET_ALERT_LEVEL, myLevel))
                 .append(" ")

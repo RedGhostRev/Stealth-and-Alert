@@ -1,8 +1,11 @@
 package net.rev.stealthandalert.util;
 
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -10,6 +13,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.config.CommonConfigs;
+import net.rev.stealthandalert.config.EntityAlertConfigLoader;
+import net.rev.stealthandalert.config.EntityAlertSettings;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
 
 import java.util.*;
@@ -21,9 +26,16 @@ public class StealthUtils {
     // 视线检测：如果mob能看到target，则返回true
     public static boolean hasLineOfSight(Mob observer, Entity target) {
         // 距离快速失败
+        EntityAlertSettings settings = EntityAlertConfigLoader.get(observer.getType());
         double distanceSqr = observer.distanceToSqr(target);
-        double maxDistance = CommonConfigs.MAX_DETECTION_RANGE.get();
+        double maxDistance = settings.viewRange();
         if (distanceSqr > maxDistance * maxDistance) return false;
+        // 隐身快速失败
+        if (target instanceof Player player) {
+            if (player.isInvisible() && isFullyNaked(player)) {
+                return false;
+            }
+        }
 
         // 获取观察方向与目标向量
         Vec3 eyePos = observer.getEyePosition();
@@ -32,14 +44,22 @@ public class StealthUtils {
         Vec3 targetDir = targetVec.normalize();
 
         // 水平与垂直FOV判定
-        if (!isWithinFOV(lookVec, targetDir)) return false;
+        if (!isWithinFOV(observer, lookVec, targetDir)) return false;
 
         // 多点物理遮挡检查
         return canSeeAnyPart(observer, target, eyePos);
     }
 
+    private static boolean isFullyNaked(Player player) {
+        for (ItemStack armor : player.getArmorSlots()) {
+            if (!armor.isEmpty()) return false;
+        }
+        return true;
+    }
+
     // 新感知系统
     public static void processStealthTick(Mob mob) {
+        if (mob.level().isClientSide()) return;
 
         // A: 获取原始数据快照
         AlertData oldData = mob.getData(ModAttachments.ALERT_DATA);
@@ -47,11 +67,14 @@ public class StealthUtils {
         // B: 门卫检查
         if (mob.level().players().isEmpty() && oldData.targetReactions().isEmpty()) return;
 
+        EntityAlertSettings settings = EntityAlertConfigLoader.get(mob.getType());
+        if (settings.ignoreBaby() && mob.isBaby()) return;
+
         // 继承记忆名单
         Set<UUID> trackedPlayers = new HashSet<>(oldData.targetReactions().keySet());
 
         // 扫描周围物理范围内的玩家，加入处理名单
-        double range = CommonConfigs.MAX_DETECTION_RANGE.get();
+        double range = settings.viewRange();
         List<Player> nearbyPlayers = mob.level().getEntitiesOfClass(Player.class,
                 mob.getBoundingBox().inflate(range),
                 p -> mob.distanceToSqr(p) <= range * range);
@@ -76,6 +99,7 @@ public class StealthUtils {
                     oldData.targetProgress().getOrDefault(uuid, 0.0F),
                     oldData.targetReactions().getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()),
                     oldData.targetStates().getOrDefault(uuid, AlertData.UNTRACKED),
+                    oldData.lastDamageTicks().getOrDefault(uuid, 0),
                     canSee
             );
             resultsMap.put(uuid, res);
@@ -94,9 +118,7 @@ public class StealthUtils {
 
         // F: 写回并同步
         mob.setData(ModAttachments.ALERT_DATA, newData);
-        if (!mob.level().isClientSide()) {
-            PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
-        }
+        PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
 
         // 处理敌人针对主目标的行为
         UUID primaryUuid = newData.primaryTarget().orElseGet(() -> null);
@@ -104,13 +126,17 @@ public class StealthUtils {
             Player primaryPlayer = mob.level().getPlayerByUUID(primaryUuid);
             if (primaryPlayer != null) {
                 boolean canSeePrimary = shouldArouseAlert(mob, primaryPlayer);
-                StealthActionHandler.execute(mob, newData, canSeePrimary);
+                AlertActionHandler.execute(mob, newData, canSeePrimary);
             }
         }
     }
 
     // “引起警戒”的检查
     public static boolean shouldArouseAlert(Mob mob, Player player) {
+        // 难度检查
+        if (mob.level().getDifficulty() == Difficulty.PEACEFUL) {
+            return false;
+        }
         // 1.基础物理状态检查
         if (player == null || !player.isAlive() || mob == null || !mob.isAlive()) {
             return false;
@@ -121,14 +147,33 @@ public class StealthUtils {
             return false;
         }
 
-        // 3.视线检查
+        // 3.属性检查
+        if (AlertLogicHandler.isPlayerPet(mob, player)) {
+            return false;
+        }
+        if (mob instanceof Panda panda) {
+            if (!panda.isAggressive()) return false;
+        }
+
+        // 4.视线检查
         if (!StealthUtils.hasLineOfSight(mob, player)) {
             return false;
         }
 
-        // TODO 意图检查
+        // 分流
+        if (!mob.getType().is(ModTags.Entities.CONDITIONAL_SEEKERS)) return true;
 
-        return true;
+        // 5.意图检查
+        EntityAlertSettings settings = EntityAlertConfigLoader.get(mob.getType());
+        if (settings.logicList().isEmpty()) return true;
+
+        for (String logic : settings.logicList()) {
+            if (AlertLogicHandler.checkLogic(logic, mob, player, settings)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // 打包数据
@@ -136,16 +181,19 @@ public class StealthUtils {
         Map<UUID, Float> progress = new HashMap<>();
         Map<UUID, Integer> states = new HashMap<>();
         Map<UUID, Integer> reactions = new HashMap<>();
+        Map<UUID, Integer> lastDamageTicks = new HashMap<>();
 
         // lres意思为Lambda表达式中的参数，代表每个玩家的个体结果
         res.forEach((uuid, lres) -> {
             boolean isDeadData = lres.level() <= 0.0F &&
                     lres.pState() == AlertData.UNTRACKED &&
-                    lres.reaction() >= CommonConfigs.DETECTION_REACTION_TICKS.getAsInt();
+                    lres.reaction() >= CommonConfigs.DETECTION_REACTION_TICKS.getAsInt() &&
+                    lres.memory() <= 0;
             if (!isDeadData) {
                 progress.put(uuid, lres.level());
                 states.put(uuid, lres.pState());
                 reactions.put(uuid, lres.reaction());
+                lastDamageTicks.put(uuid, lres.memory());
             }
         });
 
@@ -154,210 +202,13 @@ public class StealthUtils {
                 progress,
                 states,
                 reactions,
+                lastDamageTicks,
                 gRes.lkp(),
                 gRes.primaryTarget(),
                 gRes.stateTicks(),
                 gRes.patienceTicks()
         );
     }
-
-/*
-    // 感知系统
-    // TODO 更标准、完善的状态机；将player对应参数的生物类型推广
-    public static void tickPerception(Mob mob, Player player, boolean canSee) {
-        if (player == null) return;
-        AlertData data = mob.getData(ModAttachments.ALERT_DATA);
-        UUID uuid = player.getUUID();
-
-        // 敌人对单独玩家的状态
-        Map<UUID, Float> newProgressMap = new HashMap<>(data.targetProgress());
-        Map<UUID, Integer> newStatesMap = new HashMap<>(data.targetStates());
-        Map<UUID, Integer> newReactionsMap = new HashMap<>(data.targetReactions());
-        float currentLevel = newProgressMap.getOrDefault(uuid, 0.0F);
-        int currentPState = newStatesMap.getOrDefault(uuid, AlertData.UNTRACKED);
-        int currentReaction = newReactionsMap.getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt());
-        float newLevel = currentLevel;
-        int newPState = currentPState;
-        int newReaction = currentReaction;
-
-        // 敌人的全局状态
-        int newState = data.state();
-        int newStateTicks = data.stateTicks(); // 状态切换计时器
-        int newPatienceTicks = data.patienceTicks(); // 耐心值计时器
-        Optional<Vec3> lkp = data.lastSeenPos(); // LKP（最后已知位置）
-        Optional<UUID> newPrimary = data.primaryTarget(); // 主目标
-
-        if (canSee) {
-            // 如果看到了玩家
-            newStateTicks = 0; // 重置计时器为0
-            newPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt(); // 重置耐心值
-            boolean shouldUpdateLKP = false; // 要不要更新LKP？
-
-            // 对于每个单独的玩家来说
-            if (currentPState == AlertData.UNTRACKED) {
-                // 反应期
-                if (currentReaction > 0) {
-                    newReaction--;
-                    newLevel = 0.0F;
-                } else {
-                    newPState = AlertData.AWARE;
-                }
-            }
-
-            if (newPState == AlertData.AWARE) {
-                // 涨条期
-                newLevel = Math.min(100.0F, currentLevel + 1.2F);
-                if (newLevel >= 100.0F) {
-                    newPState = AlertData.TRACKING;
-                }
-            }
-
-            if (newPState == AlertData.TRACKING) {
-                // 追踪期
-                newLevel = 100.0F;
-                newState = AlertData.FIGHTING;
-            }
-
-            // 当玩家被察觉后，开始处理LKP竞争更新问题
-            if (newPState >= AlertData.AWARE) {
-                if (lkp.isEmpty()) {
-                    shouldUpdateLKP = true; // 如果LKP为空，可以更新
-                } else {
-                    float globalMaxLevel = newLevel;
-                    for (Float level : newProgressMap.values()) {
-                        if (level > globalMaxLevel) globalMaxLevel = level;
-                    }
-
-                    // 如果我的警觉值达到了全场最高
-                    if (newLevel >= globalMaxLevel) {
-                        // 找出所有处于最高警觉值的玩家中最近的
-                        double minNearbyDistSq = mob.distanceToSqr(player);
-                        boolean anotherCloser = false;
-
-                        for (Map.Entry<UUID, Float> entry : newProgressMap.entrySet()) {
-                            UUID otherId = entry.getKey();
-                            // 如果有人警觉值跟我一样
-                            if (!otherId.equals(uuid) && entry.getValue() >= globalMaxLevel) {
-                                Player otherPlayer = mob.level().getPlayerByUUID(otherId);
-                                if (otherPlayer != null) {
-                                    double otherDistSq = mob.distanceToSqr(otherPlayer);
-                                    if (otherDistSq < minNearbyDistSq) {
-                                        anotherCloser = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        // 如果没人比我更近，那么我获得LKP更新权，而且我成为了主目标
-                        if (!anotherCloser) {
-                            shouldUpdateLKP = true;
-                            newPrimary = Optional.of(uuid);
-                        }
-                    }
-                }
-            }
-            if (shouldUpdateLKP) {
-                lkp = Optional.of(player.position());
-            }
-
-        } else {
-            // 如果看不到玩家
-            newLevel = Math.max(0.0F, currentLevel - 0.5F);
-
-            if (currentPState == AlertData.TRACKING) {
-                newPState = AlertData.AWARE;
-            }
-
-            if (newLevel <= 0.0F) {
-                newPState = AlertData.UNTRACKED;
-                newReaction = CommonConfigs.DETECTION_REACTION_TICKS.getAsInt();
-            }
-        }
-
-        newProgressMap.put(uuid, newLevel);
-
-        // TODO 实现警戒条和警戒状态的解耦
-        // 对于怪物全局状态
-        if (newPState >= AlertData.AWARE) {
-            // 如果这个玩家让条满了，且怪物还没有进入战斗
-            if (newLevel >= 100.0F && newState < AlertData.FIGHTING) {
-                newState = AlertData.FIGHTING;
-            }
-            // 如果这个玩家条过半了，且怪物小于搜寻状态
-            else if (newLevel >= 50.0F && newState < AlertData.SEARCHING) {
-                newState = AlertData.SEARCHING;
-            }
-            // 如果这个玩家刚起条，且怪物还在闲逛
-            else if (newLevel > 0.0F && newState < AlertData.SUSPICIOUS) {
-                newState = AlertData.SUSPICIOUS;
-            }
-        }
-
-        // 敌人警戒状态的回落
-
-        float globalMaxLevel = 0.0F;
-        for (Map.Entry<UUID, Float> entry : newProgressMap.entrySet()) {
-            globalMaxLevel = Math.max(globalMaxLevel, entry.getValue());
-        }
-
-        boolean canStartReset = false; // 开始重置LKP记忆吗？
-        // 如果敌人看不到玩家
-        if (!canSee) {
-            // 全局回落
-            if (globalMaxLevel <= 0.0F && newState > AlertData.IDLE) {
-                if (newState == AlertData.SEARCHING || newState == AlertData.FIGHTING) {
-                    canStartReset = (lkp.isPresent() && mob.distanceToSqr(lkp.get()) < 4.0) || --newPatienceTicks <= 1;
-                } else {
-                    canStartReset = true;
-                }
-            }
-        }
-
-        if (canStartReset) {
-            if (newStateTicks <= 0) {
-                newStateTicks = 40; // 开始计时
-            } else {
-                newStateTicks--;
-                if (newStateTicks <= 1) {
-                    newState = AlertData.IDLE; // 计时结束，状态重置
-                    lkp = Optional.empty(); // 清除LKP
-                    newPrimary = Optional.empty(); // 清除主目标
-                    newStateTicks = 0;
-                    newPState = AlertData.UNTRACKED; // 强制默认化玩家的观测状态
-                    newPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt(); // 重置耐心值
-                }
-            }
-        }
-
-        // 如果满足以下条件，就清空生物对单个玩家的总体记忆
-        if (newLevel <= 0.0F && newState <= AlertData.UNTRACKED && newReaction >= CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()) {
-            newProgressMap.remove(uuid);
-            newStatesMap.remove(uuid);
-            newReactionsMap.remove(uuid);
-        } else {
-            newStatesMap.put(uuid, newPState);
-            newReactionsMap.put(uuid, newReaction);
-        }
-
-        data = new AlertData(
-                newState,
-                newProgressMap,
-                newStatesMap,
-                newReactionsMap,
-                lkp,
-                newPrimary,
-                newStateTicks,
-                Math.max(0, newPatienceTicks)
-        );
-
-        mob.setData(ModAttachments.ALERT_DATA, data);
-
-        if (!mob.level().isClientSide()) {
-            PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), data));
-        }
-    }
-*/
 
     // 三点检查
     private static boolean canSeeAnyPart(Mob observer, Entity target, Vec3 start) {
@@ -388,16 +239,17 @@ public class StealthUtils {
     }
 
     // FOV判定
-    private static boolean isWithinFOV(Vec3 lookVec, Vec3 targetDir) {
+    private static boolean isWithinFOV(Mob observer, Vec3 lookVec, Vec3 targetDir) {
         boolean isVerticalLooking = Math.abs(lookVec.x) < 0.0001 && Math.abs(lookVec.z) < 0.0001;
 
+        EntityAlertSettings settings = EntityAlertConfigLoader.get(observer.getType());
         // 水平角度判定
         if (!isVerticalLooking) {
             Vec3 lookHorizontal = new Vec3(lookVec.x, 0, lookVec.z).normalize();
             Vec3 targetHorizontal = new Vec3(targetDir.x, 0, targetDir.z).normalize();
 
             double horizontalDot = lookHorizontal.dot(targetHorizontal);
-            double horizontalThreshold = Math.cos(Math.toRadians(CommonConfigs.DETECTION_HORIZONTAL_FOV.get() / 2.0));
+            double horizontalThreshold = Math.cos(Math.toRadians(settings.horizontalFov() / 2.0));
 
             if (horizontalDot < horizontalThreshold) return false;
         }
@@ -405,8 +257,8 @@ public class StealthUtils {
         // 垂直角度判定
         double pitchToTargetDegrees = Math.toDegrees(Math.asin(targetDir.y));
 
-        double maxUpPitch = CommonConfigs.DETECTION_VERTICAL_UP_FOV.get();
-        double maxDownPitch = -CommonConfigs.DETECTION_VERTICAL_DOWN_FOV.get();
+        double maxUpPitch = settings.maxUpPitch();
+        double maxDownPitch = -settings.maxDownPitch();
 
         return pitchToTargetDegrees >= maxDownPitch && pitchToTargetDegrees <= maxUpPitch;
     }

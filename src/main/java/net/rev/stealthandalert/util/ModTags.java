@@ -31,6 +31,7 @@ public class ModTags {
 
     public static class Entities {
         public static final TagKey<EntityType<?>> SEEKERS = createTag("seekers");
+        public static final TagKey<EntityType<?>> CONDITIONAL_SEEKERS = createTag("conditional_seekers");
         public static final TagKey<EntityType<?>> DETECTABLE = createTag("detectable");
     }
 

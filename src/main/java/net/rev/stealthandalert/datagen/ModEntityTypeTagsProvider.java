@@ -20,6 +20,7 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         tag(ModTags.Entities.SEEKERS)
+                .addTag(ModTags.Entities.CONDITIONAL_SEEKERS)
                 .addTag(EntityTypeTags.ZOMBIES)
                 .remove(EntityType.ZOMBIE_HORSE)
                 .addTag(EntityTypeTags.SKELETONS)
@@ -29,11 +30,20 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
                 .add(EntityType.SLIME)
                 .add(EntityType.WITCH)
                 .add(EntityType.SILVERFISH)
-                .add(EntityType.PIGLIN)
                 .add(EntityType.PIGLIN_BRUTE)
-                .add(EntityType.HOGLIN)
+                .add(EntityType.HOGLIN);
+        // 带有条件的生物，触发特定条件后，才会执行警戒
+        tag(ModTags.Entities.CONDITIONAL_SEEKERS)
                 .add(EntityType.SPIDER)
-                .add(EntityType.CAVE_SPIDER);
+                .add(EntityType.CAVE_SPIDER)
+                .add(EntityType.PIGLIN)
+                .add(EntityType.ENDERMAN)
+                .add(EntityType.ZOMBIFIED_PIGLIN)
+                .add(EntityType.DOLPHIN)
+                .add(EntityType.WOLF)
+                .add(EntityType.POLAR_BEAR)
+                .add(EntityType.PANDA)
+                .add(EntityType.IRON_GOLEM);
 
         tag(ModTags.Entities.DETECTABLE)
                 .add(EntityType.PLAYER);

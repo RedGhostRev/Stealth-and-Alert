@@ -1,0 +1,16 @@
+{
+  "ignore_baby": true,
+  "logic_list": [
+    "stealth_and_alert:provocation",
+    "stealth_and_alert:social_revenge",
+    "stealth_and_alert:item_wearing",
+    "stealth_and_alert:action_on_container"
+  ],
+  "params": {
+    "stealth_and_alert:social_revenge.horizontal_range": "16.0",
+    "stealth_and_alert:social_revenge.vertical_range": "10.0",
+    "stealth_and_alert:social_revenge.relatables": "minecraft:piglin_brute",
+    "stealth_and_alert:item_wearing.forbidden_tag": "minecraft:piglin_loved",
+    "stealth_and_alert:action_on_container.range": "32.0"
+  }
+}

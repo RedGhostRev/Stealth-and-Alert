@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class StealthEngine {
-    public record IndividualResult(float level, int reaction, int pState) {
+    public record IndividualResult(float level, int reaction, int pState, int memory) {
     }
 
     public record GlobalResult(
@@ -27,17 +27,20 @@ public class StealthEngine {
             float currentLevel,
             int currentReaction,
             int currentPState,
+            int currentMemory,
             boolean canSee
     ) {
         float nextLevel = currentLevel;
         int nextReaction = currentReaction;
         int nextPState = currentPState;
+        int nextMemory = currentMemory;
 
         if (canSee) { // 看见了
             // 反应期：从UNTRACKED向AWARE迁徙
             if (currentPState == AlertData.UNTRACKED) {
                 if (currentReaction > 0) {
                     nextReaction--;
+                    nextMemory = Math.max(0, --currentMemory); // 反应期，记忆也应衰减
                 } else {
                     nextPState = AlertData.AWARE;
                 }
@@ -55,10 +58,12 @@ public class StealthEngine {
             // 锁定期
             if (nextPState == AlertData.TRACKING) {
                 nextLevel = 100.0F;
+                nextMemory = 1200;
             }
         } else { // 没看见
             // 回落
             nextLevel = Math.max(0.0F, currentLevel - 0.5F);
+            nextMemory = Math.max(0, --currentMemory); // 只要看不见，记忆就开始衰减
 
             // 阶梯式回落判定
             if (nextLevel <= 0.0F) {
@@ -69,7 +74,7 @@ public class StealthEngine {
                 nextPState = AlertData.AWARE;
             }
         }
-        return new IndividualResult(nextLevel, nextReaction, nextPState);
+        return new IndividualResult(nextLevel, nextReaction, nextPState, nextMemory);
     }
 
     public static GlobalResult updateGlobalContext(

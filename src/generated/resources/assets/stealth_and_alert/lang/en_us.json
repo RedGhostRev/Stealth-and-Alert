@@ -9,6 +9,7 @@
   "debug.stealth_and_alertalert_state_ticks": "§eALERT_STATE_TICKS: %d",
   "debug.stealth_and_alertalert_unknown": "UNKNOWN",
   "debug.stealth_and_alertdebug_patience_ticks": "§dPATIENCE_TICKS: %d",
+  "debug.stealth_and_alerthatred_memory": "HATRED_MEMORY: %d",
   "debug.stealth_and_alertprimary_target_null": "NO_PRIMARY_TARGET",
   "debug.stealth_and_alerttarget_alert_level": "§bALERT_LEVEL: %.1f%%",
   "debug.stealth_and_alerttarget_alert_state_aware": "§fAWARE",

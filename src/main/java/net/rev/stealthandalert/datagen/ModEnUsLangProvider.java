@@ -41,6 +41,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.DEBUG_TARGET_ALERT_STATE_TRACKING, "§cTRACKING");
         add(LangKeys.DEBUG_PRIMARY_TARGET_NULL, "NO_PRIMARY_TARGET");
         add(LangKeys.DEBUG_UNKNOWN, "UNKNOWN");
+        add(LangKeys.DEBUG_HATRED_MEMORY, "HATRED_MEMORY: %d");
         add(LangKeys.DEBUG_TARGET_ALERT_LEVEL, "§bALERT_LEVEL: %.1f%%");
         add(LangKeys.DEBUG_ALERT_STATE_TICKS, "§eALERT_STATE_TICKS: %d");
         add(LangKeys.DEBUG_PATIENCE_TICKS, "§dPATIENCE_TICKS: %d");

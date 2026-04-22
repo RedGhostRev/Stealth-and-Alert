@@ -1,0 +1,10 @@
+{
+  "logic_list": [
+    "stealth_and_alert:provocation",
+    "stealth_and_alert:village_reputation"
+  ],
+  "params": {
+    "stealth_and_alert:village_reputation.threshold": "-15",
+    "stealth_and_alert:village_reputation.range": "16.0"
+  }
+}

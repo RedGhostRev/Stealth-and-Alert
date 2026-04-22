@@ -35,6 +35,7 @@ public class LangKeys {
     public static final String DEBUG_TARGET_ALERT_STATE_TRACKING = "debug." + MOD_ID + "target_alert_state_tracking";
     public static final String DEBUG_PRIMARY_TARGET_NULL = "debug." + MOD_ID + "primary_target_null";
     public static final String DEBUG_UNKNOWN = "debug." + MOD_ID + "alert_unknown";
+    public static final String DEBUG_HATRED_MEMORY = "debug." + MOD_ID + "hatred_memory";
     public static final String DEBUG_TARGET_ALERT_LEVEL = "debug." + MOD_ID + "target_alert_level";
     public static final String DEBUG_ALERT_STATE_TICKS = "debug." + MOD_ID + "alert_state_ticks";
     public static final String DEBUG_PATIENCE_TICKS = "debug." + MOD_ID + "debug_patience_ticks";

@@ -41,6 +41,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.DEBUG_TARGET_ALERT_STATE_TRACKING, "§c追踪");
         add(LangKeys.DEBUG_PRIMARY_TARGET_NULL, "无主要目标");
         add(LangKeys.DEBUG_UNKNOWN, "未知");
+        add(LangKeys.DEBUG_HATRED_MEMORY, "仇恨记忆：%d");
         add(LangKeys.DEBUG_TARGET_ALERT_LEVEL, "§b警觉度：%.1f%%");
         add(LangKeys.DEBUG_ALERT_STATE_TICKS, "§e状态切换计时：%d");
         add(LangKeys.DEBUG_PATIENCE_TICKS, "§d耐心值：%d");

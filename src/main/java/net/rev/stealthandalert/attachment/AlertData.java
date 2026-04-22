@@ -4,13 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 import net.rev.stealthandalert.config.CommonConfigs;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +18,7 @@ public record AlertData(
         Map<UUID, Float> targetProgress,
         Map<UUID, Integer> targetStates,
         Map<UUID, Integer> targetReactions,
+        Map<UUID, Integer> lastDamageTicks,
         Optional<Vec3> lastSeenPos,
         Optional<UUID> primaryTarget,
         int stateTicks,
@@ -42,6 +41,7 @@ public record AlertData(
                     Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.FLOAT).fieldOf("target_progress").forGetter(AlertData::targetProgress),
                     Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT).fieldOf("target_states").forGetter(AlertData::targetStates),
                     Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT).fieldOf("target_reactions").forGetter(AlertData::targetReactions),
+                    Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT).fieldOf("last_damage_ticks").forGetter(AlertData::lastDamageTicks),
                     Vec3.CODEC.optionalFieldOf("last_pos").forGetter(AlertData::lastSeenPos),
                     UUIDUtil.STRING_CODEC.optionalFieldOf("primary_target").forGetter(AlertData::primaryTarget),
                     Codec.INT.fieldOf("state_ticks").forGetter(AlertData::stateTicks),
@@ -71,6 +71,6 @@ public record AlertData(
 //            ByteBufCodecs.VAR_INT, AlertData::patienceTicks,
 //            AlertData::new);
 
-    public static final AlertData DEFAULT = new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+    public static final AlertData DEFAULT = new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
 }
 
