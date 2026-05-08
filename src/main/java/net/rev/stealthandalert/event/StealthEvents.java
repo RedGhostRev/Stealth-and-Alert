@@ -1,5 +1,7 @@
 package net.rev.stealthandalert.event;
 
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -31,6 +33,8 @@ import java.util.*;
 public class StealthEvents {
 
     // 拦截原版setTarget事件
+    // 当且仅当生物的待设定攻击目标有 DETECTABLE 标签时，才根据条件拦截
+    // 如果生物有主目标，且生物为 FIGHTING 状态，主目标为 TRACKING 状态，则拦截生物对其他任何生物的目标设定，强制将待设定目标设置为主目标
     @SubscribeEvent
     public static void onMobTarget(LivingChangeTargetEvent event) {
         LivingEntity target = event.getNewAboutToBeSetTarget();
@@ -40,9 +44,50 @@ public class StealthEvents {
         if (!(event.getEntity() instanceof Mob mob)) return;
         if (!(mob.getType().is(ModTags.Entities.SEEKERS))) return;
 
+        AlertData data = mob.getData(ModAttachments.ALERT_DATA);
+
+        // 若生物无主目标且待设目标也不是 DETECTABLE，则任由原版 AI 处理
+        if (data.primaryTarget().isEmpty()) {
+            if (!target.getType().is(ModTags.Entities.DETECTABLE)) {
+                return;
+            } else {
+                // 接下来，生物待设目标是 DETECTABLE
+                // 生物无主目标时，无论如何也不应锁定当前待设目标，直到主目标设立
+                event.setNewAboutToBeSetTarget(null);
+                return;
+            }
+        }
+
+        // 接下来，生物有主目标
+
+        // 如果待设目标与主目标不一致，
+        if (!target.getUUID().equals(data.primaryTarget().get())) {
+            // 此时，若生物处于FIGHTING状态且主目标处于TRACKING状态
+            // 那么，强制将主目标设置为待设目标
+            if ((data.state() == AlertData.FIGHTING && data.targetStates().getOrDefault(data.primaryTarget().get(), AlertData.UNTRACKED) == AlertData.TRACKING)) {
+                ServerLevel level = ((ServerLevel) mob.level());
+                Entity entity = level.getEntity(data.primaryTarget().get());
+                if (entity instanceof LivingEntity livingEntity) {
+                    event.setNewAboutToBeSetTarget(livingEntity);
+                    return;
+                }
+            } else {
+                if (!target.getType().is(ModTags.Entities.DETECTABLE)) {
+                    // 如若不然，如果待设目标不是 DETECTABLE，则归于原版
+                    return;
+                } else {
+                    // 如果待设目标是 DETECTABLE，由于待设目标不是主目标，无论如何也不应被锁定
+                    event.setNewAboutToBeSetTarget(null);
+                    return;
+                }
+            }
+        }
+
+        // 如果待设目标与主目标一致，此时待设目标必为 DETECTABLE
+        // 为可读性，保留 DETECTABLE 判断
         if (!target.getType().is(ModTags.Entities.DETECTABLE)) return;
 
-        AlertData data = mob.getData(ModAttachments.ALERT_DATA);
+        // 锁定要求：生物处于 FIGHTING 状态且主目标处于 TRACKING 状态
         if (data.state() < AlertData.FIGHTING) {
             event.setNewAboutToBeSetTarget(null);
             return;
@@ -50,12 +95,6 @@ public class StealthEvents {
 
         int pState = data.targetStates().getOrDefault(target.getUUID(), AlertData.UNTRACKED);
         if (pState < AlertData.TRACKING) {
-            event.setNewAboutToBeSetTarget(null);
-            return;
-        }
-
-        UUID primaryUUID = data.primaryTarget().orElse(null);
-        if (primaryUUID != null && !primaryUUID.equals(target.getUUID())) {
             event.setNewAboutToBeSetTarget(null);
         }
     }

@@ -21,6 +21,7 @@ public class AlertActionHandler {
                 .orElse(null);
         Vec3 lkp = data.lastSeenPos().orElse(null);
         if (canSeePrimary && primary != null) {
+            // 如果看见了主目标
             int pState = data.targetStates().getOrDefault(primary.getUUID(), AlertData.UNTRACKED);
 
             if (pState >= AlertData.AWARE) {
@@ -38,7 +39,12 @@ public class AlertActionHandler {
                     if (!mob.getNavigation().isDone()) mob.getNavigation().stop();
                 }
             }
+
         } else {
+            // 如果没看见主目标
+            if (mob.getTarget() != null && mob.getTarget().equals(primary)) {
+                mob.setTarget(null);
+            }
             if (lkp == null) return;
             if (data.state() == AlertData.SEARCHING || data.state() == AlertData.FIGHTING) {
                 double distSq = lkp.distanceToSqr(mob.position());
