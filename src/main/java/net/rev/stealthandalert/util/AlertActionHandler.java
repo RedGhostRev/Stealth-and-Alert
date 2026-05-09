@@ -25,7 +25,6 @@ public class AlertActionHandler {
             int pState = data.targetStates().getOrDefault(primary.getUUID(), AlertData.UNTRACKED);
 
             if (pState >= AlertData.AWARE) {
-                removeLookIdleGoals(mob);
                 mob.getLookControl().setLookAt(primary, 30.0F, 30.0F);
 
                 if (data.state() == AlertData.FIGHTING && pState == AlertData.TRACKING) {
@@ -47,26 +46,17 @@ public class AlertActionHandler {
             }
             if (lkp == null) return;
             if (data.state() == AlertData.SEARCHING || data.state() == AlertData.FIGHTING) {
-                double distSq = lkp.distanceToSqr(mob.position());
-                if (distSq > 2.25) {
-                    removeLookIdleGoals(mob);
-                    mob.getLookControl().setLookAt(lkp.x, lkp.y + 1.6, lkp.z, 30.0F, 30.0F);
-                    mob.getNavigation().moveTo(lkp.x, lkp.y, lkp.z, 1.1);
-                } else {
-                    if (!mob.getNavigation().isDone()) mob.getNavigation().stop();
-                }
+//                double distSq = lkp.distanceToSqr(mob.position());
+//                if (distSq > 2.25) {
+//                    mob.getLookControl().setLookAt(lkp.x, lkp.y + 1.6, lkp.z, 30.0F, 30.0F);
+//                    mob.getNavigation().moveTo(lkp.x, lkp.y, lkp.z, 1.1);
+//                } else {
+//                    if (!mob.getNavigation().isDone()) mob.getNavigation().stop();
+//                }
             } else if (data.state() == AlertData.SUSPICIOUS) {
-                removeLookIdleGoals(mob);
                 mob.getLookControl().setLookAt(lkp.x, lkp.y + 1.6, lkp.z, 30.0F, 30.0F);
                 if (!mob.getNavigation().isDone()) mob.getNavigation().stop();
             }
         }
-    }
-
-    private static void removeLookIdleGoals(Mob mob) {
-        mob.goalSelector.getAvailableGoals().removeIf(wrappedGoal ->
-                wrappedGoal.getGoal() instanceof RandomLookAroundGoal ||
-                        wrappedGoal.getGoal() instanceof LookAtPlayerGoal
-        );
     }
 }

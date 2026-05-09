@@ -188,13 +188,13 @@ public class StealthEngine {
                     boolean reachedLkp = nextLkp.isPresent() && mob.distanceToSqr(nextLkp.get()) < 4.0;
                     if (reachedLkp || --nextPatienceTicks <= 1) {
                         if (nextStateTicks <= 0) {
-                            nextStateTicks = 40;
+                            nextStateTicks = 300;
                         }
                     }
                 } else if (nextState == AlertData.SUSPICIOUS) {
                     // SUSPICIOUS状态直接回落
                     if (nextStateTicks <= 0) {
-                        nextStateTicks = 30;
+                        nextStateTicks = 160;
                     }
                 }
 

@@ -5,6 +5,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.entity.npc.Villager;
@@ -12,11 +16,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.ai.InvestigateLkpGoal;
+import net.rev.stealthandalert.ai.StealthLookAroundGoal;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.config.CommonConfigs;
@@ -220,6 +227,40 @@ public class StealthEvents {
                     PacketDistributor.sendToPlayersTrackingEntity(golem, new S2CAlertDataPacket(golem.getId(), newData));
                 }
             }
+        }
+    }
+
+    // 为 SEEKERS 新增、删除特定 Goal
+    @SubscribeEvent
+    public static void onEntityJoin(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide()) return;
+        if (!(event.getEntity() instanceof Mob mob)) return;
+        if (!mob.getType().is(ModTags.Entities.SEEKERS)) return;
+
+        boolean hasInvestigateGoal = mob.goalSelector.getAvailableGoals().stream().anyMatch(wrappedGoal ->
+                wrappedGoal.getGoal() instanceof InvestigateLkpGoal);
+        if (!hasInvestigateGoal) {
+            mob.goalSelector.addGoal(3, new InvestigateLkpGoal(mob, 0.9));
+        }
+
+        mob.goalSelector.getAvailableGoals().removeIf(wrappedGoal ->
+                wrappedGoal.getGoal() instanceof LookAtPlayerGoal);
+
+        int originalPriority = -1;
+        Goal goalToRemove = null;
+
+        for (WrappedGoal wrappedGoal : mob.goalSelector.getAvailableGoals()) {
+            Goal innerGoal = wrappedGoal.getGoal();
+            if (innerGoal instanceof RandomLookAroundGoal && !(innerGoal instanceof StealthLookAroundGoal)) {
+                originalPriority = wrappedGoal.getPriority();
+                goalToRemove = innerGoal;
+                break;
+            }
+        }
+
+        if (goalToRemove != null && originalPriority != -1) {
+            mob.goalSelector.removeGoal(goalToRemove);
+            mob.goalSelector.addGoal(originalPriority, new StealthLookAroundGoal(mob));
         }
     }
 
