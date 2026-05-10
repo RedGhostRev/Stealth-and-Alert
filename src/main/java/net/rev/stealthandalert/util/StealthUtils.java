@@ -50,7 +50,7 @@ public class StealthUtils {
         return canSeeAnyPart(observer, target, eyePos);
     }
 
-    private static boolean isFullyNaked(Player player) {
+    public static boolean isFullyNaked(Player player) {
         for (ItemStack armor : player.getArmorSlots()) {
             if (!armor.isEmpty()) return false;
         }
@@ -121,7 +121,7 @@ public class StealthUtils {
         PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
 
         // 处理敌人针对主目标的行为
-        UUID primaryUuid = newData.primaryTarget().orElseGet(() -> null);
+        UUID primaryUuid = newData.primaryTarget().orElse(null);
         if (primaryUuid != null) {
             Player primaryPlayer = mob.level().getPlayerByUUID(primaryUuid);
             if (primaryPlayer != null) {

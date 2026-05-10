@@ -1,7 +1,5 @@
 package net.rev.stealthandalert.ai;
 
-import java.util.EnumSet;
-
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
@@ -9,6 +7,8 @@ import net.minecraft.world.phys.Vec3;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.util.StealthUtils;
+
+import java.util.EnumSet;
 
 public class InvestigateLkpGoal extends Goal {
     private final Mob mob;

@@ -62,16 +62,26 @@ public class StealthEngine {
             }
         } else { // 没看见
             // 回落
-            nextLevel = Math.max(0.0F, currentLevel - 0.5F);
-            nextMemory = Math.max(0, --currentMemory); // 只要看不见，记忆就开始衰减
+            // 如果当前目标处于 TRACKING 状态，则通过另一种方式来视线丢失视野后的计时
+            if (currentPState == AlertData.TRACKING) {
+                // 若处于 TRACKING 状态，则初始 currentReaction 必定为0
+                if (nextReaction <= 0) {
+                    nextReaction = 10;
+                } else {
+                    nextReaction--;
+                    if (nextReaction <= 0) {
+                        nextPState = AlertData.AWARE;
+                    }
+                }
+            } else {
+                nextLevel = Math.max(0.0F, currentLevel - 0.5F);
+                nextMemory = Math.max(0, --currentMemory); // 只要看不见，记忆就开始衰减
+            }
 
             // 阶梯式回落判定
             if (nextLevel <= 0.0F) {
                 nextPState = AlertData.UNTRACKED;
                 nextReaction = CommonConfigs.DETECTION_REACTION_TICKS.getAsInt();
-            } else if (currentPState == AlertData.TRACKING) {
-                // 如果丢失视野但Level没掉完，降级为AWARE
-                nextPState = AlertData.AWARE;
             }
         }
         return new IndividualResult(nextLevel, nextReaction, nextPState, nextMemory);
@@ -181,9 +191,16 @@ public class StealthEngine {
 
         // B: 状态降级（看不到人，开始阶梯回落）
         else {
+            // 如果怪物看不到人，且仍处于 FIGHTING 状态，
+            // 则为了确保怪物在战斗中不轻易丢失锁定，为 FIGHTING 状态下的降级设定一个很短的计时
+            if (nextState == AlertData.FIGHTING) {
+                if (nextStateTicks <= 0) {
+                    nextStateTicks = 10;
+                }
+            }
             if (maxLevel <= 0.0F) {
                 // 如果所有人警戒值都为空，开始计时降级
-                if (nextState == AlertData.FIGHTING || nextState == AlertData.SEARCHING) {
+                if (nextState == AlertData.SEARCHING) {
                     // 如果到了LKP附近或者耐心耗尽
                     boolean reachedLkp = nextLkp.isPresent() && mob.distanceToSqr(nextLkp.get()) < 4.0;
                     if (reachedLkp || --nextPatienceTicks <= 1) {
@@ -197,21 +214,22 @@ public class StealthEngine {
                         nextStateTicks = 160;
                     }
                 }
-
-                // 统一计时
-                if (nextStateTicks > 0) {
-                    nextStateTicks--;
-                    if (nextStateTicks <= 1) {
+            }
+            // 统一计时
+            if (nextStateTicks > 0) {
+                nextStateTicks--;
+                if (nextStateTicks <= 0) {
+                    if (nextState == AlertData.FIGHTING) {
+                        nextState = AlertData.SEARCHING;
+                    } else {
                         nextState = AlertData.IDLE;
                         nextLkp = Optional.empty();
                         nextPrimary = Optional.empty();
-                        nextStateTicks = 0;
                         nextPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt();
                     }
                 }
             }
         }
-
         return new GlobalResult(nextState, nextLkp, nextPrimary, nextStateTicks, nextPatienceTicks);
     }
 }

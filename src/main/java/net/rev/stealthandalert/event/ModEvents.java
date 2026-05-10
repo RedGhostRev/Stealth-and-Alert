@@ -6,7 +6,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.util.ModTags;
 
@@ -45,12 +44,5 @@ public class ModEvents {
         double dot = targetLookHorizon.dot(toAttackerHorizon);
         double threshold = Math.cos(Math.toRadians(angleDegrees));
         return dot <= -threshold;
-    }
-
-    @SubscribeEvent
-    public static void onRightClickEntity(PlayerInteractEvent.EntityInteract event) {
-        if (!event.getLevel().isClientSide()) {
-
-        }
     }
 }
