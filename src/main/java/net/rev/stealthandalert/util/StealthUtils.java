@@ -207,7 +207,8 @@ public class StealthUtils {
                 gRes.lkp(),
                 gRes.primaryTarget(),
                 gRes.stateTicks(),
-                gRes.patienceTicks()
+                gRes.patienceTicks(),
+                gRes.isSeeingAnyone()
         );
     }
 

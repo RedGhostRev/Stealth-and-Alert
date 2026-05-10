@@ -19,7 +19,8 @@ public class StealthEngine {
             Optional<Vec3> lkp,
             Optional<UUID> primaryTarget,
             int stateTicks,
-            int patienceTicks
+            int patienceTicks,
+            boolean isSeeingAnyone
     ) {
     }
 
@@ -230,6 +231,6 @@ public class StealthEngine {
                 }
             }
         }
-        return new GlobalResult(nextState, nextLkp, nextPrimary, nextStateTicks, nextPatienceTicks);
+        return new GlobalResult(nextState, nextLkp, nextPrimary, nextStateTicks, nextPatienceTicks, anyTargetVisible);
     }
 }

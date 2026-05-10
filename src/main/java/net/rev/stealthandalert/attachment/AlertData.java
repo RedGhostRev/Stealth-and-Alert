@@ -22,7 +22,8 @@ public record AlertData(
         Optional<Vec3> lastSeenPos,
         Optional<UUID> primaryTarget,
         int stateTicks,
-        int patienceTicks) {
+        int patienceTicks,
+        boolean isSeeingAnyone) {
 
     // 生物全局警戒状态
     public static final int IDLE = 0;
@@ -45,7 +46,8 @@ public record AlertData(
                     Vec3.CODEC.optionalFieldOf("last_pos").forGetter(AlertData::lastSeenPos),
                     UUIDUtil.STRING_CODEC.optionalFieldOf("primary_target").forGetter(AlertData::primaryTarget),
                     Codec.INT.fieldOf("state_ticks").forGetter(AlertData::stateTicks),
-                    Codec.INT.fieldOf("patience_ticks").forGetter(AlertData::patienceTicks)
+                    Codec.INT.fieldOf("patience_ticks").forGetter(AlertData::patienceTicks),
+                    Codec.BOOL.fieldOf("is_seeing_anyone").forGetter(AlertData::isSeeingAnyone)
             ).apply(instance, AlertData::new)
     );
 
@@ -71,6 +73,6 @@ public record AlertData(
 //            ByteBufCodecs.VAR_INT, AlertData::patienceTicks,
 //            AlertData::new);
 
-    public static final AlertData DEFAULT = new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+    public static final AlertData DEFAULT = new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt(), false);
 }
 

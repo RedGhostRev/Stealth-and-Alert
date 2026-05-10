@@ -147,7 +147,8 @@ public class StealthEvents {
                         data.lastSeenPos(),
                         data.primaryTarget(),
                         data.stateTicks(),
-                        data.patienceTicks()
+                        data.patienceTicks(),
+                        data.isSeeingAnyone()
                 );
 
                 mob.setData(ModAttachments.ALERT_DATA, newData);
@@ -190,7 +191,8 @@ public class StealthEvents {
                         nextLKP,
                         nextPrimary,
                         data.stateTicks(),
-                        data.patienceTicks()
+                        data.patienceTicks(),
+                        data.isSeeingAnyone()
                 );
 
                 mob.setData(ModAttachments.ALERT_DATA, newData);
@@ -219,7 +221,7 @@ public class StealthEvents {
 
                     AlertData newData = new AlertData(
                             data.state(), data.targetProgress(), data.targetStates(), data.targetReactions(),
-                            memoryMap, data.lastSeenPos(), data.primaryTarget(), data.stateTicks(), data.patienceTicks()
+                            memoryMap, data.lastSeenPos(), data.primaryTarget(), data.stateTicks(), data.patienceTicks(), data.isSeeingAnyone()
                     );
 
                     golem.setData(ModAttachments.ALERT_DATA, newData);
