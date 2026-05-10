@@ -6,6 +6,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.item.custom.DaggerItem;
+import net.rev.stealthandalert.item.custom.DebugWandItem;
 
 import java.util.List;
 
@@ -32,6 +33,9 @@ public class ModItems {
             () -> new DaggerItem(ModTiers.SHADOW_CRYSTAL, new Item.Properties().attributes(
                     DaggerItem.createAttributes(ModTiers.SHADOW_CRYSTAL, 2F, -1.2F)
             )));
+
+    public static final DeferredItem<DebugWandItem> DEBUG_WAND = ITEMS.register("debug_wand",
+            () -> new DebugWandItem(new Item.Properties().stacksTo(1)));
 
     public static final List<DeferredItem<DaggerItem>> DAGGER_LIST = List.of(
             SHADOW_CRYSTAL_DAGGER

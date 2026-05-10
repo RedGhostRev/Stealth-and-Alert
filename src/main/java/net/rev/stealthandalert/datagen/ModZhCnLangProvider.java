@@ -18,6 +18,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.SHADOW_CRYSTAL_SHARD, "暗影水晶碎片");
         add(LangKeys.SHADOW_BERRIES, "暗影浆果");
         add(LangKeys.SHADOW_CRYSTAL_DAGGER, "暗影水晶匕首");
+        add(LangKeys.DEBUG_WAND, "调试手杖");
 
         // 方块
         add(LangKeys.PEBBLE_BLOCK, "石子块");
@@ -26,12 +27,16 @@ public class ModZhCnLangProvider extends LanguageProvider {
 
         // 工具提示
         add(LangKeys.TOOLTIP_CAN_STAB, "§c背刺§e时造成双倍伤害");
+        add(LangKeys.TOOLTIP_DEBUG_WAND, "右键以开关调试模式");
+        add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "调试模式：显示带有SEEKERS标签的生物的警戒数据——全局警戒状态、对你的观测状态、主目标、对你的记忆时间、对你的警戒值、全局警戒状态切换计时和耐心值计时");
 
         // 创造模式物品栏
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "潜行与警戒 - 物品");
         add(LangKeys.STEALTH_AND_ALERT_BLOCKS_TAB, "潜行与警戒 - 方块");
 
         // 调试文本
+        add(LangKeys.DEBUG_MODE_ON, "§a调试模式：开启");
+        add(LangKeys.DEBUG_MODE_OFF, "§c调试模式：关闭");
         add(LangKeys.DEBUG_ALERT_STATE_IDLE, "§7空闲");
         add(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS, "§f怀疑");
         add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§6搜寻");

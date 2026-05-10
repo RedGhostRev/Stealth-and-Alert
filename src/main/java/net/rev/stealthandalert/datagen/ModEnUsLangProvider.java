@@ -18,6 +18,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.SHADOW_CRYSTAL_SHARD, "Shadow Crystal Shard");
         add(LangKeys.SHADOW_BERRIES, "Shadow Berries");
         add(LangKeys.SHADOW_CRYSTAL_DAGGER, "Shadow Crystal Dagger");
+        add(LangKeys.DEBUG_WAND, "Debug Wand");
 
         // Blocks
         add(LangKeys.PEBBLE_BLOCK, "Pebble Block");
@@ -26,12 +27,16 @@ public class ModEnUsLangProvider extends LanguageProvider {
 
         // Tooltips
         add(LangKeys.TOOLTIP_CAN_STAB, "§eDeels double damage when §cbackstabbing");
+        add(LangKeys.TOOLTIP_DEBUG_WAND, "Right-click to toggle debug mode");
+        add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "Debug Mode: Displays alert data for mobs with the SEEKERS tag — Global Alert State, Observation State towards you, Primary Target, Memory Time towards you, Alert Level towards you, Global State Transition Timer, and Patience Timer.");
 
         // Creative Tabs
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "Stealth and Alert - Items");
         add(LangKeys.STEALTH_AND_ALERT_BLOCKS_TAB, "Stealth and Alert - Blocks");
 
         // Debug Texts
+        add(LangKeys.DEBUG_MODE_ON, "§aDEBUG MODE: ON");
+        add(LangKeys.DEBUG_MODE_OFF, "§cDEBUG MODE: OFF");
         add(LangKeys.DEBUG_ALERT_STATE_IDLE, "§7IDLE");
         add(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS, "§fSUSPICIOUS");
         add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§6SEARCHING");

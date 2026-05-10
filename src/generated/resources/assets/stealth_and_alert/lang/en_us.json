@@ -8,6 +8,8 @@
   "debug.stealth_and_alertalert_state_suspicious": "§fSUSPICIOUS",
   "debug.stealth_and_alertalert_state_ticks": "§eALERT_STATE_TICKS: %d",
   "debug.stealth_and_alertalert_unknown": "UNKNOWN",
+  "debug.stealth_and_alertdebug_mode_off": "§cDEBUG MODE: OFF",
+  "debug.stealth_and_alertdebug_mode_on": "§aDEBUG MODE: ON",
   "debug.stealth_and_alertdebug_patience_ticks": "§dPATIENCE_TICKS: %d",
   "debug.stealth_and_alerthatred_memory": "HATRED_MEMORY: %d",
   "debug.stealth_and_alertprimary_target_null": "NO_PRIMARY_TARGET",
@@ -16,6 +18,7 @@
   "debug.stealth_and_alerttarget_alert_state_tracking": "§cTRACKING",
   "debug.stealth_and_alerttarget_alert_state_untracked": "§7UNTRACKED",
   "item.stealth_and_alert.clamor_bell": "Clamor Bell",
+  "item.stealth_and_alert.debug_wand": "Debug Wand",
   "item.stealth_and_alert.pebble": "Pebble",
   "item.stealth_and_alert.shadow_berries": "Shadow Berries",
   "item.stealth_and_alert.shadow_crystal": "Shadow Crystal",
@@ -23,5 +26,7 @@
   "item.stealth_and_alert.shadow_crystal_shard": "Shadow Crystal Shard",
   "itemGroup.stealth_and_alert.blocks_tab": "Stealth and Alert - Blocks",
   "itemGroup.stealth_and_alert.items_tab": "Stealth and Alert - Items",
-  "tooltip.stealth_and_alert.can_stab": "§eDeels double damage when §cbackstabbing"
+  "tooltip.stealth_and_alert.can_stab": "§eDeels double damage when §cbackstabbing",
+  "tooltip.stealth_and_alert.debug_wand": "Right-click to toggle debug mode",
+  "tooltip.stealth_and_alert.debug_wand.debug_mode_desc": "Debug Mode: Displays alert data for mobs with the SEEKERS tag — Global Alert State, Observation State towards you, Primary Target, Memory Time towards you, Alert Level towards you, Global State Transition Timer, and Patience Timer."
 }

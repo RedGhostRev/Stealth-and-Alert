@@ -155,8 +155,9 @@ public class StealthUtils {
             if (!panda.isAggressive()) return false;
         }
 
-        // 4.视线检查
-        if (!StealthUtils.hasLineOfSight(mob, player)) {
+        // 4.视线与碰撞检查
+        boolean isTouching = mob.getBoundingBox().intersects(player.getBoundingBox().inflate(0.4));
+        if (!isTouching && !StealthUtils.hasLineOfSight(mob, player)) {
             return false;
         }
 

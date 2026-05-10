@@ -12,6 +12,7 @@ public class LangKeys {
     public static final String SHADOW_CRYSTAL_SHARD = "item." + MOD_ID + ".shadow_crystal_shard";
     public static final String SHADOW_BERRIES = "item." + MOD_ID + ".shadow_berries";
     public static final String SHADOW_CRYSTAL_DAGGER = "item." + MOD_ID + ".shadow_crystal_dagger";
+    public static final String DEBUG_WAND = "item." + MOD_ID + ".debug_wand";
 
     // Blocks
     public static final String PEBBLE_BLOCK = "block." + MOD_ID + ".pebble_block";
@@ -20,12 +21,16 @@ public class LangKeys {
 
     // Tooltips
     public static final String TOOLTIP_CAN_STAB = "tooltip." + MOD_ID + ".can_stab";
+    public static final String TOOLTIP_DEBUG_WAND = "tooltip." + MOD_ID + ".debug_wand";
+    public static final String TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC = "tooltip." + MOD_ID + ".debug_wand.debug_mode_desc";
 
     // Creative Tabs
     public static final String STEALTH_AND_ALERT_ITEMS_TAB = "itemGroup." + MOD_ID + ".items_tab";
     public static final String STEALTH_AND_ALERT_BLOCKS_TAB = "itemGroup." + MOD_ID + ".blocks_tab";
 
     // Debug Texts
+    public static final String DEBUG_MODE_ON = "debug." + MOD_ID + "debug_mode_on";
+    public static final String DEBUG_MODE_OFF = "debug." + MOD_ID + "debug_mode_off";
     public static final String DEBUG_ALERT_STATE_IDLE = "debug." + MOD_ID + "alert_state_idle";
     public static final String DEBUG_ALERT_STATE_SUSPICIOUS = "debug." + MOD_ID + "alert_state_suspicious";
     public static final String DEBUG_ALERT_STATE_SEARCHING = "debug." + MOD_ID + "alert_state_searching";
