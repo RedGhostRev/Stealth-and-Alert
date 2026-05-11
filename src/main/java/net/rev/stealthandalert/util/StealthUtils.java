@@ -65,13 +65,13 @@ public class StealthUtils {
         AlertData oldData = mob.getData(ModAttachments.ALERT_DATA);
 
         // B: 门卫检查
-        if (mob.level().players().isEmpty() && oldData.targetReactions().isEmpty()) return;
+        if (mob.level().players().isEmpty() && oldData.targetReactionTicks().isEmpty()) return;
 
         EntityAlertSettings settings = EntityAlertConfigLoader.get(mob.getType());
         if (settings.ignoreBaby() && mob.isBaby()) return;
 
         // 继承记忆名单
-        Set<UUID> trackedPlayers = new HashSet<>(oldData.targetReactions().keySet());
+        Set<UUID> trackedPlayers = new HashSet<>(oldData.targetReactionTicks().keySet());
 
         // 扫描周围物理范围内的玩家，加入处理名单
         double range = settings.viewRange();
@@ -96,10 +96,10 @@ public class StealthUtils {
             if (canSee) anyoneVisible = true;
 
             StealthEngine.IndividualResult res = StealthEngine.updateIndividual(
-                    oldData.targetProgress().getOrDefault(uuid, 0.0F),
-                    oldData.targetReactions().getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()),
+                    oldData.targetAwareness().getOrDefault(uuid, 0.0F),
+                    oldData.targetReactionTicks().getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()),
                     oldData.targetStates().getOrDefault(uuid, AlertData.UNTRACKED),
-                    oldData.lastDamageTicks().getOrDefault(uuid, 0),
+                    oldData.targetMemoryTicks().getOrDefault(uuid, 0),
                     canSee
             );
             resultsMap.put(uuid, res);

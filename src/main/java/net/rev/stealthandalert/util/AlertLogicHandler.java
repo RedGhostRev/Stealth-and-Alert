@@ -135,7 +135,7 @@ public class AlertLogicHandler {
         if (mob.getTarget() == player || data.targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED) > AlertData.UNTRACKED) {
             return true;
         }
-        if (data.lastDamageTicks().getOrDefault(player.getUUID(), 0) > 0) {
+        if (data.targetMemoryTicks().getOrDefault(player.getUUID(), 0) > 0) {
             return true;
         }
         return false;
@@ -190,7 +190,7 @@ public class AlertLogicHandler {
             if (isSociallyRelated(mob, neighbor, relatableStr)) {
                 AlertData neighborData = neighbor.getData(ModAttachments.ALERT_DATA);
                 if (neighbor.getTarget() == player ||
-                        neighborData.lastDamageTicks().getOrDefault(player.getUUID(), 0) > 0) {
+                        neighborData.targetMemoryTicks().getOrDefault(player.getUUID(), 0) > 0) {
                     return true;
                 }
             }

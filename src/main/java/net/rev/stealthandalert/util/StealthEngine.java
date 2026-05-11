@@ -95,9 +95,9 @@ public class StealthEngine {
             boolean anyTargetVisible
     ) {
         int nextState = oldData.state();
-        int nextStateTicks = oldData.stateTicks();
+        int nextStateTicks = oldData.stateChangeTicks();
         int nextPatienceTicks = oldData.patienceTicks();
-        Optional<Vec3> nextLkp = oldData.lastSeenPos();
+        Optional<Vec3> nextLkp = oldData.lastKnownPos();
         Optional<UUID> nextPrimary = oldData.primaryTarget();
 
         // 找出当前全场最高的警戒值

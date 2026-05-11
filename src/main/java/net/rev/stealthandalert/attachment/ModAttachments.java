@@ -13,7 +13,7 @@ public class ModAttachments {
             DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, StealthAndAlert.MOD_ID);
 
     public static final Supplier<AttachmentType<AlertData>> ALERT_DATA = ATTACHMENT_TYPES.register("alert_data",
-            () -> AttachmentType.builder(() -> AlertData.DEFAULT).build());
+            () -> AttachmentType.builder(AlertData::createDefault).serialize(AlertData.CODEC).build());
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);

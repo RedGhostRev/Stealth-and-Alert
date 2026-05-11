@@ -125,10 +125,10 @@ public class StealthEvents {
             UUID uuid = player.getUUID();
 
 
-            Map<UUID, Float> progressMap = new HashMap<>(data.targetProgress());
+            Map<UUID, Float> progressMap = new HashMap<>(data.targetAwareness());
             Map<UUID, Integer> statesMap = new HashMap<>(data.targetStates());
-            Map<UUID, Integer> reactionsMap = new HashMap<>(data.targetReactions());
-            Map<UUID, Integer> lastDamageTicksMap = new HashMap<>(data.lastDamageTicks());
+            Map<UUID, Integer> reactionsMap = new HashMap<>(data.targetReactionTicks());
+            Map<UUID, Integer> lastDamageTicksMap = new HashMap<>(data.targetMemoryTicks());
             boolean canPerceive = StealthUtils.hasLineOfSight(mob, player) || (StealthUtils.shouldArouseAlert(mob, player) && reactionsMap.getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.get()) <= 0);
             boolean dataChanged = false;
             if (canPerceive) {
@@ -144,11 +144,11 @@ public class StealthEvents {
                         statesMap,
                         reactionsMap,
                         lastDamageTicksMap,
-                        data.lastSeenPos(),
+                        data.lastKnownPos(),
                         data.primaryTarget(),
-                        data.stateTicks(),
+                        data.stateChangeTicks(),
                         data.patienceTicks(),
-                        data.isSeeingAnyone()
+                        data.canSeeAnyone()
                 );
 
                 mob.setData(ModAttachments.ALERT_DATA, newData);
@@ -163,7 +163,7 @@ public class StealthEvents {
             // 判定：是否在打别人
             boolean isFightingOthers = (data.state() == AlertData.FIGHTING) && currentTarget != null && currentTarget != player;
             int nextState = data.state();
-            Optional<Vec3> nextLKP = data.lastSeenPos();
+            Optional<Vec3> nextLKP = data.lastKnownPos();
             Optional<UUID> nextPrimary = data.primaryTarget();
             // 只有当该玩家还没达到 TRACKING 状态时才更新数据
             if (currentPState < AlertData.TRACKING) {
@@ -190,9 +190,9 @@ public class StealthEvents {
                         lastDamageTicksMap,
                         nextLKP,
                         nextPrimary,
-                        data.stateTicks(),
+                        data.stateChangeTicks(),
                         data.patienceTicks(),
-                        data.isSeeingAnyone()
+                        data.canSeeAnyone()
                 );
 
                 mob.setData(ModAttachments.ALERT_DATA, newData);
@@ -216,12 +216,12 @@ public class StealthEvents {
             for (IronGolem golem : nearbyGolems) {
                 if (StealthUtils.hasLineOfSight(golem, villager)) {
                     AlertData data = golem.getData(ModAttachments.ALERT_DATA);
-                    Map<UUID, Integer> memoryMap = new HashMap<>(data.lastDamageTicks());
+                    Map<UUID, Integer> memoryMap = new HashMap<>(data.targetMemoryTicks());
                     memoryMap.put(player.getUUID(), 1200);
 
                     AlertData newData = new AlertData(
-                            data.state(), data.targetProgress(), data.targetStates(), data.targetReactions(),
-                            memoryMap, data.lastSeenPos(), data.primaryTarget(), data.stateTicks(), data.patienceTicks(), data.isSeeingAnyone()
+                            data.state(), data.targetAwareness(), data.targetStates(), data.targetReactionTicks(),
+                            memoryMap, data.lastKnownPos(), data.primaryTarget(), data.stateChangeTicks(), data.patienceTicks(), data.canSeeAnyone()
                     );
 
                     golem.setData(ModAttachments.ALERT_DATA, newData);

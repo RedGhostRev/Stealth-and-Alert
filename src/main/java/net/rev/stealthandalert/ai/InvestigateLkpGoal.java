@@ -28,7 +28,7 @@ public class InvestigateLkpGoal extends Goal {
     @Override
     public boolean canUse() {
         AlertData data = this.mob.getData(ModAttachments.ALERT_DATA);
-        if (data.lastSeenPos().isEmpty()) return false;
+        if (data.lastKnownPos().isEmpty()) return false;
 
         if (data.state() < AlertData.SEARCHING) {
             return false;
@@ -49,7 +49,7 @@ public class InvestigateLkpGoal extends Goal {
     public boolean canContinueToUse() {
         AlertData data = this.mob.getData(ModAttachments.ALERT_DATA);
 
-        if (data.state() < AlertData.SEARCHING || data.lastSeenPos().isEmpty()) {
+        if (data.state() < AlertData.SEARCHING || data.lastKnownPos().isEmpty()) {
             return false;
         }
 
@@ -67,7 +67,8 @@ public class InvestigateLkpGoal extends Goal {
     @Override
     public void start() {
         AlertData data = this.mob.getData(ModAttachments.ALERT_DATA);
-        Vec3 lkp = data.lastSeenPos().get();
+        if (data.lastKnownPos().isEmpty()) return;
+        Vec3 lkp = data.lastKnownPos().get();
 
         this.isSearchingAround = false;
         this.stayTicks = 0;
@@ -88,9 +89,9 @@ public class InvestigateLkpGoal extends Goal {
     @Override
     public void tick() {
         AlertData data = this.mob.getData(ModAttachments.ALERT_DATA);
-        if (data.lastSeenPos().isEmpty()) return;
+        if (data.lastKnownPos().isEmpty()) return;
 
-        Vec3 currentLkp = data.lastSeenPos().get();
+        Vec3 currentLkp = data.lastKnownPos().get();
 
         if (!this.isSearchingAround) {
             this.setTargetPos(currentLkp.x, currentLkp.y, currentLkp.z);

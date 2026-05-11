@@ -17,7 +17,7 @@ public class AlertActionHandler {
         Player primary = data.primaryTarget()
                 .map(uuid -> mob.level().getPlayerByUUID(uuid))
                 .orElse(null);
-        Vec3 lkp = data.lastSeenPos().orElse(null);
+        Vec3 lkp = data.lastKnownPos().orElse(null);
         if (canSeePrimary && primary != null) {
             // 如果看见了主目标
             int pState = data.targetStates().getOrDefault(primary.getUUID(), AlertData.UNTRACKED);

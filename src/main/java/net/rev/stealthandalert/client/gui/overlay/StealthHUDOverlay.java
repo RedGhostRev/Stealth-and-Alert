@@ -32,7 +32,7 @@ public class StealthHUDOverlay {
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (entity instanceof Mob mob && mob.getType().is(ModTags.Entities.SEEKERS)) {
                 AlertData data = mob.getData(ModAttachments.ALERT_DATA);
-                float level = data.targetProgress().getOrDefault(myUUID, 0.0F);
+                float level = data.targetAwareness().getOrDefault(myUUID, 0.0F);
                 if (level > 0F) {
                     // int individualRadius = 100 + (mob.getId() % 5) * 3;
                     drawIndicator(graphics, mc.player, mob, level, ClientConfigs.ALERT_INDICATOR_RADIUS.getAsInt());
@@ -95,8 +95,8 @@ public class StealthHUDOverlay {
 
         // drawX为负的一半，实现水平居中
         // drawY为负的半径再减去一半，实现垂直居中在圆周上
-        int drawX = -imgSize / 2;
-        int drawY = -radius - imgSize / 2;
+        // int drawX = -imgSize / 2;
+        // int drawY = -radius - imgSize / 2;
 
         // 绘制白色底图
         // graphics.blit(INDICATOR, drawX, drawY, 0, 0, imgSize, imgSize, imgSize, imgSize);

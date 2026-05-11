@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+// 绘制敌人头顶上的警戒标志
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID, value = Dist.CLIENT)
 public class AlertSymbolRenderer {
     private static final ResourceLocation BASE = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
@@ -51,8 +52,8 @@ public class AlertSymbolRenderer {
         poseStack.pushPose();
 
         float yOffset = mob.getBbHeight();
-        float basePedding = ClientConfigs.DEBUG_MODE.get() ? 1.0F : 0.5F;
-        yOffset += basePedding;
+        float base = ClientConfigs.DEBUG_MODE.get() ? 1.0F : 0.5F;
+        yOffset += base;
 
         boolean hasName = mob.hasCustomName();
         boolean isAlwaysVisible = mob.isCustomNameVisible();
@@ -72,7 +73,7 @@ public class AlertSymbolRenderer {
         float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
         int tickCount = mob.tickCount;
 
-        boolean canSee = data.isSeeingAnyone();
+        boolean canSee = data.canSeeAnyone();
         float tempAlphaQ = 0.0F;
         float tempAlphaE = 0.0F;
 

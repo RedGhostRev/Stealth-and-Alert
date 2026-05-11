@@ -101,10 +101,10 @@ public class ModClientEvents {
             Player p = mob.level().getPlayerByUUID(data.primaryTarget().get());
             if (p != null) primaryName = p.getName().getString();
         }
-        int stateTicks = data.stateTicks();
+        int stateTicks = data.stateChangeTicks();
         int patienceTicks = data.patienceTicks();
-        int myMemory = data.lastDamageTicks().getOrDefault(myUUID, 0);
-        float myLevel = data.targetProgress().getOrDefault(myUUID, 0.0F);
+        int myMemory = data.targetMemoryTicks().getOrDefault(myUUID, 0);
+        float myLevel = data.targetAwareness().getOrDefault(myUUID, 0.0F);
         int myPState = data.targetStates().getOrDefault(myUUID, AlertData.UNTRACKED);
         Component pStateText = switch (myPState) {
             case AlertData.UNTRACKED -> Component.translatable(LangKeys.DEBUG_TARGET_ALERT_STATE_UNTRACKED);
