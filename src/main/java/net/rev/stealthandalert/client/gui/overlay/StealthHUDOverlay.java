@@ -4,7 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -13,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attachment.VisibilityData;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.util.ModTags;
 
@@ -36,6 +40,9 @@ public class StealthHUDOverlay {
         float angle;      // 精确角度，用于平滑渲染
         int sectorIndex;  // 当前帧位于的扇区号 (0~23)
         int joinedTick;
+
+        int outAnimTick = -1;
+        boolean disappearing = false;
 
         IndicatorData(UUID uuid, float level, float angle, int sectorIndex, int joinedTick) {
             this.uuid = uuid;
@@ -138,7 +145,12 @@ public class StealthHUDOverlay {
             }
 
             if (!found || oldData.level <= 0) {
-                ACTIVE_POOL.remove(i);
+                if (!oldData.disappearing) {
+                    oldData.disappearing = true;
+                    oldData.outAnimTick = mc.player.tickCount;
+                }
+                // 延迟删除以播放动画
+                // ACTIVE_POOL.remove(i);
             }
         }
 
@@ -163,14 +175,39 @@ public class StealthHUDOverlay {
             }
         }
         // 渲染
-        for (IndicatorData data : ACTIVE_POOL) {
-            float ticksAlive = mc.player.tickCount - data.joinedTick + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
-            float unfoldDuration = 10F;
-            float unfoldProgress = Math.min(1F, ticksAlive / unfoldDuration);
-            unfoldProgress = 1.0F - (1.0F - unfoldProgress) * (1.0F - unfoldProgress);
+        Iterator<IndicatorData> iterator = ACTIVE_POOL.iterator();
+        while (iterator.hasNext()) {
+            IndicatorData data = iterator.next();
 
-            drawIndicator(graphics, mc.player, data.uuid, data.level, data.angle, radius, unfoldProgress);
+            float unfoldProgress;
+            boolean removeNow = false;
+
+            if (data.disappearing) {
+                // 离场动画
+                float animDuration = 10F; // 动画帧长
+                float ticksGone = mc.player.tickCount - data.outAnimTick + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+                unfoldProgress = Math.max(0F, 1F - (ticksGone / animDuration));
+                unfoldProgress = unfoldProgress * unfoldProgress; // ease-in
+                if (unfoldProgress <= 0.01F) {
+                    removeNow = true;
+                }
+            } else {
+                // 未离场，进场动画
+                float ticksAlive = mc.player.tickCount - data.joinedTick + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+                float unfoldDuration = 10F;
+                unfoldProgress = Math.min(1F, ticksAlive / unfoldDuration);
+                unfoldProgress = 1.0F - (1.0F - unfoldProgress) * (1.0F - unfoldProgress);
+            }
+
+            if (unfoldProgress > 0.01F) {
+                drawIndicator(graphics, mc.player, data.uuid, data.level, data.angle, radius, unfoldProgress);
+            }
+            if (removeNow) {
+                iterator.remove();
+            }
         }
+
+        // showVisibility(graphics);
     }
 
     // 画出警戒条
@@ -307,7 +344,7 @@ public class StealthHUDOverlay {
     }
 
     private static void drawIndicatorLayerFrame(GuiGraphics graphics, int radius, int imgSize, float levelPercent,
-                                           float r, float g, float b, float a, float zOffSet) {
+                                                float r, float g, float b, float a, float zOffSet) {
         int currentW = (int) (64 * levelPercent);
         int uOffSet = (imgSize / 2) - (currentW / 2);
 
@@ -321,5 +358,26 @@ public class StealthHUDOverlay {
         // 渲染
         graphics.blit(FRAME, drawX, drawY, uOffSet, 0, currentW, imgSize, imgSize, imgSize);
         graphics.pose().translate(0, 0, -zOffSet);
+    }
+
+//    private static void showLastSeenTickFromMob(GuiGraphics graphics) {
+//        Entity entity = Minecraft.getInstance().crosshairPickEntity;
+//        if (!(entity instanceof Mob mob)) return;
+//        if (!AlertSymbolRenderer.LAST_SEEN_TICKS.containsKey(mob)) return;
+//        Integer lastSeenTick = AlertSymbolRenderer.LAST_SEEN_TICKS.get(mob);
+//        MutableComponent literal = Component.literal(lastSeenTick + "");
+//        graphics.drawString(Minecraft.getInstance().font, literal, (graphics.guiWidth() - Minecraft.getInstance().font.width(literal)) / 2,
+//                graphics.guiHeight() / 2 + 20, 0xFFFFFF);
+//    }
+
+    private static void showVisibility(GuiGraphics graphics) {
+        if (Minecraft.getInstance().player == null) return;
+        VisibilityData data = Minecraft.getInstance().player.getData(ModAttachments.VISIBILITY_DATA);
+        String text = "Visibility: " + data.visibility();
+        Font font = Minecraft.getInstance().font;
+        MutableComponent component = Component.literal(text);
+        int height = font.lineHeight;
+
+        graphics.drawString(font, component, 0, (graphics.guiHeight() - height) / 2, 0xFFFFFF);
     }
 }

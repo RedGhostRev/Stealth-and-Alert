@@ -23,7 +23,7 @@ public class ClientConfigs {
 
     public static final ModConfigSpec.DoubleValue ALERT_SYMBOL_SCALE =
             BUILDER.comment("The scale of the alert symbol above enemies' heads. | 敌人头顶警戒标志的缩放。")
-                    .defineInRange("alertSymbolScale", 0.0025, 0.001, 0.01);
+                    .defineInRange("alertSymbolScale", 0.005, 0.001, 0.01);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

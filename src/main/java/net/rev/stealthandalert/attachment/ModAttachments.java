@@ -15,6 +15,9 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<AlertData>> ALERT_DATA = ATTACHMENT_TYPES.register("alert_data",
             () -> AttachmentType.builder(AlertData::createDefault).serialize(AlertData.CODEC).build());
 
+    public static final Supplier<AttachmentType<VisibilityData>> VISIBILITY_DATA = ATTACHMENT_TYPES.register("visibility_data",
+            () -> AttachmentType.builder(() -> VisibilityData.DEFAULT).build());
+
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
     }

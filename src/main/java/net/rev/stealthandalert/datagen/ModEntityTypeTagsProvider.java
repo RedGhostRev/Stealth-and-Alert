@@ -28,10 +28,12 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
                 .addTag(EntityTypeTags.ILLAGER)
                 .add(EntityType.CREEPER)
                 .add(EntityType.SLIME)
+                .add(EntityType.MAGMA_CUBE)
                 .add(EntityType.WITCH)
                 .add(EntityType.SILVERFISH)
                 .add(EntityType.PIGLIN_BRUTE)
-                .add(EntityType.HOGLIN);
+                .add(EntityType.HOGLIN)
+                .add(EntityType.BLAZE);
         // 带有条件的生物，触发特定条件后，才会执行警戒
         tag(ModTags.Entities.CONDITIONAL_SEEKERS)
                 .add(EntityType.SPIDER)

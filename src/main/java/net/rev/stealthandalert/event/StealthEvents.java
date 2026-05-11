@@ -1,6 +1,7 @@
 package net.rev.stealthandalert.event;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,16 +21,19 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.ai.InvestigateLkpGoal;
 import net.rev.stealthandalert.ai.StealthLookAroundGoal;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attachment.VisibilityData;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertSettings;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
+import net.rev.stealthandalert.network.S2CVisibilityDataPacket;
 import net.rev.stealthandalert.util.AlertLogicHandler;
 import net.rev.stealthandalert.util.ModTags;
 import net.rev.stealthandalert.util.StealthUtils;
@@ -266,7 +270,22 @@ public class StealthEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+        if (player.level().isClientSide()) return;
+
+        float currentVis = StealthUtils.calculateVisibility(player);
+
+        player.setData(ModAttachments.VISIBILITY_DATA, new VisibilityData(currentVis));
+
+        if (player.tickCount % 2 == 0) {
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new S2CVisibilityDataPacket(currentVis));
+        }
+    }
+
     // FIXME 可能有潜在的性能问题
+    // 分步发包？
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Pre event) {
         if (!(event.getEntity() instanceof Mob mob)) return;

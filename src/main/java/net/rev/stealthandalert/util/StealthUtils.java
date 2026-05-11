@@ -1,12 +1,18 @@
 package net.rev.stealthandalert.util;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -263,5 +269,83 @@ public class StealthUtils {
         double maxDownPitch = -settings.maxDownPitch();
 
         return pitchToTargetDegrees >= maxDownPitch && pitchToTargetDegrees <= maxUpPitch;
+    }
+
+    // 可见度计算
+    public static float calculateVisibility(Player player) {
+        if (player.isInvisible() && isFullyNaked(player)) return 0.0F;
+        if (isFullyHiddenByEnvironment(player)) return 0.0F;
+
+        int skyDarken = player.level().getSkyDarken();
+        int ambientLight = player.level().getRawBrightness(player.blockPosition(), skyDarken);
+        int emittedLight = getPlayerEmittedLight(player);
+        int finalLight = Math.max(ambientLight, emittedLight);
+
+        int effectiveThreshold = 2;
+        if (player.isCrouching()) {
+            effectiveThreshold = 4;
+        } else if (player.isVisuallyCrawling()) {
+            effectiveThreshold = 5;
+        }
+
+        if (finalLight <= emittedLight) return 0.0F;
+
+        float visibility = 1.0F;
+
+        // 计算
+        // 光照修正
+        float adjustedLight = (float) (finalLight - effectiveThreshold) / (15 - effectiveThreshold);
+        float lightMultiplier = 0.2F + adjustedLight * 0.8F;
+        visibility *= lightMultiplier;
+
+        // 姿态修正
+        if (player.isVisuallyCrawling()) {
+            visibility *= 0.4F;
+        } else if (player.isCrouching()) {
+            visibility *= 0.7F;
+        }
+
+        if (player.isSprinting()) {
+            visibility *= 1.25F;
+        }
+
+        return Math.clamp(visibility, 0.0F, 1.0F);
+    }
+
+    private static boolean isFullyHiddenByEnvironment(Player player) {
+        Level level = player.level();
+        BlockPos pos = player.blockPosition();
+
+        BlockState feetState = level.getBlockState(pos);
+        BlockState headState = level.getBlockState(pos.above());
+
+        boolean feetIsCover = feetState.is(Blocks.TALL_GRASS) || feetState.is(Blocks.LARGE_FERN) || feetState.is(BlockTags.TALL_FLOWERS);
+        boolean headIsCover = headState.is(Blocks.TALL_GRASS) || headState.is(Blocks.LARGE_FERN) || headState.is(BlockTags.TALL_FLOWERS);
+        boolean isInTallPlant = feetIsCover && headIsCover;
+        if (isInTallPlant) return true;
+
+        boolean isInShortGrass = (feetState.is(Blocks.SHORT_GRASS) || feetState.is(Blocks.FERN) || feetState.is(BlockTags.SMALL_FLOWERS)) && player.isVisuallyCrawling();
+        if (isInShortGrass) return true;
+
+        if (feetState.is(BlockTags.LEAVES) && headState.is(BlockTags.LEAVES)) return true;
+
+        return false;
+    }
+
+    private static int getPlayerEmittedLight(Player player) {
+        if (player.hasEffect(MobEffects.GLOWING)) return 15;
+
+        int glintLevel = 0;
+
+        for (ItemStack armor : player.getArmorSlots()) {
+            if (armor.isEnchanted()) {
+                glintLevel += 2;
+            }
+        }
+
+        if (player.getMainHandItem().isEnchanted()) glintLevel += 2;
+        if (player.getOffhandItem().isEnchanted()) glintLevel += 2;
+
+        return Math.min(glintLevel, 15);
     }
 }

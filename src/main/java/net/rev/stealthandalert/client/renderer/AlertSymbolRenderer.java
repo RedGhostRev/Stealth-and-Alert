@@ -21,8 +21,9 @@ import net.rev.stealthandalert.util.ModTags;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.WeakHashMap;
+import java.util.Map;
 
 // 绘制敌人头顶上的警戒标志
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID, value = Dist.CLIENT)
@@ -37,7 +38,7 @@ public class AlertSymbolRenderer {
     // 延迟渲染队列
     private static final List<RenderTask> RENDER_QUEUE = new ArrayList<>();
 
-    private static final WeakHashMap<Mob, Integer> LAST_SEEN_TICKS = new WeakHashMap<>();
+    private static final Map<Mob, Integer> LAST_SEEN_TICKS = new HashMap<>();
 
     @SubscribeEvent
     public static void onRenderAlertSymbol(RenderNameTagEvent event) {
@@ -84,6 +85,9 @@ public class AlertSymbolRenderer {
                 LAST_SEEN_TICKS.put(mob, tickCount);
                 tempAlphaE = 1.0F;
             } else {
+                if (!LAST_SEEN_TICKS.containsKey(mob)) {
+                    LAST_SEEN_TICKS.put(mob, tickCount);
+                }
                 int lastSeenTick = LAST_SEEN_TICKS.getOrDefault(mob, tickCount);
                 float ticksSinceLost = tickCount - lastSeenTick + partialTick;
                 float period = 50.0F;
@@ -125,6 +129,8 @@ public class AlertSymbolRenderer {
         });
     }
 
+    private static int cleanTick = 0;
+
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return;
@@ -137,6 +143,14 @@ public class AlertSymbolRenderer {
         }
 
         RENDER_QUEUE.clear();
+        cleanLastSeenTicks();
+    }
+
+
+    private static void cleanLastSeenTicks() {
+        if (++cleanTick < 20) return;
+        cleanTick = 0;
+        LAST_SEEN_TICKS.keySet().removeIf(mob -> mob.isRemoved() || mob.isDeadOrDying() || mob.getData(ModAttachments.ALERT_DATA).state() == AlertData.IDLE);
     }
 
     private static void renderTextureQuad(Matrix4f pose, MultiBufferSource bufferSource, ResourceLocation texture,
