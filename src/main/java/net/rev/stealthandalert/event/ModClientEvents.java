@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderNameTagEvent;
 import net.neoforged.neoforge.common.util.TriState;
@@ -18,7 +19,8 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
-import net.rev.stealthandalert.client.gui.overlay.StealthHUDOverlay;
+import net.rev.stealthandalert.client.gui.overlay.AlertIndicatorOverlay;
+import net.rev.stealthandalert.client.gui.overlay.VisibilityBarOverlay;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.datagen.LangKeys;
 import net.rev.stealthandalert.util.ModTags;
@@ -73,9 +75,38 @@ public class ModClientEvents {
     // 渲染HUD
     @SubscribeEvent
     public static void onRegisterOverlays(RegisterGuiLayersEvent event) {
-        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "stealth_hud"),
-                StealthHUDOverlay::render);
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "alert_indicator_hud"),
+                AlertIndicatorOverlay::render);
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "visibility_hud"),
+                VisibilityBarOverlay::render);
     }
+
+    @SubscribeEvent
+    public static void onClientPlayerLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        // 清空 HUD 数据
+        AlertIndicatorOverlay.FULL_AWARENESS_TICKS.clear();
+        AlertIndicatorOverlay.ACTIVE_POOL.clear();
+        AlertIndicatorOverlay.EXPIRED_GHOSTS.clear();
+    }
+
+    // 按键注册
+//    @SubscribeEvent
+//    public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+//        event.register(ModKeyMappings.CRAWL_KEY);
+//    }
+//
+//    @SubscribeEvent
+//    public static void onKeyInput(InputEvent.Key event) {
+//        Minecraft mc = Minecraft.getInstance();
+//        if (mc.player == null) return;
+//
+//        if (event.getAction() == GLFW.GLFW_PRESS) {
+//            if (event.getKey() == ModKeyMappings.CRAWL_KEY.getKey().getValue()) {
+//                boolean crawling = mc.player.getData(ModAttachments.CRAWL_DATA).isCrawling();
+//                mc.player.connection.send(new C2SCrawlPacket(!crawling));
+//            }
+//        }
+//    }
 
     // DEBUG内容
     @SubscribeEvent

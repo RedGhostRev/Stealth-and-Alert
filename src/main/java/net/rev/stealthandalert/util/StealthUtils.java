@@ -26,6 +26,8 @@ import net.rev.stealthandalert.network.S2CAlertDataPacket;
 import java.util.*;
 
 public class StealthUtils {
+    public static float VISIBILITY_THRESHOLD = CommonConfigs.VISIBILITY_THRESHOLD.get().floatValue();
+
     private StealthUtils() {
     }
 
@@ -102,6 +104,9 @@ public class StealthUtils {
             if (canSee) anyoneVisible = true;
 
             StealthEngine.IndividualResult res = StealthEngine.updateIndividual(
+                    player,
+                    mob,
+                    mob.getData(ModAttachments.ALERT_DATA).state(),
                     oldData.targetAwareness().getOrDefault(uuid, 0.0F),
                     oldData.targetReactionTicks().getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()),
                     oldData.targetStates().getOrDefault(uuid, AlertData.UNTRACKED),
@@ -161,8 +166,20 @@ public class StealthUtils {
             if (!panda.isAggressive()) return false;
         }
 
-        // 4.视线与碰撞检查
+        // 4.可见度不大于阈值时，最大感知距离检查
+        double distanceSqr = mob.distanceToSqr(player);
+        if (!player.getData(ModAttachments.VISIBILITY_DATA).isVisible()) {
+            double minDistance;
+            if (mob.getData(ModAttachments.ALERT_DATA).targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED) < AlertData.TRACKING) {
+                minDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE.getAsDouble();
+            } else {
+                minDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble();
+            }
+            if (distanceSqr > minDistance * minDistance) return false;
+        }
+
         boolean isTouching = mob.getBoundingBox().intersects(player.getBoundingBox().inflate(0.4));
+        // 5.视线与碰撞检查
         if (!isTouching && !StealthUtils.hasLineOfSight(mob, player)) {
             return false;
         }
@@ -214,7 +231,8 @@ public class StealthUtils {
                 gRes.primaryTarget(),
                 gRes.stateTicks(),
                 gRes.patienceTicks(),
-                gRes.isSeeingAnyone()
+                gRes.isSeeingAnyone(),
+                gRes.willFighting()
         );
     }
 
@@ -288,8 +306,6 @@ public class StealthUtils {
             effectiveThreshold = 5;
         }
 
-        if (finalLight <= emittedLight) return 0.0F;
-
         float visibility = 1.0F;
 
         // 计算
@@ -297,6 +313,11 @@ public class StealthUtils {
         float adjustedLight = (float) (finalLight - effectiveThreshold) / (15 - effectiveThreshold);
         float lightMultiplier = 0.2F + adjustedLight * 0.8F;
         visibility *= lightMultiplier;
+
+        // 环境修正
+        if (isInTallGrass(player.level(), player.blockPosition())) {
+            visibility *= 0.4F;
+        }
 
         // 姿态修正
         if (player.isVisuallyCrawling()) {
@@ -314,22 +335,95 @@ public class StealthUtils {
 
     private static boolean isFullyHiddenByEnvironment(Player player) {
         Level level = player.level();
-        BlockPos pos = player.blockPosition();
+        BlockPos center = player.blockPosition();
 
-        BlockState feetState = level.getBlockState(pos);
-        BlockState headState = level.getBlockState(pos.above());
+        if (isInLargeTallGrassPatch(level, center)) return true;
+        if (player.isVisuallyCrawling() && isInLargeShortGrassPatch(level, center)) return true;
 
-        boolean feetIsCover = feetState.is(Blocks.TALL_GRASS) || feetState.is(Blocks.LARGE_FERN) || feetState.is(BlockTags.TALL_FLOWERS);
-        boolean headIsCover = headState.is(Blocks.TALL_GRASS) || headState.is(Blocks.LARGE_FERN) || headState.is(BlockTags.TALL_FLOWERS);
-        boolean isInTallPlant = feetIsCover && headIsCover;
-        if (isInTallPlant) return true;
-
-        boolean isInShortGrass = (feetState.is(Blocks.SHORT_GRASS) || feetState.is(Blocks.FERN) || feetState.is(BlockTags.SMALL_FLOWERS)) && player.isVisuallyCrawling();
-        if (isInShortGrass) return true;
+        BlockState feetState = level.getBlockState(center);
+        BlockState headState = level.getBlockState(center.above());
 
         if (feetState.is(BlockTags.LEAVES) && headState.is(BlockTags.LEAVES)) return true;
 
         return false;
+    }
+
+    private static boolean isInTallGrass(Level level, BlockPos pos) {
+        BlockState feet = level.getBlockState(pos);
+        BlockState head = level.getBlockState(pos.above());
+        boolean feetIsCover = feet.is(Blocks.TALL_GRASS) || feet.is(Blocks.LARGE_FERN) || feet.is(BlockTags.TALL_FLOWERS);
+        boolean headIsCover = head.is(Blocks.TALL_GRASS) || head.is(Blocks.LARGE_FERN) || head.is(BlockTags.TALL_FLOWERS);
+        return feetIsCover && headIsCover;
+    }
+
+/*    private static boolean inInShortGrass(Level level, BlockPos pos) {
+        BlockState feet = level.getBlockState(pos);
+        return feet.is(Blocks.SHORT_GRASS) || feet.is(Blocks.FERN) || feet.is(BlockTags.SMALL_FLOWERS);
+    }*/
+
+    private static boolean isInLargeTallGrassPatch(Level level, BlockPos center) {
+        BlockPos[] origins = {
+                center,
+                center.north(),
+                center.west(),
+                center.north().west()
+        };
+
+        for (BlockPos origin : origins) {
+            if (is2x2TallGrassBlock(level, origin)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isInLargeShortGrassPatch(Level level, BlockPos center) {
+        BlockPos[] origins = {
+                center,
+                center.north(),
+                center.west(),
+                center.north().west()
+        };
+
+        for (BlockPos origin : origins) {
+            if (is2x2ShortGrassBlock(level, origin)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean is2x2TallGrassBlock(Level level, BlockPos origin) {
+        BlockPos[] feetPositions = {
+                origin, origin.east(), origin.south(), origin.east().south()
+        };
+        BlockPos[] headPositions = {
+                origin.above(), origin.east().above(), origin.south().above(), origin.east().south().above()
+        };
+
+        for (int i = 0; i < 4; i++) {
+            BlockState feet = level.getBlockState(feetPositions[i]);
+            BlockState head = level.getBlockState(headPositions[i]);
+            boolean feetIsCover = feet.is(Blocks.TALL_GRASS) || feet.is(Blocks.LARGE_FERN) || feet.is(BlockTags.TALL_FLOWERS);
+            boolean headIsCover = head.is(Blocks.TALL_GRASS) || head.is(Blocks.LARGE_FERN) || head.is(BlockTags.TALL_FLOWERS);
+            if (!(feetIsCover && headIsCover)) return false;
+        }
+
+        return true;
+    }
+
+    private static boolean is2x2ShortGrassBlock(Level level, BlockPos origin) {
+        BlockPos[] feetPositions = {
+                origin, origin.east(), origin.south(), origin.east().south()
+        };
+
+        for (int i = 0; i < 4; i++) {
+            BlockState feet = level.getBlockState(feetPositions[i]);
+            boolean feetIsCover = feet.is(Blocks.SHORT_GRASS) || feet.is(Blocks.FERN) || feet.is(BlockTags.SMALL_FLOWERS);
+            if (!feetIsCover) return false;
+        }
+
+        return true;
     }
 
     private static int getPlayerEmittedLight(Player player) {

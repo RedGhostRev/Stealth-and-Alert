@@ -4,10 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -16,25 +13,24 @@ import net.minecraft.world.entity.player.Player;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
-import net.rev.stealthandalert.attachment.VisibilityData;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.util.ModTags;
 
 import java.util.*;
 
-public class StealthHUDOverlay {
-    private static final ResourceLocation INDICATOR = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
+public class AlertIndicatorOverlay {
+    private static final ResourceLocation ALERT_INDICATOR = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
             "textures/gui/alert_indicator.png");
-    private static final ResourceLocation FRAME = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
+    private static final ResourceLocation ALERT_INDICATOR_FRAME = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
             "textures/gui/alert_indicator_frame.png");
 
-    private static final Map<UUID, Integer> FULL_AWARENESS_TICKS = new HashMap<>();
+    public static final Map<UUID, Integer> FULL_AWARENESS_TICKS = new HashMap<>();
 
-    private static final List<IndicatorData> ACTIVE_POOL = new ArrayList<>();
+    public static final List<IndicatorData> ACTIVE_POOL = new ArrayList<>();
 
-    private static final Set<UUID> EXPIRED_GHOSTS = new HashSet<>();
+    public static final Set<UUID> EXPIRED_GHOSTS = new HashSet<>();
 
-    static class IndicatorData {
+    public static class IndicatorData {
         final UUID uuid;
         float level;
         float angle;      // 精确角度，用于平滑渲染
@@ -81,6 +77,7 @@ public class StealthHUDOverlay {
         // 获取实体
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (entity instanceof Mob mob && mob.getType().is(ModTags.Entities.SEEKERS)) {
+                if (!mob.isAlive() || mob.isRemoved() || mob.isDeadOrDying()) continue;
                 AlertData data = mob.getData(ModAttachments.ALERT_DATA);
                 float level = data.targetAwareness().getOrDefault(myUUID, 0.0F);
                 aliveMobUuids.add(mob.getUUID());
@@ -138,8 +135,10 @@ public class StealthHUDOverlay {
                     // 更新它的最新状态
                     oldData.level = info.level;
                     oldData.angle = info.angle;             // 保持平滑转动
-                    oldData.sectorIndex = info.sector;      // 玩家转身时，它可能会掉进相邻的扇区
-                    found = true;
+                    oldData.sectorIndex = info.sector;
+                    if (info.mob.isAlive() || !info.mob.isDeadOrDying() || !info.mob.isRemoved()) {// 玩家转身时，它可能会掉进相邻的扇区
+                        found = true;
+                    }
                     break;
                 }
             }
@@ -206,8 +205,6 @@ public class StealthHUDOverlay {
                 iterator.remove();
             }
         }
-
-        // showVisibility(graphics);
     }
 
     // 画出警戒条
@@ -248,14 +245,14 @@ public class StealthHUDOverlay {
             // 填充白色
             float fillPercent = level / 50.0F;
             float actualFill = Math.min(fillPercent, unfoldProgress);
-            drawIndicatorLayer(graphics, radius, imgSize, actualFill, 1F, 1F, 1F, 1F, 0.01F);
+            drawIndicatorLayer(graphics, radius, imgSize, actualFill, 1F, 1F, 1F, 0.9F, 0.01F);
         } else if (level < 100) {
             // 画出底色
-            drawIndicatorLayer(graphics, radius, imgSize, unfoldProgress, 1F, 1F, 1F, 1F, 0.0F);
+            drawIndicatorLayer(graphics, radius, imgSize, unfoldProgress, 1F, 1F, 1F, 0.9F, 0.0F);
             // 填充黄色
             float fillPercent = (level - 50.0F) / 50.0F;
             float actualFill = Math.min(fillPercent, unfoldProgress);
-            drawIndicatorLayer(graphics, radius, imgSize, actualFill, 1.0F, 0.8F, 0.0F, 1.0F, 0.01F);
+            drawIndicatorLayer(graphics, radius, imgSize, actualFill, 1.0F, 0.8F, 0.0F, 0.9F, 0.01F);
         } else {
             // 红色
             int startTick = FULL_AWARENESS_TICKS.getOrDefault(mobUuid, player.tickCount);
@@ -307,7 +304,7 @@ public class StealthHUDOverlay {
         }
 
         if (level < 100) {
-            drawIndicatorLayerFrame(graphics, radius, imgSize, unfoldProgress, 0F, 0F, 0F, 0.5F, 0.02F);
+            drawIndicatorLayerFrame(graphics, radius, imgSize, unfoldProgress, 0.5F, 0.5F, 0.5F, 0.2F, 0.02F);
         }
 
         // 重置颜色
@@ -328,7 +325,8 @@ public class StealthHUDOverlay {
     // 填充颜色
     private static void drawIndicatorLayer(GuiGraphics graphics, int radius, int imgSize, float levelPercent,
                                            float r, float g, float b, float a, float zOffSet) {
-        int currentW = (int) (62 * levelPercent);
+        int maxW = 62;
+        int currentW = Math.max(2, (int)(maxW * levelPercent) & ~1);
         int uOffSet = (imgSize / 2) - (currentW / 2);
 
         int drawX = -currentW / 2;
@@ -339,13 +337,14 @@ public class StealthHUDOverlay {
 
         graphics.pose().translate(0, 0, zOffSet);
         // 渲染
-        graphics.blit(INDICATOR, drawX, drawY, uOffSet, 0, currentW, imgSize, imgSize, imgSize);
+        graphics.blit(ALERT_INDICATOR, drawX, drawY, uOffSet, 0, currentW, imgSize, imgSize, imgSize);
         graphics.pose().translate(0, 0, -zOffSet);
     }
 
     private static void drawIndicatorLayerFrame(GuiGraphics graphics, int radius, int imgSize, float levelPercent,
                                                 float r, float g, float b, float a, float zOffSet) {
-        int currentW = (int) (64 * levelPercent);
+        int maxW = 64;
+        int currentW = Math.max(2, (int)(maxW * levelPercent) & ~1);
         int uOffSet = (imgSize / 2) - (currentW / 2);
 
         int drawX = -currentW / 2;
@@ -356,28 +355,7 @@ public class StealthHUDOverlay {
 
         graphics.pose().translate(0, 0, zOffSet);
         // 渲染
-        graphics.blit(FRAME, drawX, drawY, uOffSet, 0, currentW, imgSize, imgSize, imgSize);
+        graphics.blit(ALERT_INDICATOR_FRAME, drawX, drawY, uOffSet, 0, currentW, imgSize, imgSize, imgSize);
         graphics.pose().translate(0, 0, -zOffSet);
-    }
-
-//    private static void showLastSeenTickFromMob(GuiGraphics graphics) {
-//        Entity entity = Minecraft.getInstance().crosshairPickEntity;
-//        if (!(entity instanceof Mob mob)) return;
-//        if (!AlertSymbolRenderer.LAST_SEEN_TICKS.containsKey(mob)) return;
-//        Integer lastSeenTick = AlertSymbolRenderer.LAST_SEEN_TICKS.get(mob);
-//        MutableComponent literal = Component.literal(lastSeenTick + "");
-//        graphics.drawString(Minecraft.getInstance().font, literal, (graphics.guiWidth() - Minecraft.getInstance().font.width(literal)) / 2,
-//                graphics.guiHeight() / 2 + 20, 0xFFFFFF);
-//    }
-
-    private static void showVisibility(GuiGraphics graphics) {
-        if (Minecraft.getInstance().player == null) return;
-        VisibilityData data = Minecraft.getInstance().player.getData(ModAttachments.VISIBILITY_DATA);
-        String text = "Visibility: " + data.visibility();
-        Font font = Minecraft.getInstance().font;
-        MutableComponent component = Component.literal(text);
-        int height = font.lineHeight;
-
-        graphics.drawString(font, component, 0, (graphics.guiHeight() - height) / 2, 0xFFFFFF);
     }
 }

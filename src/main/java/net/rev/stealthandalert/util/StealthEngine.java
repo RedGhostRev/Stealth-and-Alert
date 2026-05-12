@@ -4,6 +4,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.rev.stealthandalert.attachment.AlertData;
+import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.config.CommonConfigs;
 
 import java.util.Map;
@@ -20,11 +21,15 @@ public class StealthEngine {
             Optional<UUID> primaryTarget,
             int stateTicks,
             int patienceTicks,
-            boolean isSeeingAnyone
+            boolean isSeeingAnyone,
+            boolean willFighting
     ) {
     }
 
     public static IndividualResult updateIndividual(
+            Player player,
+            Mob mob,
+            int state,
             float currentLevel,
             int currentReaction,
             int currentPState,
@@ -49,8 +54,33 @@ public class StealthEngine {
 
             // 涨条期：在AWARE状态下累积
             if (nextPState == AlertData.AWARE) {
-                // TODO 引入可见度
-                nextLevel = Math.min(100.0F, currentLevel + 1.2F);
+                // 可见度系数
+                float visibility = player.getData(ModAttachments.VISIBILITY_DATA).visibility();
+                double distanceSqr = mob.distanceToSqr(player);
+                float visModifier = Math.clamp(visibility, StealthUtils.VISIBILITY_THRESHOLD, 1F);
+                visModifier *= CommonConfigs.AWARENESS_INCREASE_VISIBILITY_FACTOR.get().floatValue();
+
+                // 距离系数
+                float distModifier = 1F;
+                if (distanceSqr <= 64.0) {
+                    float dist = (float) Math.sqrt(distanceSqr);
+                    dist = Math.clamp(dist, 0.4F, 8F);
+                    distModifier = (float) (Math.pow(8.0F / dist, 2.5));
+                    distModifier = Math.clamp(distModifier, 1F, 300F);
+                    distModifier *= CommonConfigs.AWARENESS_INCREASE_DISTANCE_FACTOR.get().floatValue();
+                }
+                // 状态系数
+                float stateModifier = 1F;
+                if (state == AlertData.SUSPICIOUS) {
+                    stateModifier *= CommonConfigs.AWARENESS_INCREASE_SUSPICIOUS_STATE_FACTOR.get().floatValue();
+                } else if (state == AlertData.SEARCHING) {
+                    stateModifier *= CommonConfigs.AWARENESS_INCREASE_SEARCHING_STATE_FACTOR.get().floatValue();
+                }
+
+                float basicIncreaseRate = CommonConfigs.AWARENESS_INCREASE_BASIC_RATE.get().floatValue();
+
+                float awarenessIncreaseRate = basicIncreaseRate * visModifier * distModifier * stateModifier;
+                nextLevel = Math.min(100.0F, currentLevel + awarenessIncreaseRate);
                 if (nextLevel >= 100.0F) {
                     nextPState = AlertData.TRACKING;
                 }
@@ -67,7 +97,7 @@ public class StealthEngine {
             if (currentPState == AlertData.TRACKING) {
                 // 若处于 TRACKING 状态，则初始 currentReaction 必定为0
                 if (nextReaction <= 0) {
-                    nextReaction = 10;
+                    nextReaction = 15;
                 } else {
                     nextReaction--;
                     if (nextReaction <= 0) {
@@ -75,7 +105,17 @@ public class StealthEngine {
                     }
                 }
             } else {
-                nextLevel = Math.max(0.0F, currentLevel - 0.5F);
+                // 状态系数
+                float stateModifier = 1F;
+                if (state == AlertData.SUSPICIOUS) {
+                    stateModifier = CommonConfigs.AWARENESS_DECREASE_SUSPICIOUS_STATE_FACTOR.get().floatValue();
+                } else if (state == AlertData.SEARCHING) {
+                    stateModifier = CommonConfigs.AWARENESS_DECREASE_SEARCHING_STATE_FACTOR.get().floatValue();
+                }
+
+                float basicDecreaseRate = CommonConfigs.AWARENESS_DECREASE_BASIC_RATE.get().floatValue();
+                float awarenessDecreaseRate = basicDecreaseRate * stateModifier;
+                nextLevel = Math.max(0.0F, currentLevel - awarenessDecreaseRate);
                 nextMemory = Math.max(0, --currentMemory); // 只要看不见，记忆就开始衰减
             }
 
@@ -99,6 +139,7 @@ public class StealthEngine {
         int nextPatienceTicks = oldData.patienceTicks();
         Optional<Vec3> nextLkp = oldData.lastKnownPos();
         Optional<UUID> nextPrimary = oldData.primaryTarget();
+        boolean willFighting = oldData.willFighting();
 
         // 找出当前全场最高的警戒值
         float maxLevel = 0.0F;
@@ -165,19 +206,36 @@ public class StealthEngine {
             // 只有当全场最高警戒值大于0，即怪物至少对看到的一个人反应过来后，才重置耐心值和状态切换计时器
             if (maxLevel > 0.0F) {
                 nextPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt();
-                nextStateTicks = 0;
+                if (!willFighting) {
+                    nextStateTicks = 0;
+                }
             }
 
             // 如果有人处于TRACKING状态，强制进入FIGHTING
+            // 但在此之前，应有一个很短的计时，这个计时与红条动画时长相同
             boolean anyoneTracking = currentResults.values().stream()
                     .anyMatch(r -> r.pState() == AlertData.TRACKING);
 
             if (anyoneTracking) {
-                nextState = AlertData.FIGHTING;
-            } else if (maxLevel >= 50.0F && nextState < AlertData.SEARCHING) {
-                nextState = AlertData.SEARCHING;
-            } else if (maxLevel > 0.0F && nextState < AlertData.SUSPICIOUS) {
-                nextState = AlertData.SUSPICIOUS;
+                if (nextState < AlertData.FIGHTING && !willFighting) {
+                    nextStateTicks = 15;
+                    willFighting = true;
+                }
+            } else if (!willFighting) {
+                if (maxLevel >= 50.0F && nextState < AlertData.SEARCHING) {
+                    nextState = AlertData.SEARCHING;
+                } else if (maxLevel > 0.0F && nextState < AlertData.SUSPICIOUS) {
+                    nextState = AlertData.SUSPICIOUS;
+                }
+            }
+
+            // 计时
+            if (nextStateTicks > 0) {
+                nextStateTicks--;
+                if (nextStateTicks <= 0 && willFighting) {
+                    nextState = AlertData.FIGHTING;
+                    willFighting = false;
+                }
             }
 
             // LKP竞争更新
@@ -192,27 +250,29 @@ public class StealthEngine {
 
         // B: 状态降级（看不到人，开始阶梯回落）
         else {
-            // 如果怪物看不到人，且仍处于 FIGHTING 状态，
-            // 则为了确保怪物在战斗中不轻易丢失锁定，为 FIGHTING 状态下的降级设定一个很短的计时
-            if (nextState == AlertData.FIGHTING) {
-                if (nextStateTicks <= 0) {
-                    nextStateTicks = 10;
-                }
-            }
-            if (maxLevel <= 0.0F) {
-                // 如果所有人警戒值都为空，开始计时降级
-                if (nextState == AlertData.SEARCHING) {
-                    // 如果到了LKP附近或者耐心耗尽
-                    boolean reachedLkp = nextLkp.isPresent() && mob.distanceToSqr(nextLkp.get()) < 4.0;
-                    if (reachedLkp || --nextPatienceTicks <= 1) {
-                        if (nextStateTicks <= 0) {
-                            nextStateTicks = 300;
-                        }
-                    }
-                } else if (nextState == AlertData.SUSPICIOUS) {
-                    // SUSPICIOUS状态直接回落
+            if (!willFighting) {
+                // 如果怪物看不到人，且仍处于 FIGHTING 状态，
+                // 则为了确保怪物在战斗中不轻易丢失锁定，为 FIGHTING 状态下的降级设定一个很短的计时
+                if (nextState == AlertData.FIGHTING) {
                     if (nextStateTicks <= 0) {
-                        nextStateTicks = 160;
+                        nextStateTicks = 10;
+                    }
+                }
+                if (maxLevel <= 0.0F) {
+                    // 如果所有人警戒值都为空，开始计时降级
+                    if (nextState == AlertData.SEARCHING) {
+                        // 如果到了LKP附近或者耐心耗尽
+                        boolean reachedLkp = nextLkp.isPresent() && mob.distanceToSqr(nextLkp.get()) < 4.0;
+                        if (reachedLkp || --nextPatienceTicks <= 1) {
+                            if (nextStateTicks <= 0) {
+                                nextStateTicks = 300;
+                            }
+                        }
+                    } else if (nextState == AlertData.SUSPICIOUS) {
+                        // SUSPICIOUS状态直接回落
+                        if (nextStateTicks <= 0) {
+                            nextStateTicks = 160;
+                        }
                     }
                 }
             }
@@ -220,7 +280,10 @@ public class StealthEngine {
             if (nextStateTicks > 0) {
                 nextStateTicks--;
                 if (nextStateTicks <= 0) {
-                    if (nextState == AlertData.FIGHTING) {
+                    if (willFighting) {
+                        nextState = AlertData.FIGHTING;
+                        willFighting = false;
+                    } else if (nextState == AlertData.FIGHTING) {
                         nextState = AlertData.SEARCHING;
                     } else {
                         nextState = AlertData.IDLE;
@@ -231,6 +294,6 @@ public class StealthEngine {
                 }
             }
         }
-        return new GlobalResult(nextState, nextLkp, nextPrimary, nextStateTicks, nextPatienceTicks, anyTargetVisible);
+        return new GlobalResult(nextState, nextLkp, nextPrimary, nextStateTicks, nextPatienceTicks, anyTargetVisible, willFighting);
     }
 }

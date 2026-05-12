@@ -28,12 +28,14 @@ import java.util.Map;
 // 绘制敌人头顶上的警戒标志
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID, value = Dist.CLIENT)
 public class AlertSymbolRenderer {
-    private static final ResourceLocation BASE = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
-            "textures/gui/alert_symbol_base.png");
-    private static final ResourceLocation EXCLAMATION = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
+    private static final ResourceLocation ALERT_SYMBOL_BACKGROUND = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
+            "textures/gui/alert_symbol_background.png");
+    private static final ResourceLocation ALERT_SYMBOL_EXCLAMATION = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
             "textures/gui/alert_symbol_exclamation.png");
-    private static final ResourceLocation QUESTION = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
+    private static final ResourceLocation ALERT_SYMBOL_QUESTION = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
             "textures/gui/alert_symbol_question.png");
+    private static final ResourceLocation ALERT_SYMBOL_BACKGROUND_FRAME = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
+            "textures/gui/alert_symbol_background_frame.png");
 
     // 延迟渲染队列
     private static final List<RenderTask> RENDER_QUEUE = new ArrayList<>();
@@ -44,6 +46,7 @@ public class AlertSymbolRenderer {
     public static void onRenderAlertSymbol(RenderNameTagEvent event) {
         if (!ClientConfigs.ALERT_SYMBOL.get()) return;
         if (!(event.getEntity() instanceof Mob mob) || !mob.getType().is(ModTags.Entities.SEEKERS)) return;
+        if (!mob.isAlive() || mob.isDeadOrDying() || mob.isRemoved()) return;
 
         AlertData data = mob.getData(ModAttachments.ALERT_DATA);
         int state = data.state();
@@ -66,7 +69,7 @@ public class AlertSymbolRenderer {
         }
         poseStack.translate(0.0F, yOffset, 0.0F);
         poseStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
-        float scale = ((float) ClientConfigs.ALERT_SYMBOL_SCALE.getAsDouble());
+        float scale = ClientConfigs.ALERT_SYMBOL_SCALE.get().floatValue();
         poseStack.scale(scale, -scale, scale);
         Matrix4f savedMatrix = new Matrix4f(poseStack.last().pose());
         poseStack.popPose();
@@ -115,16 +118,17 @@ public class AlertSymbolRenderer {
         float alphaE = tempAlphaE;
 
         RENDER_QUEUE.add(bufferSource -> {
-            renderTextureQuad(savedMatrix, bufferSource, BASE, 0F, 0F, 0F, 0.5F, 15728880);
+            renderTextureQuad(savedMatrix, bufferSource, ALERT_SYMBOL_BACKGROUND, 0F, 0F, 0F, 0.5F, 15728880);
+            renderTextureQuad(savedMatrix, bufferSource, ALERT_SYMBOL_BACKGROUND_FRAME, 0.5F, 0.5F, 0.5F, 0.3F, 15728880);
             if (alphaQ > 0.01F) {
                 if (state == AlertData.SUSPICIOUS) {
-                    renderTextureQuad(savedMatrix, bufferSource, QUESTION, 1.0F, 1.0F, 1.0F, alphaQ, 15728880);
+                    renderTextureQuad(savedMatrix, bufferSource, ALERT_SYMBOL_QUESTION, 1.0F, 1.0F, 1.0F, alphaQ, 15728880);
                 } else {
-                    renderTextureQuad(savedMatrix, bufferSource, QUESTION, 1.0F, 0.8F, 0.0F, alphaQ, 15728880);
+                    renderTextureQuad(savedMatrix, bufferSource, ALERT_SYMBOL_QUESTION, 1.0F, 0.8F, 0.0F, alphaQ, 15728880);
                 }
             }
             if (alphaE > 0.01F) {
-                renderTextureQuad(savedMatrix, bufferSource, EXCLAMATION, 1.0F, 0.8F, 0.0F, alphaE, 15728880);
+                renderTextureQuad(savedMatrix, bufferSource, ALERT_SYMBOL_EXCLAMATION, 1.0F, 0.8F, 0.0F, alphaE, 15728880);
             }
         });
     }

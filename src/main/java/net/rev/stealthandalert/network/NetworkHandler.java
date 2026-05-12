@@ -25,8 +25,26 @@ public class NetworkHandler {
                 S2CVisibilityDataPacket.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> {
                     Player player = context.player();
-                    player.setData(ModAttachments.VISIBILITY_DATA, new VisibilityData(payload.visibility()));
+                    player.setData(ModAttachments.VISIBILITY_DATA, new VisibilityData(payload.visibility(), payload.isVisible()));
                 })
         );
+
+//        registrar.playToClient(
+//                S2CCrawlPacket.TYPE,
+//                S2CCrawlPacket.STREAM_CODEC,
+//                (payload, context) -> context.enqueueWork(() -> {
+//                    Player player = context.player();
+//                    player.setData(ModAttachments.CRAWL_DATA, new CrawlData(payload.isCrawling()));
+//                })
+//        );
+//
+//        registrar.playToServer(
+//                C2SCrawlPacket.TYPE,
+//                C2SCrawlPacket.STREAM_CODEC,
+//                ((payload, context) -> {
+//                    Player player = context.player();
+//                    player.setData(ModAttachments.CRAWL_DATA, new CrawlData(payload.isCrawling()));
+//                })
+//        );
     }
 }

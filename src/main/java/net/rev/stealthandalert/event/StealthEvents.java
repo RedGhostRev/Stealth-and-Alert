@@ -152,7 +152,8 @@ public class StealthEvents {
                         data.primaryTarget(),
                         data.stateChangeTicks(),
                         data.patienceTicks(),
-                        data.canSeeAnyone()
+                        data.canSeeAnyone(),
+                        data.willFighting()
                 );
 
                 mob.setData(ModAttachments.ALERT_DATA, newData);
@@ -196,7 +197,8 @@ public class StealthEvents {
                         nextPrimary,
                         data.stateChangeTicks(),
                         data.patienceTicks(),
-                        data.canSeeAnyone()
+                        data.canSeeAnyone(),
+                        data.willFighting()
                 );
 
                 mob.setData(ModAttachments.ALERT_DATA, newData);
@@ -225,7 +227,7 @@ public class StealthEvents {
 
                     AlertData newData = new AlertData(
                             data.state(), data.targetAwareness(), data.targetStates(), data.targetReactionTicks(),
-                            memoryMap, data.lastKnownPos(), data.primaryTarget(), data.stateChangeTicks(), data.patienceTicks(), data.canSeeAnyone()
+                            memoryMap, data.lastKnownPos(), data.primaryTarget(), data.stateChangeTicks(), data.patienceTicks(), data.canSeeAnyone(), data.willFighting()
                     );
 
                     golem.setData(ModAttachments.ALERT_DATA, newData);
@@ -274,13 +276,20 @@ public class StealthEvents {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
         if (player.level().isClientSide()) return;
+/*        boolean crawling = player.getData(ModAttachments.CRAWL_DATA).isCrawling();
+        if (crawling) {
+            player.setPose(Pose.SWIMMING);
+        }
+        PacketDistributor.sendToPlayer((ServerPlayer) player, new S2CCrawlPacket(crawling));*/
 
         float currentVis = StealthUtils.calculateVisibility(player);
+        boolean isVisible;
+        isVisible = !(currentVis <= StealthUtils.VISIBILITY_THRESHOLD);
 
-        player.setData(ModAttachments.VISIBILITY_DATA, new VisibilityData(currentVis));
+        player.setData(ModAttachments.VISIBILITY_DATA, new VisibilityData(currentVis, isVisible));
 
         if (player.tickCount % 2 == 0) {
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new S2CVisibilityDataPacket(currentVis));
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new S2CVisibilityDataPacket(currentVis, isVisible));
         }
     }
 

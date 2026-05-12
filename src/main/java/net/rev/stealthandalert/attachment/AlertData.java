@@ -24,7 +24,8 @@ public record AlertData(
         Optional<UUID> primaryTarget,
         int stateChangeTicks,
         int patienceTicks,
-        boolean canSeeAnyone) {
+        boolean canSeeAnyone,
+        boolean willFighting) {
 
     // 生物全局警戒状态
     public static final int IDLE = 0;
@@ -49,7 +50,8 @@ public record AlertData(
 
                     Codec.INT.optionalFieldOf("state_change_ticks", 0).forGetter(AlertData::stateChangeTicks),
                     Codec.INT.optionalFieldOf("patience_ticks", 600).forGetter(AlertData::patienceTicks),
-                    Codec.BOOL.optionalFieldOf("can_see_anyone", false).forGetter(AlertData::canSeeAnyone)
+                    Codec.BOOL.optionalFieldOf("can_see_anyone", false).forGetter(AlertData::canSeeAnyone),
+                    Codec.BOOL.optionalFieldOf("will_fighting", false).forGetter(AlertData::willFighting)
             ).apply(instance, AlertData::new)
     );
 
@@ -79,7 +81,8 @@ public record AlertData(
                     ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC).decode(buf),   // primaryTarget
                     ByteBufCodecs.VAR_INT.decode(buf),                           // stateChangeTicks
                     ByteBufCodecs.VAR_INT.decode(buf),                           // patienceTicks
-                    ByteBufCodecs.BOOL.decode(buf)                               // canSeeAnyone
+                    ByteBufCodecs.BOOL.decode(buf),                              // canSeeAnyone
+                    ByteBufCodecs.BOOL.decode(buf)                               // willFighting
             );
         }
 
@@ -95,11 +98,12 @@ public record AlertData(
             ByteBufCodecs.VAR_INT.encode(buf, data.stateChangeTicks());
             ByteBufCodecs.VAR_INT.encode(buf, data.patienceTicks());
             ByteBufCodecs.BOOL.encode(buf, data.canSeeAnyone());
+            ByteBufCodecs.BOOL.encode(buf, data.willFighting());
         }
     };
 
     public static AlertData createDefault() {
-        return new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt(), false);
+        return new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt(), false, false);
     }
 }
 

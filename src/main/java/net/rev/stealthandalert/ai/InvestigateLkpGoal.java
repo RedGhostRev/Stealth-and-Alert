@@ -114,7 +114,7 @@ public class InvestigateLkpGoal extends Goal {
                 this.isSearchingAround = true;
             } else {
                 this.stayTicks--;
-                if (this.stayTicks == 0) {
+                if (this.stayTicks <= 0) {
                     this.pickNextSearchPoint();
                     this.mob.getNavigation().moveTo(this.targetX, this.targetY, this.targetZ, this.speedModifier);
                 }
