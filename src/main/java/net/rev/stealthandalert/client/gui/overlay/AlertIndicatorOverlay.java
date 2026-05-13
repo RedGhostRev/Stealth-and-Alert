@@ -136,7 +136,7 @@ public class AlertIndicatorOverlay {
                     oldData.level = info.level;
                     oldData.angle = info.angle;             // 保持平滑转动
                     oldData.sectorIndex = info.sector;
-                    if (info.mob.isAlive() || !info.mob.isDeadOrDying() || !info.mob.isRemoved()) {// 玩家转身时，它可能会掉进相邻的扇区
+                    if (info.mob.isAlive() && !info.mob.isDeadOrDying() && !info.mob.isRemoved()) {// 玩家转身时，它可能会掉进相邻的扇区
                         found = true;
                     }
                     break;
@@ -187,7 +187,7 @@ public class AlertIndicatorOverlay {
                 float ticksGone = mc.player.tickCount - data.outAnimTick + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
                 unfoldProgress = Math.max(0F, 1F - (ticksGone / animDuration));
                 unfoldProgress = unfoldProgress * unfoldProgress; // ease-in
-                if (unfoldProgress <= 0.01F) {
+                if (unfoldProgress <= 0.01F || FULL_AWARENESS_TICKS.containsKey(data.uuid)) {
                     removeNow = true;
                 }
             } else {
@@ -198,11 +198,10 @@ public class AlertIndicatorOverlay {
                 unfoldProgress = 1.0F - (1.0F - unfoldProgress) * (1.0F - unfoldProgress);
             }
 
-            if (unfoldProgress > 0.01F) {
-                drawIndicator(graphics, mc.player, data.uuid, data.level, data.angle, radius, unfoldProgress);
-            }
             if (removeNow) {
                 iterator.remove();
+            } else if (unfoldProgress > 0.01F) {
+                drawIndicator(graphics, mc.player, data.uuid, data.level, data.angle, radius, unfoldProgress);
             }
         }
     }
@@ -326,7 +325,7 @@ public class AlertIndicatorOverlay {
     private static void drawIndicatorLayer(GuiGraphics graphics, int radius, int imgSize, float levelPercent,
                                            float r, float g, float b, float a, float zOffSet) {
         int maxW = 62;
-        int currentW = Math.max(2, (int)(maxW * levelPercent) & ~1);
+        int currentW = Math.max(2, (int) (maxW * levelPercent) & ~1);
         int uOffSet = (imgSize / 2) - (currentW / 2);
 
         int drawX = -currentW / 2;
@@ -344,7 +343,7 @@ public class AlertIndicatorOverlay {
     private static void drawIndicatorLayerFrame(GuiGraphics graphics, int radius, int imgSize, float levelPercent,
                                                 float r, float g, float b, float a, float zOffSet) {
         int maxW = 64;
-        int currentW = Math.max(2, (int)(maxW * levelPercent) & ~1);
+        int currentW = Math.max(2, (int) (maxW * levelPercent) & ~1);
         int uOffSet = (imgSize / 2) - (currentW / 2);
 
         int drawX = -currentW / 2;

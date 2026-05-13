@@ -218,6 +218,7 @@ public class StealthEngine {
 
             if (anyoneTracking) {
                 if (nextState < AlertData.FIGHTING && !willFighting) {
+                    nextState = AlertData.TRACKING;
                     nextStateTicks = 15;
                     willFighting = true;
                 }
