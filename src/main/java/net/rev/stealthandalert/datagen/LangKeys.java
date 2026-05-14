@@ -29,8 +29,8 @@ public class LangKeys {
     public static final String STEALTH_AND_ALERT_BLOCKS_TAB = "itemGroup." + MOD_ID + ".blocks_tab";
 
     // Key Mappings
-//    public static final String CATEGORY = "category." + MOD_ID + "stealth_and_alert";
-//    public static final String CRAWL = "key." + MOD_ID + ".crawl";
+    public static final String CATEGORY = "category." + MOD_ID + "stealth_and_alert";
+    public static final String CRAWL = "key." + MOD_ID + ".crawl";
 
     // Debug Texts
     public static final String DEBUG_MODE_ON = "debug." + MOD_ID + "debug_mode_on";

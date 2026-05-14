@@ -3,6 +3,7 @@ package net.rev.stealthandalert.datagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.rev.stealthandalert.StealthAndAlert;
@@ -34,5 +35,13 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
         tag(ModTags.Blocks.INCORRECT_FOR_SHADOW_CRYSTAL_TOOL)
                 .addTag(BlockTags.INCORRECT_FOR_IRON_TOOL)
                 .remove(ModTags.Blocks.NEEDS_SHADOW_CRYSTAL_TOOL);
+
+        tag(ModTags.Blocks.CAN_COVER)
+                .addTag(BlockTags.TALL_FLOWERS)
+                .add(Blocks.TALL_GRASS)
+                .add(Blocks.LARGE_FERN)
+                .add(Blocks.SUGAR_CANE)
+                .add(Blocks.TALL_SEAGRASS)
+                .add(Blocks.KELP_PLANT);
     }
 }

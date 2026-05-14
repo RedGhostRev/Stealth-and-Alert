@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "net.rev.stealthandalert.mixin",
+  "mixins": [
+    "PlayerMixin"
+  ],
+  "client": [
+  ],
+  "server": [
+  ],
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

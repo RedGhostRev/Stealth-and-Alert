@@ -27,12 +27,14 @@ import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.ai.InvestigateLkpGoal;
 import net.rev.stealthandalert.ai.StealthLookAroundGoal;
 import net.rev.stealthandalert.attachment.AlertData;
+import net.rev.stealthandalert.attachment.CrawlData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.attachment.VisibilityData;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertSettings;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
+import net.rev.stealthandalert.network.S2CCrawlPacket;
 import net.rev.stealthandalert.network.S2CVisibilityDataPacket;
 import net.rev.stealthandalert.util.AlertLogicHandler;
 import net.rev.stealthandalert.util.ModTags;
@@ -276,11 +278,14 @@ public class StealthEvents {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
         if (player.level().isClientSide()) return;
-/*        boolean crawling = player.getData(ModAttachments.CRAWL_DATA).isCrawling();
+        boolean crawling = player.getData(ModAttachments.CRAWL_DATA).isCrawling();
         if (crawling) {
-            player.setPose(Pose.SWIMMING);
+            if (player.isSleeping() || player.isPassenger() || player.isFallFlying() || player.getAbilities().flying) {
+                crawling = false;
+                player.setData(ModAttachments.CRAWL_DATA, new CrawlData(crawling));
+            }
         }
-        PacketDistributor.sendToPlayer((ServerPlayer) player, new S2CCrawlPacket(crawling));*/
+        PacketDistributor.sendToPlayer((ServerPlayer) player, new S2CCrawlPacket(crawling));
 
         float currentVis = StealthUtils.calculateVisibility(player);
         boolean isVisible;

@@ -6,6 +6,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.attachment.CrawlData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.attachment.VisibilityData;
 
@@ -29,22 +30,22 @@ public class NetworkHandler {
                 })
         );
 
-//        registrar.playToClient(
-//                S2CCrawlPacket.TYPE,
-//                S2CCrawlPacket.STREAM_CODEC,
-//                (payload, context) -> context.enqueueWork(() -> {
-//                    Player player = context.player();
-//                    player.setData(ModAttachments.CRAWL_DATA, new CrawlData(payload.isCrawling()));
-//                })
-//        );
-//
-//        registrar.playToServer(
-//                C2SCrawlPacket.TYPE,
-//                C2SCrawlPacket.STREAM_CODEC,
-//                ((payload, context) -> {
-//                    Player player = context.player();
-//                    player.setData(ModAttachments.CRAWL_DATA, new CrawlData(payload.isCrawling()));
-//                })
-//        );
+        registrar.playToClient(
+                S2CCrawlPacket.TYPE,
+                S2CCrawlPacket.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> {
+                    Player player = context.player();
+                    player.setData(ModAttachments.CRAWL_DATA, new CrawlData(payload.isCrawling()));
+                })
+        );
+
+        registrar.playToServer(
+                C2SCrawlPacket.TYPE,
+                C2SCrawlPacket.STREAM_CODEC,
+                ((payload, context) -> {
+                    Player player = context.player();
+                    player.setData(ModAttachments.CRAWL_DATA, new CrawlData(payload.isCrawling()));
+                })
+        );
     }
 }

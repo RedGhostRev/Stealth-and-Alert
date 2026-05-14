@@ -14,6 +14,7 @@ public class ModTags {
     public static class Blocks {
         public static final TagKey<Block> NEEDS_SHADOW_CRYSTAL_TOOL = createTag("needs_shadow_crystal_tool");
         public static final TagKey<Block> INCORRECT_FOR_SHADOW_CRYSTAL_TOOL = createTag("incorrect_for_shadow_crystal_tool");
+        public static final TagKey<Block> CAN_COVER = createTag("can_cover");
 
         private static TagKey<Block> createTag(String name) {
             return BlockTags.create(ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, name));

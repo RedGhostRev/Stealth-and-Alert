@@ -18,8 +18,8 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<VisibilityData>> VISIBILITY_DATA = ATTACHMENT_TYPES.register("visibility_data",
             () -> AttachmentType.builder(() -> VisibilityData.DEFAULT).serialize(VisibilityData.CODEC).build());
 
-//    public static final Supplier<AttachmentType<CrawlData>> CRAWL_DATA = ATTACHMENT_TYPES.register("crawl_data",
-//            () -> AttachmentType.builder(() -> CrawlData.DEFAULT).build());
+    public static final Supplier<AttachmentType<CrawlData>> CRAWL_DATA = ATTACHMENT_TYPES.register("crawl_data",
+            () -> AttachmentType.builder(() -> CrawlData.DEFAULT).build());
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);

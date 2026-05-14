@@ -11,9 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.event.RenderNameTagEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.rev.stealthandalert.StealthAndAlert;
@@ -21,9 +19,12 @@ import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.client.gui.overlay.AlertIndicatorOverlay;
 import net.rev.stealthandalert.client.gui.overlay.VisibilityBarOverlay;
+import net.rev.stealthandalert.client.key.ModKeyMappings;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.datagen.LangKeys;
+import net.rev.stealthandalert.network.C2SCrawlPacket;
 import net.rev.stealthandalert.util.ModTags;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.UUID;
@@ -90,23 +91,23 @@ public class ModClientEvents {
     }
 
     // 按键注册
-//    @SubscribeEvent
-//    public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
-//        event.register(ModKeyMappings.CRAWL_KEY);
-//    }
-//
-//    @SubscribeEvent
-//    public static void onKeyInput(InputEvent.Key event) {
-//        Minecraft mc = Minecraft.getInstance();
-//        if (mc.player == null) return;
-//
-//        if (event.getAction() == GLFW.GLFW_PRESS) {
-//            if (event.getKey() == ModKeyMappings.CRAWL_KEY.getKey().getValue()) {
-//                boolean crawling = mc.player.getData(ModAttachments.CRAWL_DATA).isCrawling();
-//                mc.player.connection.send(new C2SCrawlPacket(!crawling));
-//            }
-//        }
-//    }
+    @SubscribeEvent
+    public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+        event.register(ModKeyMappings.CRAWL_KEY);
+    }
+
+    @SubscribeEvent
+    public static void onKeyInput(InputEvent.Key event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        if (event.getAction() == GLFW.GLFW_PRESS && Minecraft.getInstance().screen == null) {
+            if (event.getKey() == ModKeyMappings.CRAWL_KEY.getKey().getValue()) {
+                boolean crawling = mc.player.getData(ModAttachments.CRAWL_DATA).isCrawling();
+                mc.player.connection.send(new C2SCrawlPacket(!crawling));
+            }
+        }
+    }
 
     // DEBUG内容
     @SubscribeEvent

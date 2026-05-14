@@ -32,12 +32,16 @@ public class VisibilityBarOverlay {
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         if (!ClientConfigs.VISIBILITY_INDICATOR.get()) return;
         Minecraft mc = Minecraft.getInstance();
+        if (mc.options.hideGui) return;
         if (mc.player == null) return;
         VisibilityData data = mc.player.getData(ModAttachments.VISIBILITY_DATA);
-        float visibility = data.visibility();
-        float lerpSpeed = 0.01F;
+        float visibility = 0;
+        if (!mc.isPaused()) {
+            visibility = data.visibility();
+            float lerpSpeed = 0.01F;
 
-        displayedVisibility = Mth.lerp(lerpSpeed, displayedVisibility, visibility);
+            displayedVisibility = Mth.lerp(lerpSpeed, displayedVisibility, visibility);
+        }
 
 
         int centerX = graphics.guiWidth() / 2;

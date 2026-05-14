@@ -149,7 +149,7 @@ public class StealthUtils {
             return false;
         }
         // 1.基础物理状态检查
-        if (player == null || !player.isAlive() || mob == null || !mob.isAlive()) {
+        if (player == null || !player.isAlive() || !mob.isAlive()) {
             return false;
         }
 
@@ -299,12 +299,12 @@ public class StealthUtils {
         int emittedLight = getPlayerEmittedLight(player);
         int finalLight = Math.max(ambientLight, emittedLight);
 
-        int effectiveThreshold = 2;
-        if (player.isCrouching()) {
-            effectiveThreshold = 4;
-        } else if (player.isVisuallyCrawling()) {
-            effectiveThreshold = 5;
-        }
+        int effectiveThreshold = 3;
+//        if (player.isCrouching()) {
+//            effectiveThreshold = 4;
+//        } else if (player.isVisuallyCrawling() || player.isVisuallySwimming()) {
+//            effectiveThreshold = 5;
+//        }
 
         float visibility = 1.0F;
 
@@ -316,11 +316,11 @@ public class StealthUtils {
 
         // 环境修正
         if (isInTallGrass(player.level(), player.blockPosition())) {
-            visibility *= 0.4F;
+            visibility *= 0.5F;
         }
 
         // 姿态修正
-        if (player.isVisuallyCrawling()) {
+        if (player.isVisuallyCrawling() || player.isVisuallySwimming()) {
             visibility *= 0.4F;
         } else if (player.isCrouching()) {
             visibility *= 0.7F;
@@ -351,8 +351,8 @@ public class StealthUtils {
     private static boolean isInTallGrass(Level level, BlockPos pos) {
         BlockState feet = level.getBlockState(pos);
         BlockState head = level.getBlockState(pos.above());
-        boolean feetIsCover = feet.is(Blocks.TALL_GRASS) || feet.is(Blocks.LARGE_FERN) || feet.is(BlockTags.TALL_FLOWERS);
-        boolean headIsCover = head.is(Blocks.TALL_GRASS) || head.is(Blocks.LARGE_FERN) || head.is(BlockTags.TALL_FLOWERS);
+        boolean feetIsCover = feet.is(ModTags.Blocks.CAN_COVER);
+        boolean headIsCover = head.is(ModTags.Blocks.CAN_COVER);
         return feetIsCover && headIsCover;
     }
 
@@ -404,8 +404,8 @@ public class StealthUtils {
         for (int i = 0; i < 4; i++) {
             BlockState feet = level.getBlockState(feetPositions[i]);
             BlockState head = level.getBlockState(headPositions[i]);
-            boolean feetIsCover = feet.is(Blocks.TALL_GRASS) || feet.is(Blocks.LARGE_FERN) || feet.is(BlockTags.TALL_FLOWERS);
-            boolean headIsCover = head.is(Blocks.TALL_GRASS) || head.is(Blocks.LARGE_FERN) || head.is(BlockTags.TALL_FLOWERS);
+            boolean feetIsCover = feet.is(ModTags.Blocks.CAN_COVER);
+            boolean headIsCover = head.is(ModTags.Blocks.CAN_COVER);
             if (!(feetIsCover && headIsCover)) return false;
         }
 
@@ -433,7 +433,7 @@ public class StealthUtils {
 
         for (ItemStack armor : player.getArmorSlots()) {
             if (armor.isEnchanted()) {
-                glintLevel += 2;
+                glintLevel += 3;
             }
         }
 
