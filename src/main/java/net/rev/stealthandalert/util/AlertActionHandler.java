@@ -59,7 +59,7 @@ public class AlertActionHandler {
             }
             if (lkp == null) return;
             if (data.state() == AlertData.SUSPICIOUS) {
-                mob.getLookControl().setLookAt(lkp.x, lkp.y + 1.6, lkp.z, 30.0F, 30.0F);
+                mob.getLookControl().setLookAt(lkp.x, lkp.y + Player.DEFAULT_EYE_HEIGHT, lkp.z, 30.0F, 30.0F);
                 if (!mob.getNavigation().isDone()) mob.getNavigation().stop();
             }
         }

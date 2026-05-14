@@ -34,6 +34,10 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "Stealth and Alert - Items");
         add(LangKeys.STEALTH_AND_ALERT_BLOCKS_TAB, "Stealth and Alert - Blocks");
 
+        // Key Mappings
+        add(LangKeys.CATEGORY, "Stealth and Alert");
+        add(LangKeys.CRAWL, "Crawl");
+
         // Debug Texts
         add(LangKeys.DEBUG_MODE_ON, "§aDEBUG MODE: ON");
         add(LangKeys.DEBUG_MODE_OFF, "§cDEBUG MODE: OFF");

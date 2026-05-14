@@ -2,6 +2,7 @@
   "block.stealth_and_alert.deepslate_shadow_crystal_ore": "深层暗影水晶矿石",
   "block.stealth_and_alert.pebble_block": "石子块",
   "block.stealth_and_alert.shadow_crystal_ore": "暗影水晶矿石",
+  "category.stealth_and_alertstealth_and_alert": "潜行与警戒",
   "debug.stealth_and_alertalert_state_fighting": "§c战斗",
   "debug.stealth_and_alertalert_state_idle": "§7空闲",
   "debug.stealth_and_alertalert_state_searching": "§6搜寻",
@@ -26,6 +27,7 @@
   "item.stealth_and_alert.shadow_crystal_shard": "暗影水晶碎片",
   "itemGroup.stealth_and_alert.blocks_tab": "潜行与警戒 - 方块",
   "itemGroup.stealth_and_alert.items_tab": "潜行与警戒 - 物品",
+  "key.stealth_and_alert.crawl": "匍匐",
   "tooltip.stealth_and_alert.can_stab": "§c背刺§e时造成双倍伤害",
   "tooltip.stealth_and_alert.debug_wand": "右键以开关调试模式",
   "tooltip.stealth_and_alert.debug_wand.debug_mode_desc": "调试模式：显示带有SEEKERS标签的生物的警戒数据——全局警戒状态、对你的观测状态、主目标、对你的记忆时间、对你的警戒值、全局警戒状态切换计时和耐心值计时"

@@ -104,7 +104,7 @@ public class InvestigateLkpGoal extends Goal {
 
         if (distSqr > 2.25) {
             // 前往 LKP
-            this.mob.getLookControl().setLookAt(this.targetX, this.targetY + 1.6, this.targetZ, 30.0F, 30.0F);
+            this.mob.getLookControl().setLookAt(this.targetX, this.targetY + Player.DEFAULT_EYE_HEIGHT, this.targetZ, 30.0F, 30.0F);
             this.mob.getNavigation().moveTo(this.targetX, this.targetY, this.targetZ, this.speedModifier);
         } else {
             this.mob.getNavigation().stop();

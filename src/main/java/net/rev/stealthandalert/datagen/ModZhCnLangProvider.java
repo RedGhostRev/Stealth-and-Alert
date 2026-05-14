@@ -34,6 +34,10 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "潜行与警戒 - 物品");
         add(LangKeys.STEALTH_AND_ALERT_BLOCKS_TAB, "潜行与警戒 - 方块");
 
+        // 按键控制
+        add(LangKeys.CATEGORY, "潜行与警戒");
+        add(LangKeys.CRAWL, "匍匐");
+
         // 调试文本
         add(LangKeys.DEBUG_MODE_ON, "§a调试模式：开启");
         add(LangKeys.DEBUG_MODE_OFF, "§c调试模式：关闭");

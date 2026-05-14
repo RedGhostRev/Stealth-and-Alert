@@ -2,6 +2,7 @@
   "block.stealth_and_alert.deepslate_shadow_crystal_ore": "Deepslate Shadow Crystal Ore",
   "block.stealth_and_alert.pebble_block": "Pebble Block",
   "block.stealth_and_alert.shadow_crystal_ore": "Shadow Crystal Ore",
+  "category.stealth_and_alertstealth_and_alert": "Stealth and Alert",
   "debug.stealth_and_alertalert_state_fighting": "§cFIGHTING",
   "debug.stealth_and_alertalert_state_idle": "§7IDLE",
   "debug.stealth_and_alertalert_state_searching": "§6SEARCHING",
@@ -26,6 +27,7 @@
   "item.stealth_and_alert.shadow_crystal_shard": "Shadow Crystal Shard",
   "itemGroup.stealth_and_alert.blocks_tab": "Stealth and Alert - Blocks",
   "itemGroup.stealth_and_alert.items_tab": "Stealth and Alert - Items",
+  "key.stealth_and_alert.crawl": "Crawl",
   "tooltip.stealth_and_alert.can_stab": "§eDeels double damage when §cbackstabbing",
   "tooltip.stealth_and_alert.debug_wand": "Right-click to toggle debug mode",
   "tooltip.stealth_and_alert.debug_wand.debug_mode_desc": "Debug Mode: Displays alert data for mobs with the SEEKERS tag — Global Alert State, Observation State towards you, Primary Target, Memory Time towards you, Alert Level towards you, Global State Transition Timer, and Patience Timer."
