@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "stealth_and_alert:pebble_block"
+        "recipe": "stealth_and_alert:pebble_block_from_pebble"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "stealth_and_alert:pebble_block"
+      "stealth_and_alert:pebble_block_from_pebble"
     ]
   }
 }

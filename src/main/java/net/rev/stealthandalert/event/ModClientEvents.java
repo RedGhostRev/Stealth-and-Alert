@@ -12,12 +12,14 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.client.gui.overlay.AlertIndicatorOverlay;
+import net.rev.stealthandalert.client.gui.overlay.SoundWaveOverlay;
 import net.rev.stealthandalert.client.gui.overlay.VisibilityBarOverlay;
 import net.rev.stealthandalert.client.key.ModKeyMappings;
 import net.rev.stealthandalert.config.ClientConfigs;
@@ -76,10 +78,27 @@ public class ModClientEvents {
     // 渲染HUD
     @SubscribeEvent
     public static void onRegisterOverlays(RegisterGuiLayersEvent event) {
-        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "alert_indicator_hud"),
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "alert_indicator_hud"),
                 AlertIndicatorOverlay::render);
-        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "visibility_hud"),
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "visibility_hud"),
                 VisibilityBarOverlay::render);
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "sound_hud"),
+                SoundWaveOverlay::render);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRespawn(ClientPlayerNetworkEvent.Clone event) {
+        // 清空 HUD 数据
+        AlertIndicatorOverlay.FULL_AWARENESS_TICKS.clear();
+        AlertIndicatorOverlay.ACTIVE_POOL.clear();
+        AlertIndicatorOverlay.EXPIRED_GHOSTS.clear();
+        SoundWaveOverlay.bossEventsField = null;
+        SoundWaveOverlay.lastSoundTick = 0;
+        SoundWaveOverlay.targetAmplitude = 0.0;
+        SoundWaveOverlay.renderAmplitude = 0.0;
+        SoundWaveOverlay.timeTracker = 0.0;
+        SoundWaveOverlay.tickMaxAmplitude = 0.0;
+        SoundWaveOverlay.hasNewSoundThisTick = false;
     }
 
     @SubscribeEvent
@@ -88,6 +107,13 @@ public class ModClientEvents {
         AlertIndicatorOverlay.FULL_AWARENESS_TICKS.clear();
         AlertIndicatorOverlay.ACTIVE_POOL.clear();
         AlertIndicatorOverlay.EXPIRED_GHOSTS.clear();
+        SoundWaveOverlay.bossEventsField = null;
+        SoundWaveOverlay.lastSoundTick = 0;
+        SoundWaveOverlay.targetAmplitude = 0.0;
+        SoundWaveOverlay.renderAmplitude = 0.0;
+        SoundWaveOverlay.timeTracker = 0.0;
+        SoundWaveOverlay.tickMaxAmplitude = 0.0;
+        SoundWaveOverlay.hasNewSoundThisTick = false;
     }
 
     // 按键注册

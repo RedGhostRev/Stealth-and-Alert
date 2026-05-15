@@ -15,11 +15,17 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<AlertData>> ALERT_DATA = ATTACHMENT_TYPES.register("alert_data",
             () -> AttachmentType.builder(AlertData::createDefault).serialize(AlertData.CODEC).build());
 
+    public static final Supplier<AttachmentType<AlertSoundData>> ALERT_SOUND_DATA = ATTACHMENT_TYPES.register("alert_sound_data",
+            () -> AttachmentType.builder(() -> AlertSoundData.DEFAULT).serialize(AlertSoundData.CODEC).build());
+
+    public static final Supplier<AttachmentType<InvestigateLkpData>> INVESTIGATE_LKP_DATA = ATTACHMENT_TYPES.register("investigate_lkp_data",
+            () -> AttachmentType.builder(() -> InvestigateLkpData.DEFAULT).serialize(InvestigateLkpData.CODEC).build());
+
     public static final Supplier<AttachmentType<VisibilityData>> VISIBILITY_DATA = ATTACHMENT_TYPES.register("visibility_data",
             () -> AttachmentType.builder(() -> VisibilityData.DEFAULT).serialize(VisibilityData.CODEC).build());
 
     public static final Supplier<AttachmentType<CrawlData>> CRAWL_DATA = ATTACHMENT_TYPES.register("crawl_data",
-            () -> AttachmentType.builder(() -> CrawlData.DEFAULT).build());
+            () -> AttachmentType.builder(() -> CrawlData.DEFAULT).serialize(CrawlData.CODEC).build());
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);

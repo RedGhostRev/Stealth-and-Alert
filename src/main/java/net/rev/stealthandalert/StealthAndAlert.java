@@ -15,8 +15,11 @@ import net.rev.stealthandalert.block.ModBlocks;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
+import net.rev.stealthandalert.entity.ModEntities;
+import net.rev.stealthandalert.event.StealthSoundEventHandler;
 import net.rev.stealthandalert.item.ModCreativeModeTabs;
 import net.rev.stealthandalert.item.ModItems;
+import net.rev.stealthandalert.sound.ModSounds;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -37,11 +40,14 @@ public class StealthAndAlert {
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(StealthSoundEventHandler.class);
 
         ModCreativeModeTabs.register(modEventBus);
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModEntities.register(modEventBus);
+        ModSounds.register(modEventBus);
 
         ModAttachments.register(modEventBus);
 

@@ -102,6 +102,10 @@ public record AlertData(
         }
     };
 
+    public AlertData withSound(int newState, Optional<Vec3> newLkp, int newStateChangeTicks, int newPatienceTicks) {
+        return new AlertData(newState, this.targetAwareness, this.targetStates, this.targetReactionTicks, this.targetMemoryTicks, newLkp, this.primaryTarget, newStateChangeTicks, newPatienceTicks, this.canSeeAnyone, this.willFighting);
+    }
+
     public static AlertData createDefault() {
         return new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt(), false, false);
     }

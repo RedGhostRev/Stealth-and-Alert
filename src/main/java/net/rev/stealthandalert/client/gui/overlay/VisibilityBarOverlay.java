@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.rev.stealthandalert.StealthAndAlert;
@@ -44,14 +45,34 @@ public class VisibilityBarOverlay {
         }
 
 
-        int centerX = graphics.guiWidth() / 2;
-        int centerY = 30;
+        double centerX = graphics.guiWidth() / 2.0;
+        double centerY = 30;
 
         int width = 38;
         int imageSize = 128;
         int uOffsetMid = imageSize / 2 - width / 2;
         int x = -width / 2 + ClientConfigs.VISIBILITY_INDICATOR_POSITION.get().getFirst();
-        int y = -imageSize / 2 + ClientConfigs.VISIBILITY_INDICATOR_POSITION.get().getLast();
+        int y = -imageSize / 2 +4 + ClientConfigs.VISIBILITY_INDICATOR_POSITION.get().getLast();
+        BossHealthOverlay bossOverlay = mc.gui.getBossOverlay();
+        if (ClientConfigs.VISIBILITY_INDICATOR_CAN_OFFSET_FROM_BOSS_BAR.get() && bossOverlay != null) {
+            try {
+                if (SoundWaveOverlay.bossEventsField == null) {
+                    SoundWaveOverlay.bossEventsField = BossHealthOverlay.class.getDeclaredField("events");
+                    SoundWaveOverlay.bossEventsField.setAccessible(true);
+                }
+
+                java.util.Map<?, ?> eventsMap = (java.util.Map<?, ?>) SoundWaveOverlay.bossEventsField.get(bossOverlay);
+
+                if (eventsMap != null && !eventsMap.isEmpty()) {
+                    int bossCount = eventsMap.size();
+
+                    int allBossBarsHeight = 12 + (bossCount - 1) * 30;
+                    y = y + allBossBarsHeight + 5;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         graphics.flush();
         RenderSystem.enableBlend();

@@ -1,11 +1,14 @@
 package net.rev.stealthandalert;
 
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.rev.stealthandalert.entity.ModEntities;
 
 // This class will not load on dedicated servers. Accessing client side code from here is safe.
 @Mod(value = StealthAndAlert.MOD_ID, dist = Dist.CLIENT)
@@ -18,6 +21,8 @@ public class StealthAndAlertClient {
 
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
-
+        event.enqueueWork(() -> {
+            EntityRenderers.register(ModEntities.PEBBLE.get(), ThrownItemRenderer::new);
+        });
     }
 }

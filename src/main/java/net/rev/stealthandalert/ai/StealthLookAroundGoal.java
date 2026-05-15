@@ -19,7 +19,7 @@ public class StealthLookAroundGoal extends RandomLookAroundGoal {
     @Override
     public boolean canUse() {
         AlertData data = mob.getData(ModAttachments.ALERT_DATA);
-        if (data.state() > AlertData.IDLE) {
+        if (data.state() > AlertData.IDLE && !mob.getData(ModAttachments.INVESTIGATE_LKP_DATA).isSearchingAround()) {
             return false;
         }
         return super.canUse();
@@ -28,7 +28,7 @@ public class StealthLookAroundGoal extends RandomLookAroundGoal {
     @Override
     public boolean canContinueToUse() {
         AlertData data = mob.getData(ModAttachments.ALERT_DATA);
-        if (data.state() > AlertData.IDLE) {
+        if (data.state() > AlertData.IDLE && !mob.getData(ModAttachments.INVESTIGATE_LKP_DATA).isSearchingAround()) {
             return false;
         }
         return super.canContinueToUse();

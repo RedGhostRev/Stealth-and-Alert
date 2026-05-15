@@ -24,12 +24,8 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.StealthAndAlert;
-import net.rev.stealthandalert.ai.InvestigateLkpGoal;
 import net.rev.stealthandalert.ai.StealthLookAroundGoal;
-import net.rev.stealthandalert.attachment.AlertData;
-import net.rev.stealthandalert.attachment.CrawlData;
-import net.rev.stealthandalert.attachment.ModAttachments;
-import net.rev.stealthandalert.attachment.VisibilityData;
+import net.rev.stealthandalert.attachment.*;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertSettings;
@@ -130,7 +126,6 @@ public class StealthEvents {
             AlertData data = mob.getData(ModAttachments.ALERT_DATA);
             UUID uuid = player.getUUID();
 
-
             Map<UUID, Float> progressMap = new HashMap<>(data.targetAwareness());
             Map<UUID, Integer> statesMap = new HashMap<>(data.targetStates());
             Map<UUID, Integer> reactionsMap = new HashMap<>(data.targetReactionTicks());
@@ -158,7 +153,9 @@ public class StealthEvents {
                         data.willFighting()
                 );
 
+                mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
                 mob.setData(ModAttachments.ALERT_DATA, newData);
+
                 // 确保客户端UI响应
                 PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
                 return;
@@ -174,15 +171,15 @@ public class StealthEvents {
             Optional<UUID> nextPrimary = data.primaryTarget();
             // 只有当该玩家还没达到 TRACKING 状态时才更新数据
             if (currentPState < AlertData.TRACKING) {
-                progressMap.put(uuid, 100.0F);
-                statesMap.put(uuid, AlertData.TRACKING);
+                // progressMap.put(uuid, 100.0F);
+                // statesMap.put(uuid, AlertData.TRACKING);
                 reactionsMap.put(uuid, 0);
 
                 // 根据是否正在打别人，决定全局状态
                 if (!isFightingOthers) {
                     nextState = AlertData.SEARCHING;
                     nextLKP = Optional.of(player.position());
-                    nextPrimary = Optional.of(uuid);
+                    // nextPrimary = Optional.of(uuid);
                 }
                 dataChanged = true;
             }
@@ -197,12 +194,13 @@ public class StealthEvents {
                         lastDamageTicksMap,
                         nextLKP,
                         nextPrimary,
-                        data.stateChangeTicks(),
-                        data.patienceTicks(),
+                        0,
+                        CommonConfigs.PATIENCE_TICKS.get(),
                         data.canSeeAnyone(),
                         data.willFighting()
                 );
 
+                mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
                 mob.setData(ModAttachments.ALERT_DATA, newData);
                 // 确保客户端UI响应
                 PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
@@ -246,12 +244,6 @@ public class StealthEvents {
         if (event.getLevel().isClientSide()) return;
         if (!(event.getEntity() instanceof Mob mob)) return;
         if (!mob.getType().is(ModTags.Entities.SEEKERS)) return;
-
-        boolean hasInvestigateGoal = mob.goalSelector.getAvailableGoals().stream().anyMatch(wrappedGoal ->
-                wrappedGoal.getGoal() instanceof InvestigateLkpGoal);
-        if (!hasInvestigateGoal) {
-            mob.goalSelector.addGoal(3, new InvestigateLkpGoal(mob, 0.9));
-        }
 
         mob.goalSelector.getAvailableGoals().removeIf(wrappedGoal ->
                 wrappedGoal.getGoal() instanceof LookAtPlayerGoal);

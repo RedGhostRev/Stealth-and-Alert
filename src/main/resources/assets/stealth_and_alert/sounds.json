@@ -1,0 +1,9 @@
+{
+  "pebble_land": {
+    "category": "block",
+    "subtitle": "subtitles.stealth_and_alert.pebble_land",
+    "sounds": [
+      "stealth_and_alert:pebble_land"
+    ]
+  }
+}

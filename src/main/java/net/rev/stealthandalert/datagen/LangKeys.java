@@ -32,6 +32,9 @@ public class LangKeys {
     public static final String CATEGORY = "category." + MOD_ID + "stealth_and_alert";
     public static final String CRAWL = "key." + MOD_ID + ".crawl";
 
+    // Subtitles
+    public static final String PEBBLE_LAND = "subtitles." + MOD_ID + ".pebble_land";
+
     // Debug Texts
     public static final String DEBUG_MODE_ON = "debug." + MOD_ID + "debug_mode_on";
     public static final String DEBUG_MODE_OFF = "debug." + MOD_ID + "debug_mode_off";

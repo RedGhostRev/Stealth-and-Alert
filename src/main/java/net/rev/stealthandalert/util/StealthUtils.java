@@ -13,14 +13,18 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.attachment.AlertData;
+import net.rev.stealthandalert.attachment.AlertSoundData;
+import net.rev.stealthandalert.attachment.InvestigateLkpData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertSettings;
+import net.rev.stealthandalert.event.StealthSoundEvent;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
 
 import java.util.*;
@@ -99,7 +103,6 @@ public class StealthUtils {
         for (UUID uuid : trackedPlayers) {
             Player player = mob.level().getPlayerByUUID(uuid);
             if (player == null) continue;
-
             boolean canSee = shouldArouseAlert(mob, player);
             if (canSee) anyoneVisible = true;
 
@@ -127,19 +130,128 @@ public class StealthUtils {
         // E: 打包
         AlertData newData = assembleData(resultsMap, gRes);
 
+        // 获取调查数据和听觉数据并组合比较
+        InvestigateLkpData investData = mob.getData(ModAttachments.INVESTIGATE_LKP_DATA);
+        AlertSoundData soundData = mob.getData(ModAttachments.ALERT_SOUND_DATA);
+        newData = dealWithVisualAndSound(mob, newData, soundData, investData);
         // F: 写回并同步
         mob.setData(ModAttachments.ALERT_DATA, newData);
+        mob.setData(ModAttachments.ALERT_SOUND_DATA, AlertSoundData.DEFAULT);
         PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
 
         // 处理敌人针对主目标的行为
         UUID primaryUuid = newData.primaryTarget().orElse(null);
+        boolean canSeePrimary;
         if (primaryUuid != null) {
             Player primaryPlayer = mob.level().getPlayerByUUID(primaryUuid);
-            if (primaryPlayer != null) {
-                boolean canSeePrimary = shouldArouseAlert(mob, primaryPlayer);
-                AlertActionHandler.execute(mob, newData, canSeePrimary);
+            canSeePrimary = shouldArouseAlert(mob, primaryPlayer);
+        } else {
+            canSeePrimary = false;
+        }
+        AlertActionHandler.execute(mob, newData, canSeePrimary);
+    }
+
+    private static AlertData dealWithVisualAndSound(Mob mob, AlertData visualData, AlertSoundData soundData, InvestigateLkpData investData) {
+        if (soundData.equals(AlertSoundData.DEFAULT)) return visualData;
+        if (soundData.pos().isEmpty()) return visualData;
+        if (visualData.canSeeAnyone() || soundData.source().isEmpty() || (mob.getType().is(ModTags.Entities.CONDITIONAL_SEEKERS) && !visualData.targetMemoryTicks().containsKey(soundData.source().get())) || visualData.willFighting() || visualData.state() == AlertData.FIGHTING)
+            return visualData;
+        if (visualData.state() == AlertData.IDLE) {
+            if (soundData.volume() < 34.0) {
+                return visualData;
+            } else {
+                if (soundData.threatLevel() <= AlertSoundData.MEDIUM) {
+                    if (soundData.volume() <= 42.0) {
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    } else {
+                        mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    }
+                } else {
+                    mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                }
             }
         }
+        if (visualData.state() == AlertData.SUSPICIOUS) {
+            if (soundData.volume() < 30.0) {
+                return visualData;
+            } else {
+                if (soundData.threatLevel() == AlertSoundData.LOW) {
+                    if (soundData.distance() > 7) {
+                        return visualData;
+                    } else if (soundData.distance() > 6) {
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    } else {
+                        mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    }
+                } else if (soundData.threatLevel() == AlertSoundData.MEDIUM) {
+                    if (soundData.distance() > 12) {
+                        return visualData;
+                    } else if (soundData.distance() > 10) {
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    } else {
+                        mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    }
+                } else {
+                    mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                }
+            }
+        }
+        if (visualData.state() == AlertData.SEARCHING) {
+            if (soundData.volume() < 28.0) {
+                return visualData;
+            } else {
+                if (soundData.threatLevel() == AlertSoundData.LOW) {
+                    if (soundData.distance() > 16) {
+                        return visualData;
+                    } else if (soundData.distance() > 12) {
+                        if (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10) {
+                            return visualData;
+                        } else {
+                            mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        }
+                    } else {
+                        if (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10) {
+                            return visualData;
+                        } else {
+                            mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        }
+                    }
+                } else if (soundData.threatLevel() == AlertSoundData.MEDIUM) {
+                    if (soundData.distance() > 20) {
+                        return visualData;
+                    } else if (soundData.distance() > 16) {
+                        if (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10) {
+                            return visualData;
+                        } else {
+                            mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        }
+                    } else {
+                        if (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10) {
+                            return visualData;
+                        } else {
+                            mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        }
+                    }
+                } else {
+                    if (soundData.distance() > 32) {
+                        return visualData;
+                    } else {
+                        mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    }
+                }
+            }
+        }
+        return visualData;
     }
 
     // “引起警戒”的检查
@@ -218,6 +330,11 @@ public class StealthUtils {
                 states.put(uuid, lres.pState());
                 reactions.put(uuid, lres.reaction());
                 lastDamageTicks.put(uuid, lres.memory());
+            } else {
+                progress.remove(uuid);
+                states.remove(uuid);
+                reactions.remove(uuid);
+                lastDamageTicks.remove(uuid);
             }
         });
 
@@ -441,5 +558,87 @@ public class StealthUtils {
         if (player.getOffhandItem().isEnchanted()) glintLevel += 2;
 
         return Math.min(glintLevel, 15);
+    }
+
+    public static void reactToSound(StealthSoundEvent event) {
+        if (event.volume <= 0F || event.radius <= 0) return;
+        if (!(event.soundSource instanceof Player)) return;
+        Level level = event.soundSource.level();
+        Vec3 pos = event.soundPos;
+        double radius = event.radius;
+
+        // 框选声音半径内的所有 SEEKERS 怪物
+        List<Mob> mobs = level.getEntitiesOfClass(Mob.class, new AABB(pos.x - radius, pos.y - radius, pos.z - radius,
+                pos.x + radius, pos.y + radius, pos.z + radius), mob -> mob.isAlive() && mob.getType().is(ModTags.Entities.SEEKERS));
+
+        for (Mob mob : mobs) {
+            Vec3 eyePos = mob.getEyePosition();
+            double distance = pos.distanceTo(eyePos);
+
+            if (distance > radius) {
+                continue;
+            }
+
+            double currentVolume = event.volume;
+
+            // 计算中间隔着的固体厚度与层数
+            double solidBlockThickness = 0.0;
+            int solidBlockCount = 0;
+            Vec3 direction = eyePos.subtract(pos);
+            Vec3 normalizedDir = direction.normalize();
+
+            BlockPos originBlockPos = BlockPos.containing(pos.x, pos.y, pos.z);
+
+            double stepSize = 0.5;
+            int totalSteps = (int) (distance / stepSize);
+
+            BlockPos.MutableBlockPos mutablePos = BlockPos.containing(pos).mutable();
+            BlockState lastState = null;
+
+            for (int i = 0; i < totalSteps; i++) {
+                Vec3 currentCheckPos = pos.add(normalizedDir.scale(i * stepSize));
+                mutablePos.set(currentCheckPos.x, currentCheckPos.y, currentCheckPos.z);
+                BlockState currentState = level.getBlockState(mutablePos);
+
+                if (mutablePos.equals(originBlockPos)) continue;
+
+                // 如果在固体方块内部
+                if (!currentState.isAir() && currentState.isCollisionShapeFullBlock(level, mutablePos)) {
+                    solidBlockThickness += stepSize; // 固体厚度累加当前的步长
+
+                    // 如果材质，层数 +1
+                    if (lastState == null || !currentState.getBlock().equals(lastState.getBlock())) {
+                        solidBlockCount++;
+                    }
+                }
+                lastState = currentState;
+            }
+
+            // 计算音量损耗
+            double thicknessPenalty = solidBlockThickness * 8.0; // 每 1 米厚度扣 8 点
+            double layerPenalty = solidBlockCount * 4.0;          // 每跨一层界面额外重罚 4 点
+            double totalOcclusionDamping = thicknessPenalty + layerPenalty;
+
+            // 计算最终音量
+            double finalReceivedVolume = currentVolume - totalOcclusionDamping;
+            finalReceivedVolume = Math.max(0.0, finalReceivedVolume);
+            boolean canHear = finalReceivedVolume > 0;
+
+            // 比较
+            if (canHear) {
+                AlertSoundData data = mob.getData(ModAttachments.ALERT_SOUND_DATA);
+                double currentScore = getScore(finalReceivedVolume, distance, event.threatLevel);
+                if (currentScore > data.score()) {
+                    mob.setData(ModAttachments.ALERT_SOUND_DATA, new AlertSoundData(Optional.of(event.soundSource.getUUID()), Optional.of(event.soundPos), finalReceivedVolume, distance, event.threatLevel, currentScore));
+                }
+            }
+        }
+    }
+
+    private static double getScore(double volume, double distance, int threatLevel) {
+        double wVolume = 1.0;
+        double wDistance = 0.5;
+        double wThreat = 20.0;
+        return (volume * wVolume) + (threatLevel * wThreat) - (distance * wDistance);
     }
 }

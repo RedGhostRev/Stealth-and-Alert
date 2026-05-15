@@ -22,23 +22,22 @@ and environmental factors to bypass enemies.
   god-mode" vision.
 - **Multi-player Sync**: Fully synchronized stealth data in multiplayer environments, including primary target
   competition.
+- **In-World Alert Indicators**: Visual cues displayed directly above enemies' heads within the game world to indicate
+  their current alertness. With HUD.
+- **Unified Visibility System**: A complex perception model influenced by environmental factors (such as light levels) 
+and player stances (crouching/running).
+- **Environmental Stealth**: Hiding in specific blocks like tall grass.
+- **Acoustic Detection**: Mobs will react to sounds, such as footsteps, block breaking, or arrow impacts near them. 
+With HUD.
 
 ## Planned Features
 
-- **In-World Alert Indicators**: Visual cues displayed directly above enemies' heads within the game world to indicate
-  their current alertness.
 - **Assassination System**: Special takedowns and lethal strikes for unaware enemies.
-- **Unified Visibility System**: A complex perception model influenced by environmental factors (such as light levels)
-  and
-  player stances (crouching/running).
-- **Acoustic Detection**: Mobs will react to sounds, such as footsteps, block breaking, or arrow impacts near them.
 - **Corpse Mechanics**: Enemies will become alerted or enter a search state upon discovering the bodies of their fallen
   allies.
-- **Environmental Stealth**: Hiding in specific blocks like tall grass.
 - And more!
 
-This mod is on a very early stage of development, and many features are yet to be implemented,
-and there may be bugs and performance issues.
+There may be bugs and performance issues, and feel free to report them!
 
 ## Authors
 

@@ -5,7 +5,11 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attachment.VisibilityData;
 
 public record S2CVisibilityDataPacket(float visibility, boolean isVisible) implements CustomPacketPayload {
     public static final Type<S2CVisibilityDataPacket> TYPE =
@@ -21,5 +25,12 @@ public record S2CVisibilityDataPacket(float visibility, boolean isVisible) imple
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
+    }
+
+    public static void handle(S2CVisibilityDataPacket payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            Player player = context.player();
+            player.setData(ModAttachments.VISIBILITY_DATA, new VisibilityData(payload.visibility(), payload.isVisible()));
+        });
     }
 }

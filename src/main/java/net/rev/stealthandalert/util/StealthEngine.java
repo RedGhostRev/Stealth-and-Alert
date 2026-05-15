@@ -41,6 +41,10 @@ public class StealthEngine {
         int nextPState = currentPState;
         int nextMemory = currentMemory;
 
+        if (!player.isAlive()) {
+            return new IndividualResult(0F, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt(), AlertData.UNTRACKED, 0);
+        }
+
         if (canSee) { // 看见了
             // 反应期：从UNTRACKED向AWARE迁徙
             if (currentPState == AlertData.UNTRACKED) {
@@ -150,12 +154,23 @@ public class StealthEngine {
         // 主目标竞争：警戒值最高为优先，若同样高，距离最近为优先
         // 应保证在怪物变回IDLE之前，存储主目标的Optional中始终有值
         UUID topTargetUuid = null;
+        UUID oldId = null;
+        if (nextPrimary.isPresent()) {
+            oldId = nextPrimary.get();
+        }
+        Player oldPlayer = null;
+
+        if (oldId != null) {
+            oldPlayer = mob.level().getPlayerByUUID(oldId);
+            if (oldPlayer == null || !oldPlayer.isAlive()) {
+                // 若主目标已死或退出，主目标直接清空
+                nextPrimary = Optional.empty();
+            }
+        }
 
         if (nextPrimary.isPresent()) {
-            UUID oldId = nextPrimary.get();
             if (currentResults.containsKey(oldId) && currentResults.get(oldId).level() >= maxLevel) {
                 topTargetUuid = oldId; // 若主目标的警戒值仍然最高，保持之，并开始判断同样高的目标之间距离更近的
-                Player oldPlayer = mob.level().getPlayerByUUID(oldId);
 
                 for (Map.Entry<UUID, IndividualResult> entry : currentResults.entrySet()) {
                     UUID candidateId = entry.getKey();
@@ -165,7 +180,7 @@ public class StealthEngine {
                         if (candidatePlayer != null &&
                                 currentResults.get(candidateId).pState() >= AlertData.AWARE &&
                                 StealthUtils.shouldArouseAlert(mob, candidatePlayer)) {
-                            if (oldPlayer == null || mob.distanceToSqr(candidatePlayer) < mob.distanceToSqr(oldPlayer)) {
+                            if (mob.distanceToSqr(candidatePlayer) < mob.distanceToSqr(oldPlayer)) {
                                 topTargetUuid = candidateId;
                                 oldPlayer = candidatePlayer;
                             }
@@ -175,7 +190,7 @@ public class StealthEngine {
             }
         }
 
-        // 若原主目标不再有最高警戒值
+        // 若原主目标不再有最高警戒值，或没有主目标
         if (topTargetUuid == null && maxLevel > 0.0F && anyTargetVisible) {
             for (Map.Entry<UUID, IndividualResult> entry : currentResults.entrySet()) {
                 if (entry.getValue().level() >= maxLevel) {
@@ -237,6 +252,8 @@ public class StealthEngine {
                     nextState = AlertData.FIGHTING;
                     willFighting = false;
                 }
+            } else if (willFighting) {
+                willFighting = false;
             }
 
             // LKP竞争更新
@@ -266,13 +283,13 @@ public class StealthEngine {
                         boolean reachedLkp = nextLkp.isPresent() && mob.distanceToSqr(nextLkp.get()) < 4.0;
                         if (reachedLkp || --nextPatienceTicks <= 1) {
                             if (nextStateTicks <= 0) {
-                                nextStateTicks = 300;
+                                nextStateTicks = 600;
                             }
                         }
                     } else if (nextState == AlertData.SUSPICIOUS) {
                         // SUSPICIOUS状态直接回落
                         if (nextStateTicks <= 0) {
-                            nextStateTicks = 160;
+                            nextStateTicks = 300;
                         }
                     }
                 }

@@ -38,6 +38,9 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.CATEGORY, "潜行与警戒");
         add(LangKeys.CRAWL, "匍匐");
 
+        // 字幕
+        add(LangKeys.PEBBLE_LAND, "石子：落地");
+
         // 调试文本
         add(LangKeys.DEBUG_MODE_ON, "§a调试模式：开启");
         add(LangKeys.DEBUG_MODE_OFF, "§c调试模式：关闭");

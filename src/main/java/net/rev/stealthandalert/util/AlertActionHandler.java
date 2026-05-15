@@ -1,11 +1,17 @@
 package net.rev.stealthandalert.util;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.rev.stealthandalert.attachment.AlertData;
+import net.rev.stealthandalert.attachment.InvestigateLkpData;
+import net.rev.stealthandalert.attachment.ModAttachments;
+
+import java.util.Optional;
 
 
 public class AlertActionHandler {
@@ -17,7 +23,6 @@ public class AlertActionHandler {
         Player primary = data.primaryTarget()
                 .map(uuid -> mob.level().getPlayerByUUID(uuid))
                 .orElse(null);
-        Vec3 lkp = data.lastKnownPos().orElse(null);
         if (canSeePrimary && primary != null) {
             // 如果看见了主目标
             int pState = data.targetStates().getOrDefault(primary.getUUID(), AlertData.UNTRACKED);
@@ -35,7 +40,9 @@ public class AlertActionHandler {
                     if (mob.getTarget() == primary) mob.setTarget(null);
                     if (!mob.getNavigation().isDone()) mob.getNavigation().stop();
                 }
+                mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
             }
+
 
         } else {
             // 如果没看见主目标
@@ -57,11 +64,80 @@ public class AlertActionHandler {
                     mob.setTarget(primary);
                 }
             }
+            Vec3 lkp = mob.getData(ModAttachments.ALERT_DATA).lastKnownPos().orElse(null);
             if (lkp == null) return;
+
+            // 接下来，执行 LKP 调查逻辑
             if (data.state() == AlertData.SUSPICIOUS) {
-                mob.getLookControl().setLookAt(lkp.x, lkp.y + Player.DEFAULT_EYE_HEIGHT, lkp.z, 30.0F, 30.0F);
-                if (!mob.getNavigation().isDone()) mob.getNavigation().stop();
+                mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+                mob.getLookControl().setLookAt(lkp.x, lkp.y + mob.getEyeHeight(), lkp.z, 30.0F, 30.0F);
+                mob.getNavigation().stop();
+            } else if (data.state() == AlertData.SEARCHING) {
+                investigateLkp(mob, lkp);
+            } else if (data.state() == AlertData.FIGHTING && !data.canSeeAnyone()) {
+                investigateLkp(mob, lkp);
             }
         }
+    }
+
+    private static void investigateLkp(Mob mob, Vec3 lkp) {
+        InvestigateLkpData data = mob.getData(ModAttachments.INVESTIGATE_LKP_DATA);
+        boolean isSearchingAround = data.isSearchingAround();
+        int stayTicks = data.stayTicks();
+        Vec3 targetPos = null;
+        if (data.targetPos().isPresent()) {
+            targetPos = data.targetPos().get();
+        }
+        if (!isSearchingAround) {
+            targetPos = lkp;
+        }
+
+        if (targetPos == null) {
+            mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+            return;
+        }
+
+        targetPos = getDownBlockPos(mob, targetPos);
+        double distSqr = mob.distanceToSqr(targetPos);
+        if (distSqr > 2.25 && !isSearchingAround) {
+            mob.getLookControl().setLookAt(targetPos.x, targetPos.y + mob.getEyeHeight(), targetPos.z);
+            mob.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.0);
+            if (mob.getData(ModAttachments.ALERT_DATA).patienceTicks() <= 0) {
+                isSearchingAround = true;
+            }
+        } else {
+            mob.getNavigation().stop();
+            if (stayTicks <= 0) {
+                stayTicks = 100 + mob.getRandom().nextInt(100); // 5 ~ 10s
+                isSearchingAround = true;
+            } else {
+                stayTicks--;
+                if (stayTicks <= 0) {
+                    targetPos = pickNextSearchPoint(mob, lkp);
+                    mob.getNavigation().moveTo(targetPos.x, targetPos.y, targetPos.z, 1.0);
+                }
+            }
+        }
+        mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, new InvestigateLkpData(isSearchingAround, stayTicks, Optional.of(targetPos)));
+    }
+
+    private static Vec3 pickNextSearchPoint(Mob mob, Vec3 lkp) {
+        double radius = 4.0 + mob.getRandom().nextDouble() * 6.0;
+        double angle = mob.getRandom().nextDouble() * Math.PI * 2;
+        double newX = lkp.x + Math.cos(angle) * radius;
+        double newZ = lkp.z + Math.sin(angle) * radius;
+        return new Vec3(newX, lkp.y, newZ);
+    }
+
+    private static Vec3 getDownBlockPos(Mob mob, Vec3 pos) {
+        BlockPos.MutableBlockPos mutable = BlockPos.containing(pos).mutable();
+        int minHeight = mob.level().getMinBuildHeight();
+        while (mutable.getY() >= minHeight) {
+            mutable.move(0, -1, 0);
+            if (!mob.level().hasChunk(mutable.getX() >> 4, mutable.getZ() >> 4)) break;
+            BlockState currentState = mob.level().getBlockState(mutable);
+            if (!currentState.isAir()) return Vec3.atBottomCenterOf(mutable.above());
+        }
+        return pos;
     }
 }

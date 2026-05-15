@@ -7,6 +7,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.item.custom.DaggerItem;
 import net.rev.stealthandalert.item.custom.DebugWandItem;
+import net.rev.stealthandalert.item.custom.PebbleItem;
 
 import java.util.List;
 
@@ -14,8 +15,8 @@ public class ModItems {
 
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(StealthAndAlert.MOD_ID);
 
-    public static final DeferredItem<Item> PEBBLE = ITEMS.register("pebble",
-            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<PebbleItem> PEBBLE = ITEMS.register("pebble",
+            () -> new PebbleItem(new Item.Properties()));
 
     public static final DeferredItem<Item> CLAMOR_BELL = ITEMS.register("clamor_bell",
             () -> new Item(new Item.Properties()));

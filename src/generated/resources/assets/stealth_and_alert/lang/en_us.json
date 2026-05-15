@@ -28,6 +28,7 @@
   "itemGroup.stealth_and_alert.blocks_tab": "Stealth and Alert - Blocks",
   "itemGroup.stealth_and_alert.items_tab": "Stealth and Alert - Items",
   "key.stealth_and_alert.crawl": "Crawl",
+  "subtitles.stealth_and_alert.pebble_land": "Pebble lands",
   "tooltip.stealth_and_alert.can_stab": "§eDeels double damage when §cbackstabbing",
   "tooltip.stealth_and_alert.debug_wand": "Right-click to toggle debug mode",
   "tooltip.stealth_and_alert.debug_wand.debug_mode_desc": "Debug Mode: Displays alert data for mobs with the SEEKERS tag — Global Alert State, Observation State towards you, Primary Target, Memory Time towards you, Alert Level towards you, Global State Transition Timer, and Patience Timer."

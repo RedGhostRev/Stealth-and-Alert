@@ -38,6 +38,9 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.CATEGORY, "Stealth and Alert");
         add(LangKeys.CRAWL, "Crawl");
 
+        // Subtitles
+        add(LangKeys.PEBBLE_LAND, "Pebble lands");
+
         // Debug Texts
         add(LangKeys.DEBUG_MODE_ON, "§aDEBUG MODE: ON");
         add(LangKeys.DEBUG_MODE_OFF, "§cDEBUG MODE: OFF");

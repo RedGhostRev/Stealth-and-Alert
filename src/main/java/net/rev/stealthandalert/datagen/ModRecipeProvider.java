@@ -3,6 +3,8 @@ package net.rev.stealthandalert.datagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
@@ -35,12 +37,18 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(recipeOutput);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.PEBBLE_BLOCK)
+                .pattern("CC")
+                .pattern("CC")
+                .define('C', ItemTags.STONE_TOOL_MATERIALS)
+                .unlockedBy("has_stone_material", has(ItemTags.STONE_TOOL_MATERIALS))
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "pebble_block_from_cobbled"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.PEBBLE_BLOCK)
                 .pattern("PPP")
                 .pattern("PPP")
                 .pattern("PPP")
                 .define('P', ModItems.PEBBLE)
                 .unlockedBy("has_pebble", has(ModItems.PEBBLE))
-                .save(recipeOutput);
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "pebble_block_from_pebble"));
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.CLAMOR_BELL)
                 .pattern(" S ")
                 .pattern("DBD")

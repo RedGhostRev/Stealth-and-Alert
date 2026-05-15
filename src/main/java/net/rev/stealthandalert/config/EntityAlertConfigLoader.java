@@ -101,7 +101,7 @@ public class EntityAlertConfigLoader {
             if (!Files.exists(targetPath)) {
                 try {
                     Files.createDirectories(targetPath.getParent());
-                    String resourceLocation = "/data/" + StealthAndAlert.MOD_ID + "/presets/" + relativePath;
+                    String resourceLocation = "/data/" + StealthAndAlert.MOD_ID + "/presets/entities/" + relativePath;
                     try (InputStream is = EntityAlertConfigLoader.class.getResourceAsStream(resourceLocation)) {
                         if (is != null) {
                             Files.copy(is, targetPath, StandardCopyOption.REPLACE_EXISTING);
