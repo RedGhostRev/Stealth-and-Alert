@@ -42,7 +42,7 @@ public class PebbleProjectileEntity extends ThrowableItemProjectile {
             DamageSource damageSource = this.damageSources().thrown(this, this.getOwner());
             target.hurt(damageSource, 0.5F);
             this.level().playSound(null, this.blockPosition(), ModSounds.PEBBLE_LAND.get(), SoundSource.NEUTRAL, 0.5F, 2F);
-            NeoForge.EVENT_BUS.post(new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, this.position(), this.getOwner(), 50.0, 8.0, AlertSoundData.LOW));
+            NeoForge.EVENT_BUS.post(new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, this.position(), this.getOwner(), 50.0, 9.0, AlertSoundData.LOW));
             this.discard();
         }
     }
@@ -52,7 +52,7 @@ public class PebbleProjectileEntity extends ThrowableItemProjectile {
         super.onHitBlock(result);
         if (!this.level().isClientSide) {
             this.level().playSound(null, this.blockPosition(), ModSounds.PEBBLE_LAND.get(), SoundSource.NEUTRAL, 0.5F, 2F);
-            NeoForge.EVENT_BUS.post(new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, this.position(), this.getOwner(), 50.0, 8.0, AlertSoundData.LOW));
+            NeoForge.EVENT_BUS.post(new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, this.position(), this.getOwner(), 50.0, 9.0, AlertSoundData.LOW));
             this.discard();
         }
     }

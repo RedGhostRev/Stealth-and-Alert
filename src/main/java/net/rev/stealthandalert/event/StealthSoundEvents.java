@@ -1,12 +1,26 @@
 package net.rev.stealthandalert.event;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.projectile.*;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.entity.BarrelBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,6 +32,8 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.entity.player.ArrowLooseEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -26,9 +42,16 @@ import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertSoundData;
 import net.rev.stealthandalert.network.S2CSoundPacket;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
 public class StealthSoundEvents {
     public static IEventBus bus = NeoForge.EVENT_BUS;
+    public static final HashMap<UUID, OpenedContainerInfo> activeContainers = new HashMap<UUID, OpenedContainerInfo>();
+
+    public record OpenedContainerInfo(BlockPos pos, BlockEntity blockEntity) {
+    }
 
     @SubscribeEvent
     public static void onPlayerLooseBow(ArrowLooseEvent event) {
@@ -65,7 +88,7 @@ public class StealthSoundEvents {
     public static void onPlayerFall(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (player.onGround()) {
-                if (0.5 < player.fallDistance && player.fallDistance < 5) {
+                if (0.9 < player.fallDistance && player.fallDistance < 5) {
                     bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 34.0, 3.0, AlertSoundData.LOW));
                     PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
                 } else if (player.fallDistance >= 5) {
@@ -77,11 +100,14 @@ public class StealthSoundEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerEat(LivingEntityUseItemEvent.Tick event) {
+    public static void onPlayerEatOrDrink(LivingEntityUseItemEvent.Tick event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (event.getItem().has(DataComponents.FOOD)) {
                 bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 41.0, 2.0, AlertSoundData.LOW));
                 PacketDistributor.sendToPlayer(player, new S2CSoundPacket(41.0));
+            } else if (event.getItem().is(Items.POTION)) {
+                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 30.0, 2.0, AlertSoundData.LOW));
+                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(30.0));
             }
         }
     }
@@ -144,6 +170,134 @@ public class StealthSoundEvents {
                     bus.post(new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, explosion.center(), player, 150.0, 32.0, AlertSoundData.HIGH));
                 } else {
                     bus.post(new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, explosion.center(), player, 180.0, 36.0, AlertSoundData.HIGH));
+                }
+            }
+        }
+    }
+
+//    @SubscribeEvent
+//    public static void onPlayerUse(LivingEntityUseItemEvent.Finish event) {
+//        if (event.getEntity() instanceof ServerPlayer player) {
+//            ItemStack item = event.getItem();
+//            if (item.is(Items.FIREWORK_ROCKET)) {
+//                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM));
+//                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(80.0));
+//            } else if (item.is(Items.FLINT_AND_STEEL)) {
+//                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 28.0, 3.0, AlertSoundData.LOW));
+//                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(28.0));
+//            } else if (item.is(Items.FISHING_ROD)) {
+//                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 28.0, 3.0, AlertSoundData.LOW));
+//                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(28.0));
+//            }
+//        }
+//    }
+
+    @SubscribeEvent
+    public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            InteractionHand hand = event.getHand();
+            ItemStack item = player.getItemInHand(hand);
+            if (item.is(Items.FISHING_ROD)) {
+                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 28.0, 3.0, AlertSoundData.LOW));
+                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(28.0));
+            } else if (item.is(Items.FIREWORK_ROCKET)) {
+                if (player.isFallFlying()) {
+                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM));
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(80.0));
+                }
+            }
+        }
+    }
+
+    // 开容器或开关门
+    @SubscribeEvent
+    public static void onPlayerOpen(PlayerInteractEvent.RightClickBlock event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ItemStack itemStack = event.getItemStack();
+            if (!player.isShiftKeyDown() || event.getItemStack().isEmpty()) {
+                Level level = player.level();
+                BlockPos pos = event.getPos();
+                BlockState state = level.getBlockState(event.getPos());
+                if (state.is(Blocks.CHEST) || state.is(Blocks.TRAPPED_CHEST) || state.is(Blocks.ENDER_CHEST)) {
+                    if (level.getBlockEntity(pos) instanceof ChestBlockEntity entity) {
+                        if (ChestBlock.isChestBlockedAt(level, pos)) return;
+                        activeContainers.put(player.getUUID(), new OpenedContainerInfo(pos, entity));
+                        bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 36.0, 5.0, AlertSoundData.LOW));
+                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                    }
+                } else if (state.is(Blocks.BARREL)) {
+                    if (level.getBlockEntity(pos) instanceof BarrelBlockEntity entity) {
+                        activeContainers.put(player.getUUID(), new OpenedContainerInfo(pos, entity));
+                        bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 36.0, 4.0, AlertSoundData.LOW));
+                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                    }
+                } else if (state.is(BlockTags.WOODEN_DOORS)) {
+                    if (state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
+                        pos = pos.above();
+                    }
+                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 32.0, 3.0, AlertSoundData.LOW));
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(32.0));
+
+                } else if (state.is(BlockTags.WOODEN_TRAPDOORS)) {
+                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 30.0, 2.8, AlertSoundData.LOW));
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(30.0));
+                } else if (state.is(BlockTags.FENCE_GATES)) {
+                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 29.0, 2.5, AlertSoundData.LOW));
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(29.0));
+                } else if (state.is(Blocks.LEVER)) {
+                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 28.0, 2.5, AlertSoundData.LOW));
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(28.0));
+                } else if (state.is(BlockTags.BUTTONS)) {
+                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 28.0, 2.3, AlertSoundData.LOW));
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(28.0));
+                } else if (itemStack.is(Items.FIREWORK_ROCKET)) {
+                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM));
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(80.0));
+                }
+            } else {
+                if (itemStack.is(Items.FIREWORK_ROCKET)) {
+                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM));
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(80.0));
+                }
+            }
+        }
+    }
+
+    // 关闭容器
+    @SubscribeEvent
+    public static void onPlayerClose(PlayerContainerEvent.Close event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            UUID playerUUID = player.getUUID();
+            if (activeContainers.containsKey(playerUUID)) {
+                OpenedContainerInfo info = activeContainers.remove(playerUUID);
+                BlockEntity entity = player.level().getBlockEntity(info.pos());
+                BlockEntity currentEntity = player.level().getBlockEntity(info.pos());
+                boolean isValid = false;
+                if (entity instanceof BarrelBlockEntity && entity == currentEntity) {
+                    isValid = true;
+                } else if (entity instanceof ChestBlockEntity && currentEntity instanceof ChestBlockEntity) {
+                    if (currentEntity == entity) {
+                        isValid = true;
+                    } else {
+                        BlockState state = player.level().getBlockState(info.pos());
+                        if (state.is(Blocks.CHEST)) {
+                            Container provider = ChestBlock.getContainer((((ChestBlock) state.getBlock())), state, player.level(), info.pos(), true);
+                            if (provider != null) {
+                                isValid = true;
+                            }
+                        }
+                    }
+                }
+                if (isValid) {
+                    if (entity == info.blockEntity) {
+                        if (entity instanceof ChestBlockEntity) {
+                            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, info.pos().getCenter(), player, 34.0, 5.0, AlertSoundData.LOW));
+                            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                        } else if (entity instanceof BarrelBlockEntity) {
+                            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, info.pos().getCenter(), player, 34.0, 4.0, AlertSoundData.LOW));
+                            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                        }
+                    }
                 }
             }
         }

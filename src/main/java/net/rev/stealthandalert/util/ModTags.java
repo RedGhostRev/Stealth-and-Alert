@@ -23,6 +23,7 @@ public class ModTags {
 
     public static class Items {
         public static final TagKey<Item> CAN_BACKSTAB = createTag("can_backstab");
+        public static final TagKey<Item> CAN_ASSASSINATE = createTag("can_assassinate");
         public static final TagKey<Item> DAGGERS = createTag("daggers");
 
         private static TagKey<Item> createTag(String name) {

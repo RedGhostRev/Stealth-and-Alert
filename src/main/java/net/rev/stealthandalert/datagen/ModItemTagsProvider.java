@@ -26,6 +26,9 @@ public class ModItemTagsProvider extends ItemTagsProvider implements IConditionB
         tag(ModTags.Items.CAN_BACKSTAB)
                 .addTag(ModTags.Items.DAGGERS);
 
+        tag(ModTags.Items.CAN_ASSASSINATE)
+                .addTag(ModTags.Items.DAGGERS);
+
         for (DeferredItem<DaggerItem> dagger : ModItems.DAGGER_LIST) {
             tag(ModTags.Items.DAGGERS).add(dagger.get());
         }

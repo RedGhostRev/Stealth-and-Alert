@@ -70,7 +70,7 @@ public class VisibilityBarOverlay {
                     y = y + allBossBarsHeight + 5;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                StealthAndAlert.LOGGER.warn("Could not get boss events field", e);
             }
         }
 

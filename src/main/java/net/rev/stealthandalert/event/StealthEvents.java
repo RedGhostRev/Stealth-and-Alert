@@ -267,7 +267,7 @@ public class StealthEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent.Post event) {
+    public static void onPlayerTick(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
         if (player.level().isClientSide()) return;
         boolean crawling = player.getData(ModAttachments.CRAWL_DATA).isCrawling();

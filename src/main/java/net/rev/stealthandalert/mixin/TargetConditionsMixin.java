@@ -15,6 +15,7 @@ public abstract class TargetConditionsMixin {
 
     @Inject(method = "test", at = @At("HEAD"), cancellable = true)
     private void stealth_and_alert$onTestTarget(LivingEntity attacker, LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
+        if (attacker == null || target == null) return;
         if (attacker.getType().is(ModTags.Entities.SEEKERS) && target.getType().is(ModTags.Entities.DETECTABLE)) {
             AlertData data = attacker.getData(ModAttachments.ALERT_DATA);
             if (data.primaryTarget().isEmpty()) {

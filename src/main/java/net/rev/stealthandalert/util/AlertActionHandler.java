@@ -133,10 +133,10 @@ public class AlertActionHandler {
         BlockPos.MutableBlockPos mutable = BlockPos.containing(pos).mutable();
         int minHeight = mob.level().getMinBuildHeight();
         while (mutable.getY() >= minHeight) {
-            mutable.move(0, -1, 0);
-            if (!mob.level().hasChunk(mutable.getX() >> 4, mutable.getZ() >> 4)) break;
             BlockState currentState = mob.level().getBlockState(mutable);
             if (!currentState.isAir()) return Vec3.atBottomCenterOf(mutable.above());
+            mutable.move(0, -1, 0);
+            if (!mob.level().hasChunk(mutable.getX() >> 4, mutable.getZ() >> 4)) break;
         }
         return pos;
     }

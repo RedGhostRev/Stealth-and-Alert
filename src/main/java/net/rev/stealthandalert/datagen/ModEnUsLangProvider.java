@@ -13,17 +13,17 @@ public class ModEnUsLangProvider extends LanguageProvider {
     protected void addTranslations() {
         // Items
         add(LangKeys.PEBBLE, "Pebble");
-        add(LangKeys.CLAMOR_BELL, "Clamor Bell");
-        add(LangKeys.SHADOW_CRYSTAL, "Shadow Crystal");
-        add(LangKeys.SHADOW_CRYSTAL_SHARD, "Shadow Crystal Shard");
-        add(LangKeys.SHADOW_BERRIES, "Shadow Berries");
-        add(LangKeys.SHADOW_CRYSTAL_DAGGER, "Shadow Crystal Dagger");
+        add(LangKeys.CLAMOR_BELL, "Clamor Bell [WIP]");
+        add(LangKeys.SHADOW_CRYSTAL, "Shadow Crystal [WIP]");
+        add(LangKeys.SHADOW_CRYSTAL_SHARD, "Shadow Crystal Shard [WIP]");
+        add(LangKeys.SHADOW_BERRIES, "Shadow Berries [WIP]");
+        add(LangKeys.SHADOW_CRYSTAL_DAGGER, "Shadow Crystal Dagger [WIP]");
         add(LangKeys.DEBUG_WAND, "Debug Wand");
 
         // Blocks
         add(LangKeys.PEBBLE_BLOCK, "Pebble Block");
-        add(LangKeys.SHADOW_CRYSTAL_ORE, "Shadow Crystal Ore");
-        add(LangKeys.DEEPSLATE_SHADOW_ORE, "Deepslate Shadow Crystal Ore");
+        add(LangKeys.SHADOW_CRYSTAL_ORE, "Shadow Crystal Ore [WIP]");
+        add(LangKeys.DEEPSLATE_SHADOW_ORE, "Deepslate Shadow Crystal Ore [WIP]");
 
         // Tooltips
         add(LangKeys.TOOLTIP_CAN_STAB, "§eDeels double damage when §cbackstabbing");

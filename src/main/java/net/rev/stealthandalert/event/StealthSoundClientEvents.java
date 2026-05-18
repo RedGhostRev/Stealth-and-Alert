@@ -62,7 +62,7 @@ public class StealthSoundClientEvents {
                         PacketDistributor.sendToServer(new C2SBreakPacket(pos));
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    StealthAndAlert.LOGGER.warn("Could not get destroyBlockPos", e);
                 }
             }
         }

@@ -17,10 +17,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.rev.stealthandalert.attachment.AlertData;
-import net.rev.stealthandalert.attachment.AlertSoundData;
-import net.rev.stealthandalert.attachment.InvestigateLkpData;
-import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attachment.*;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertSettings;
@@ -41,6 +38,14 @@ public class StealthUtils {
         EntityAlertSettings settings = EntityAlertConfigLoader.get(observer.getType());
         double distanceSqr = observer.distanceToSqr(target);
         double maxDistance = settings.viewRange();
+        VisibilityData visData = target.getData(ModAttachments.VISIBILITY_DATA);
+        if (visData.isVisible()) {
+            maxDistance = maxDistance * visData.visibility();
+            if (maxDistance < CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble()) {
+                maxDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble() + 0.5;
+            }
+        }
+
         if (distanceSqr > maxDistance * maxDistance) return false;
         // 隐身快速失败
         if (target instanceof Player player) {
@@ -234,7 +239,7 @@ public class StealthUtils {
                             return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
                         }
                     } else {
-                        if (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10) {
+                        if (soundData.volume() < 35.0 && (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10)) {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
@@ -416,7 +421,7 @@ public class StealthUtils {
         int emittedLight = getPlayerEmittedLight(player);
         int finalLight = Math.max(ambientLight, emittedLight);
 
-        int effectiveThreshold = 3;
+        int effectiveThreshold = 2;
 //        if (player.isCrouching()) {
 //            effectiveThreshold = 4;
 //        } else if (player.isVisuallyCrawling() || player.isVisuallySwimming()) {

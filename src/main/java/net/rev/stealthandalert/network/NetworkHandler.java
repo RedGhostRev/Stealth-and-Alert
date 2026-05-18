@@ -72,9 +72,9 @@ public class NetworkHandler {
                                 } else if (speedPerSecond <= 2.5) {
                                     sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 35.0, 3.0, AlertSoundData.LOW);
                                 } else if (speedPerSecond <= 3.5) {
-                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 40.0, 4.0, AlertSoundData.LOW);
+                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 40.0, 4.5, AlertSoundData.LOW);
                                 } else if (speedPerSecond <= 4.2) {
-                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 47.0, 5.0, AlertSoundData.MEDIUM);
+                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 47.0, 5.5, AlertSoundData.MEDIUM);
                                 } else {
                                     sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 55.0, 8.0, AlertSoundData.MEDIUM);
                                 }
@@ -98,11 +98,11 @@ public class NetworkHandler {
                                 } else if (speedPerSecond <= 2.5) {
                                     sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 27.0, 1.5, AlertSoundData.LOW);
                                 } else if (speedPerSecond <= 5.0) {
-                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 35.0, 4.0, AlertSoundData.LOW);
+                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 35.0, 5.5, AlertSoundData.LOW);
                                 } else if (speedPerSecond <= 6.0) {
-                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 42.0, 7.0, AlertSoundData.MEDIUM);
+                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 42.0, 7.5, AlertSoundData.MEDIUM);
                                 } else {
-                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 50.0, 8.0, AlertSoundData.MEDIUM);
+                                    sendAndPostSound(StealthSoundEvent.Type.PLAYER_SELF, player, 50.0, 8.5, AlertSoundData.MEDIUM);
                                 }
                             }
                         }
@@ -115,9 +115,9 @@ public class NetworkHandler {
                 C2SBreakPacket.STREAM_CODEC,
                 ((payload, context) -> {
                     if (context.player() instanceof ServerPlayer player) {
-                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(42.0));
+                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(36.0));
                         if (player.level().getGameTime() % 8 == 0) {
-                            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, payload.pos().getCenter(), player, 42.0, 5.0, AlertSoundData.LOW));
+                            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, payload.pos().getCenter(), player, 36.0, 5.5, AlertSoundData.LOW));
                         }
                     }
                 })

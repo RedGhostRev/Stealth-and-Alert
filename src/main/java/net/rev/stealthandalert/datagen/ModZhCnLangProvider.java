@@ -13,17 +13,17 @@ public class ModZhCnLangProvider extends LanguageProvider {
     protected void addTranslations() {
         // 物品
         add(LangKeys.PEBBLE, "石子");
-        add(LangKeys.CLAMOR_BELL, "喧闹铃铛");
-        add(LangKeys.SHADOW_CRYSTAL, "暗影水晶");
-        add(LangKeys.SHADOW_CRYSTAL_SHARD, "暗影水晶碎片");
-        add(LangKeys.SHADOW_BERRIES, "暗影浆果");
-        add(LangKeys.SHADOW_CRYSTAL_DAGGER, "暗影水晶匕首");
+        add(LangKeys.CLAMOR_BELL, "喧闹铃铛 [未完成]");
+        add(LangKeys.SHADOW_CRYSTAL, "暗影水晶 [未完成]");
+        add(LangKeys.SHADOW_CRYSTAL_SHARD, "暗影水晶碎片 [未完成]");
+        add(LangKeys.SHADOW_BERRIES, "暗影浆果 [未完成]");
+        add(LangKeys.SHADOW_CRYSTAL_DAGGER, "暗影水晶匕首 [未完成]");
         add(LangKeys.DEBUG_WAND, "调试手杖");
 
         // 方块
         add(LangKeys.PEBBLE_BLOCK, "石子块");
-        add(LangKeys.SHADOW_CRYSTAL_ORE, "暗影水晶矿石");
-        add(LangKeys.DEEPSLATE_SHADOW_ORE, "深层暗影水晶矿石");
+        add(LangKeys.SHADOW_CRYSTAL_ORE, "暗影水晶矿石 [未完成]");
+        add(LangKeys.DEEPSLATE_SHADOW_ORE, "深层暗影水晶矿石 [未完成]");
 
         // 工具提示
         add(LangKeys.TOOLTIP_CAN_STAB, "§c背刺§e时造成双倍伤害");
