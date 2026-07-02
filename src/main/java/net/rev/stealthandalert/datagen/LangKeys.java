@@ -20,7 +20,7 @@ public class LangKeys {
     public static final String DEEPSLATE_SHADOW_ORE = "block." + MOD_ID + ".deepslate_shadow_crystal_ore";
 
     // Tooltips
-    public static final String TOOLTIP_CAN_STAB = "tooltip." + MOD_ID + ".can_stab";
+    public static final String TOOLTIP_CAN_ASSASSINATE = "tooltip." + MOD_ID + ".can_assassinate";
     public static final String TOOLTIP_DEBUG_WAND = "tooltip." + MOD_ID + ".debug_wand";
     public static final String TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC = "tooltip." + MOD_ID + ".debug_wand.debug_mode_desc";
 
@@ -31,9 +31,38 @@ public class LangKeys {
     // Key Mappings
     public static final String CATEGORY = "category." + MOD_ID + "stealth_and_alert";
     public static final String CRAWL = "key." + MOD_ID + ".crawl";
+    public static final String ASSASSINATE = "key." + MOD_ID + ".assassinate";
 
     // Subtitles
     public static final String PEBBLE_LAND = "subtitles." + MOD_ID + ".pebble_land";
+
+    // Death Messages
+    public static final String ASSASSINATION = "death.attack.assassination";
+    public static final String ASSASSINATION_PLAYER = ASSASSINATION + ".player";
+    public static final String ASSASSINATION_ITEM = ASSASSINATION + ".item";
+    public static final String ASSASSINATION_ITEM_DUAL = ASSASSINATION + ".item.dual";
+    public static final String DAGGER_THROAT_SLIT = getDeath("dagger.throat_slit");
+    public static final String DAGGER_THROAT_SLIT_PLAYER = DAGGER_THROAT_SLIT + ".player";
+    public static final String DAGGER_THROAT_SLIT_ITEM = DAGGER_THROAT_SLIT + ".item";
+    public static final String DAGGET_THROAT_SLIT_ITEM_DUAL = DAGGER_THROAT_SLIT + ".item.dual";
+    public static final String TRIDENT_IMPALE = getDeath("trident.impale");
+    public static final String TRIDENT_IMPALE_PLAYER = TRIDENT_IMPALE + ".player";
+    public static final String TRIDENT_IMPALE_ITEM = TRIDENT_IMPALE + ".item";
+    public static final String TRIDENT_IMPALE_ITEM_DUAL = TRIDENT_IMPALE + ".item.dual";
+    public static final String MACE_SMASH = getDeath("mace.smash");
+    public static final String MACE_SMASH_PLAYER = MACE_SMASH + ".player";
+    public static final String MACE_SMASH_ITEM = MACE_SMASH + ".item";
+    public static final String MACE_SMASH_ITEM_DUAL = MACE_SMASH + ".item.dual";
+    public static final String SWORD_SLASH = getDeath("sword.slash");
+    public static final String SWORD_SLASH_PLAYER = SWORD_SLASH + ".player";
+    public static final String SWORD_SLASH_ITEM = SWORD_SLASH + ".item";
+    public static final String SWORD_SLASH_ITEM_DUAL = SWORD_SLASH + ".item.dual";
+    public static final String SWORD_THRUST = getDeath("sword.thrust");
+    public static final String SWORD_THRUST_PLAYER = SWORD_THRUST + ".player";
+    public static final String SWORD_THRUST_ITEM = SWORD_THRUST + ".item";
+    public static final String SWORD_THRUST_ITEM_DUAL = SWORD_THRUST + ".item.dual";
+    // GUI Texts
+    public static final String GUI_ASSASSINATE = "gui." + MOD_ID + "assassinate";
 
     // Debug Texts
     public static final String DEBUG_MODE_ON = "debug." + MOD_ID + "debug_mode_on";
@@ -51,4 +80,8 @@ public class LangKeys {
     public static final String DEBUG_TARGET_ALERT_LEVEL = "debug." + MOD_ID + "target_alert_level";
     public static final String DEBUG_ALERT_STATE_TICKS = "debug." + MOD_ID + "alert_state_ticks";
     public static final String DEBUG_PATIENCE_TICKS = "debug." + MOD_ID + "debug_patience_ticks";
+
+    private static String getDeath(String message) {
+        return "death.attack." + ".assassination." + message;
+    }
 }

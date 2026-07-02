@@ -4,6 +4,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -27,7 +28,18 @@ public class ModItemTagsProvider extends ItemTagsProvider implements IConditionB
                 .addTag(ModTags.Items.DAGGERS);
 
         tag(ModTags.Items.CAN_ASSASSINATE)
+                .addTag(ModTags.Items.CAN_ASSASSINATE_DAGGERS)
+                .addTag(ModTags.Items.CAN_ASSASSINATE_TRIDENTS)
+                .addTag(ModTags.Items.CAN_ASSASSINATE_MACES)
+                .addTag(ModTags.Items.CAN_ASSASSINATE_SWORDS);
+        tag(ModTags.Items.CAN_ASSASSINATE_DAGGERS)
                 .addTag(ModTags.Items.DAGGERS);
+        tag(ModTags.Items.CAN_ASSASSINATE_TRIDENTS)
+                .add(Items.TRIDENT);
+        tag(ModTags.Items.CAN_ASSASSINATE_MACES)
+                .add(Items.MACE);
+        tag(ModTags.Items.CAN_ASSASSINATE_SWORDS)
+                .addTag(ItemTags.SWORDS);
 
         for (DeferredItem<DaggerItem> dagger : ModItems.DAGGER_LIST) {
             tag(ModTags.Items.DAGGERS).add(dagger.get());

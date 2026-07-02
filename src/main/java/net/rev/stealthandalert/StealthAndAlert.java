@@ -12,6 +12,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.block.ModBlocks;
+import net.rev.stealthandalert.common.assassination.AssassinationRegistry;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
@@ -60,7 +61,10 @@ public class StealthAndAlert {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(EntityAlertConfigLoader::load);
+        event.enqueueWork(() -> {
+            EntityAlertConfigLoader.load();
+            AssassinationRegistry.init();
+        });
     }
 
     // Add the example block item to the building blocks tab

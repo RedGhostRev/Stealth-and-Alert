@@ -2,6 +2,7 @@ package net.rev.stealthandalert.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+// TODO 改进配置文件格式
 public class CommonConfigs {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
@@ -73,6 +74,10 @@ public class CommonConfigs {
     public static final ModConfigSpec.DoubleValue AWARENESS_DECREASE_SEARCHING_STATE_FACTOR =
             BUILDER.comment("The factor by which being in the searching state affects the awareness decrease. Higher values mean that if the enemy is in the searching state, it will lose awareness much slower. | 搜寻状态对警戒值下降的影响。数值越高，敌人如果处于搜寻状态，警戒值下降得越慢。")
                     .defineInRange("awarenessDecreaseSearchingStateFactor", 0.6, 0.5, 5.0);
+
+    public static final ModConfigSpec.BooleanValue CAN_PLAYER_BE_ASSASSINATED =
+            BUILDER.comment("Whether or not a player can be assassinated by another player. | 玩家之间能否相互刺杀。")
+                    .define("canPlayerBeAssassinated", false);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

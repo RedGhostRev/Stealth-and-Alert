@@ -27,6 +27,9 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<CrawlData>> CRAWL_DATA = ATTACHMENT_TYPES.register("crawl_data",
             () -> AttachmentType.builder(() -> CrawlData.DEFAULT).serialize(CrawlData.CODEC).build());
 
+    public static final Supplier<AttachmentType<AssassinationData>> ASSASSINATION_DATA = ATTACHMENT_TYPES.register("assassinate_data",
+            () -> AttachmentType.builder(() -> AssassinationData.DEFAULT).build());
+
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
     }

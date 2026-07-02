@@ -1,16 +1,36 @@
 package net.rev.stealthandalert.event;
 
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.util.ModTags;
+import net.rev.stealthandalert.util.SpeedHandler;
 
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
 public class ModEvents {
+    @SubscribeEvent
+    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        Player player = event.getEntity();
+        if (!player.level().isClientSide()) {
+            SpeedHandler.clear(player.getUUID());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        Player player = event.getEntity();
+        if (!player.level().isClientSide()) {
+            SpeedHandler.clear(player.getUUID());
+        }
+    }
+
+
     @SubscribeEvent
     public static void onLivingDamage(LivingDamageEvent.Pre event) {
         if (event.getSource().getDirectEntity() instanceof LivingEntity attacker) {

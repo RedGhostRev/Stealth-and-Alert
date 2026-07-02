@@ -14,7 +14,9 @@ import net.rev.stealthandalert.attachment.AlertSoundData;
 import net.rev.stealthandalert.attachment.CrawlData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.client.network.S2CAlertDataPacketClientHandler;
+import net.rev.stealthandalert.client.network.S2CAssassinationPacketClientHandler;
 import net.rev.stealthandalert.event.StealthSoundEvent;
+import net.rev.stealthandalert.util.SpeedHandler;
 
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
 public class NetworkHandler {
@@ -49,6 +51,13 @@ public class NetworkHandler {
                 S2CSoundPacket::handle
         );
 
+        registrar.playToClient(
+                S2CAssassinationPacket.TYPE,
+                S2CAssassinationPacket.STREAM_CODEC,
+                (payload, context) ->
+                        S2CAssassinationPacketClientHandler.handle(payload, context)
+        );
+
         registrar.playToServer(
                 C2SCrawlPacket.TYPE,
                 C2SCrawlPacket.STREAM_CODEC,
@@ -62,8 +71,8 @@ public class NetworkHandler {
                 C2SSpeedPacket.TYPE,
                 C2SSpeedPacket.STREAM_CODEC,
                 (((payload, context) -> {
-
                     double speedPerSecond = payload.speed();
+                    SpeedHandler.updateSpeed(context.player().getUUID(), speedPerSecond);
                     if (context.player() instanceof ServerPlayer player) {
                         if (player.isInWater()) {
                             if (speedPerSecond >= 0.5) {
@@ -121,6 +130,12 @@ public class NetworkHandler {
                         }
                     }
                 })
+        );
+
+        registrar.playToServer(
+                C2SAssassinationPacket.TYPE,
+                C2SAssassinationPacket.STREAM_CODEC,
+                C2SAssassinationPacket::handle
         );
     }
 

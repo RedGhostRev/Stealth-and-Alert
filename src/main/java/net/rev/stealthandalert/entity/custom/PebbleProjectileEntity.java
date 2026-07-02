@@ -17,6 +17,7 @@ import net.rev.stealthandalert.entity.ModEntities;
 import net.rev.stealthandalert.event.StealthSoundEvent;
 import net.rev.stealthandalert.item.ModItems;
 import net.rev.stealthandalert.sound.ModSounds;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PebbleProjectileEntity extends ThrowableItemProjectile {
@@ -35,7 +36,7 @@ public class PebbleProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected void onHitEntity(EntityHitResult result) {
+    protected void onHitEntity(@NotNull EntityHitResult result) {
         super.onHitEntity(result);
         if (!this.level().isClientSide) {
             Entity target = result.getEntity();
@@ -48,7 +49,7 @@ public class PebbleProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected void onHitBlock(BlockHitResult result) {
+    protected void onHitBlock(@NotNull BlockHitResult result) {
         super.onHitBlock(result);
         if (!this.level().isClientSide) {
             this.level().playSound(null, this.blockPosition(), ModSounds.PEBBLE_LAND.get(), SoundSource.NEUTRAL, 0.5F, 2F);
@@ -58,7 +59,7 @@ public class PebbleProjectileEntity extends ThrowableItemProjectile {
     }
 
     @Override
-    protected Item getDefaultItem() {
+    protected @NotNull Item getDefaultItem() {
         return ModItems.PEBBLE.get();
     }
 }

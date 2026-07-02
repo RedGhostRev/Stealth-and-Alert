@@ -33,6 +33,7 @@ import net.rev.stealthandalert.network.S2CAlertDataPacket;
 import net.rev.stealthandalert.network.S2CCrawlPacket;
 import net.rev.stealthandalert.network.S2CVisibilityDataPacket;
 import net.rev.stealthandalert.util.AlertLogicHandler;
+import net.rev.stealthandalert.util.AssassinationHandler;
 import net.rev.stealthandalert.util.ModTags;
 import net.rev.stealthandalert.util.StealthUtils;
 
@@ -297,7 +298,7 @@ public class StealthEvents {
         if (!(event.getEntity() instanceof Mob mob)) return;
         if (mob.level().isClientSide()) return;
         if (!(mob.getType().is(ModTags.Entities.SEEKERS))) return;
-
+        if (AssassinationHandler.isTargetLocked(mob.level(), mob.getId())) return;
         StealthUtils.processStealthTick(mob);
     }
 }

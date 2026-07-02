@@ -1,5 +1,8 @@
 {
   "values": [
-    "#stealth_and_alert:daggers"
+    "#stealth_and_alert:can_assassinate/daggers",
+    "#stealth_and_alert:can_assassinate/tridents",
+    "#stealth_and_alert:can_assassinate/maces",
+    "#stealth_and_alert:can_assassinate/swords"
   ]
 }

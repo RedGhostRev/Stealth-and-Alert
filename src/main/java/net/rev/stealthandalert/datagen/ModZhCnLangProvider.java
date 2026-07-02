@@ -26,7 +26,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.DEEPSLATE_SHADOW_ORE, "深层暗影水晶矿石 [未完成]");
 
         // 工具提示
-        add(LangKeys.TOOLTIP_CAN_STAB, "§c背刺§e时造成双倍伤害");
+        add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "可进行刺杀");
         add(LangKeys.TOOLTIP_DEBUG_WAND, "右键以开关调试模式");
         add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "调试模式：显示带有SEEKERS标签的生物的警戒数据——全局警戒状态、对你的观测状态、主目标、对你的记忆时间、对你的警戒值、全局警戒状态切换计时和耐心值计时");
 
@@ -37,9 +37,39 @@ public class ModZhCnLangProvider extends LanguageProvider {
         // 按键控制
         add(LangKeys.CATEGORY, "潜行与警戒");
         add(LangKeys.CRAWL, "匍匐");
+        add(LangKeys.ASSASSINATE, "刺杀");
 
         // 字幕
         add(LangKeys.PEBBLE_LAND, "石子：落地");
+
+        // 死亡消息
+        add(LangKeys.ASSASSINATION, "%1$s再也看不到第二天的太阳");
+        add(LangKeys.ASSASSINATION_PLAYER, "%1$s没能察觉到%2$s的接近");
+        add(LangKeys.ASSASSINATION_ITEM, "%1$s的生命被%2$s用%3$s悄无声息地带走了");
+        add(LangKeys.ASSASSINATION_ITEM_DUAL, "%1$s死前最后一眼只能看到%2$s的%3$s和%4$s");
+        add(LangKeys.DAGGER_THROAT_SLIT, "%1$s被抹了喉");
+        add(LangKeys.DAGGER_THROAT_SLIT_PLAYER, "%1$s被%2$s抹了喉");
+        add(LangKeys.DAGGER_THROAT_SLIT_ITEM, "%1$s被%2$s用%3$s切开了喉管" );
+        add(LangKeys.DAGGET_THROAT_SLIT_ITEM_DUAL, "%1$s被%2$s用%3$s和%4$s做了场喉部手术，尽管从未同意过");
+        add(LangKeys.TRIDENT_IMPALE, "%1$s被捅了个对穿");
+        add(LangKeys.TRIDENT_IMPALE_PLAYER, "%1$s被%2$s捅了个对穿");
+        add(LangKeys.TRIDENT_IMPALE_ITEM, "%1$s被%2$s用%3$s捅了个对穿");
+        add(LangKeys.TRIDENT_IMPALE_ITEM_DUAL, "%1$s的身体被%2$s用%3$s和%4$s扎出了两个窟窿");
+        add(LangKeys.MACE_SMASH, "%1$s被砸成了肉泥");
+        add(LangKeys.MACE_SMASH_PLAYER, "%1$s被%2$s砸成了肉泥");
+        add(LangKeys.MACE_SMASH_ITEM, "%1$s被%2$s用%3$s砸成了肉泥");
+        add(LangKeys.MACE_SMASH_ITEM_DUAL, "%1$s的脑袋在%2$s的%3$s和%4$s前一碰即碎");
+        add(LangKeys.SWORD_SLASH, "%1$s的尸体上满是剑痕");
+        add(LangKeys.SWORD_SLASH_PLAYER, "%1$s沦为了%2$s剑下的一段残躯");
+        add(LangKeys.SWORD_SLASH_ITEM, "在意识到危险之前，%1$s已经被%2$s用%3$s撕裂");
+        add(LangKeys.SWORD_SLASH_ITEM_DUAL, "%1$s在死前受尽了%2$s用%3$s和%4$s制造的切割酷刑");
+        add(LangKeys.SWORD_THRUST, "%1$s被剑刃贯穿了");
+        add(LangKeys.SWORD_THRUST_PLAYER, "%1$s被%2$s的剑刃贯穿了");
+        add(LangKeys.SWORD_THRUST_ITEM, "%1$s被%2$s用%3$s精准地刺入了要害");
+        add(LangKeys.SWORD_THRUST_ITEM_DUAL, "%1$s被%2$s用%3$s和%4$s刺穿了内脏");
+
+        // GUI
+        add(LangKeys.GUI_ASSASSINATE, "[%s] 刺杀");
 
         // 调试文本
         add(LangKeys.DEBUG_MODE_ON, "§a调试模式：开启");

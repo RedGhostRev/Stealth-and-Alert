@@ -23,6 +23,7 @@ import net.rev.stealthandalert.config.EntityAlertSettings;
 
 import java.util.List;
 
+// TODO 改进数据驱动
 public class AlertLogicHandler {
     // 对条件敌对生物敌意产生的断言
     // 适用于CONDITIONAL_SEEKERS标签实体

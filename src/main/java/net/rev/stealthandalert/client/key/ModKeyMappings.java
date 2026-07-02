@@ -13,4 +13,10 @@ public class ModKeyMappings {
             GLFW.GLFW_KEY_C,
             LangKeys.CATEGORY
     );
+
+    public static final KeyMapping ASSASSINATE_KEY = new KeyMapping(
+            LangKeys.ASSASSINATE,
+            GLFW.GLFW_KEY_F,
+            LangKeys.CATEGORY
+    );
 }

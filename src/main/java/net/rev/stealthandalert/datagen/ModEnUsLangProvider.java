@@ -26,7 +26,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.DEEPSLATE_SHADOW_ORE, "Deepslate Shadow Crystal Ore [WIP]");
 
         // Tooltips
-        add(LangKeys.TOOLTIP_CAN_STAB, "§eDeels double damage when §cbackstabbing");
+        add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "Can perform assassinations");
         add(LangKeys.TOOLTIP_DEBUG_WAND, "Right-click to toggle debug mode");
         add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "Debug Mode: Displays alert data for mobs with the SEEKERS tag — Global Alert State, Observation State towards you, Primary Target, Memory Time towards you, Alert Level towards you, Global State Transition Timer, and Patience Timer.");
 
@@ -37,9 +37,39 @@ public class ModEnUsLangProvider extends LanguageProvider {
         // Key Mappings
         add(LangKeys.CATEGORY, "Stealth and Alert");
         add(LangKeys.CRAWL, "Crawl");
+        add(LangKeys.ASSASSINATE, "Assassinate");
 
         // Subtitles
         add(LangKeys.PEBBLE_LAND, "Pebble lands");
+
+        // Death Messages
+        add(LangKeys.ASSASSINATION, "%1$s didn't live to see tomorrow");
+        add(LangKeys.ASSASSINATION_PLAYER, "%1$s was completely oblivious to %2$s creeping up");
+        add(LangKeys.ASSASSINATION_ITEM, "%1$s's life was quietly stolen away by %2$s with %3$s");
+        add(LangKeys.ASSASSINATION_ITEM_DUAL, "%1$s's final sight was %2$s brandishing %3$s and %4$s");
+        add(LangKeys.DAGGER_THROAT_SLIT, "%1$s's throat was slitted");
+        add(LangKeys.DAGGER_THROAT_SLIT_PLAYER, "%1$s's throat was slitted by %2$s");
+        add(LangKeys.DAGGER_THROAT_SLIT_ITEM, "%1$s's throat was slitted by %2$s using %3$s");
+        add(LangKeys.DAGGET_THROAT_SLIT_ITEM_DUAL, "%1$s received an unconsented throat surgery from %2$s using %3$s and %4$s");
+        add(LangKeys.TRIDENT_IMPALE, "%1$s was skewered clean through");
+        add(LangKeys.TRIDENT_IMPALE_PLAYER, "%1$s was skewered clean through by %2$s");
+        add(LangKeys.TRIDENT_IMPALE_ITEM, "%1$s was skewered clean through by %2$s using %3$s");
+        add(LangKeys.TRIDENT_IMPALE_ITEM_DUAL, "%1$s was left with two gaping holes by %2$s using %3$s and %4$s");
+        add(LangKeys.MACE_SMASH, "%1$s was smashed into a bloody pulp");
+        add(LangKeys.MACE_SMASH_PLAYER, "%1$s was smashed into a bloody pulp by %2$s");
+        add(LangKeys.MACE_SMASH_ITEM, "%1$s was smashed into a bloody pulp by %2$s using %3$s");
+        add(LangKeys.MACE_SMASH_ITEM_DUAL, "%1$s's skull was shattered instantly by %2$s's %3$s and %4$s");
+        add(LangKeys.SWORD_SLASH, "%1$s was left covered in slash marks");
+        add(LangKeys.SWORD_SLASH_PLAYER, "%1$s was cut to pieces by %2$s's blade");
+        add(LangKeys.SWORD_SLASH_ITEM, "%1$s was torn apart by %2$s using %3$s before even realizing the danger");
+        add(LangKeys.SWORD_SLASH_ITEM_DUAL, "%1$s was tortured to death by %2$s's relentless slicing with %3$s and %4$s");
+        add(LangKeys.SWORD_THRUST, "%1$s was impaled by a blade");
+        add(LangKeys.SWORD_THRUST_PLAYER, "%1$s was impaled by %2$s's blade");
+        add(LangKeys.SWORD_THRUST_ITEM, "%1$s was precisely struck in the vitals by %2$s using %3$s");
+        add(LangKeys.SWORD_THRUST_ITEM_DUAL, "%1$s had their vitals pierced by %2$s using %3$s and %4$s");
+
+        // GUI
+        add(LangKeys.GUI_ASSASSINATE, "[%s] Assassinate");
 
         // Debug Texts
         add(LangKeys.DEBUG_MODE_ON, "§aDEBUG MODE: ON");

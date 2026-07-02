@@ -1,0 +1,9 @@
+{
+  "remove": [
+    "minecraft:iron_golem"
+  ],
+  "values": [
+    "#stealth_and_alert:seekers",
+    "minecraft:player"
+  ]
+}

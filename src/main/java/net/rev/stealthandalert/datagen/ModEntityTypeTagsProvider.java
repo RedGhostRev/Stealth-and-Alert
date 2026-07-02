@@ -49,5 +49,12 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
 
         tag(ModTags.Entities.DETECTABLE)
                 .add(EntityType.PLAYER);
+
+        // 能被刺杀的生物
+        // 将铁傀儡排除在外
+        tag(ModTags.Entities.CAN_BE_ASSASSINATED)
+                .addTag(ModTags.Entities.SEEKERS)
+                .remove(EntityType.IRON_GOLEM)
+                .add(EntityType.PLAYER);
     }
 }

@@ -38,13 +38,13 @@ public class StealthUtils {
         EntityAlertSettings settings = EntityAlertConfigLoader.get(observer.getType());
         double distanceSqr = observer.distanceToSqr(target);
         double maxDistance = settings.viewRange();
-        VisibilityData visData = target.getData(ModAttachments.VISIBILITY_DATA);
-        if (visData.isVisible()) {
-            maxDistance = maxDistance * visData.visibility();
-            if (maxDistance < CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble()) {
-                maxDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble() + 0.5;
-            }
-        }
+//        VisibilityData visData = target.getData(ModAttachments.VISIBILITY_DATA);
+//        if (visData.isVisible()) {
+//            maxDistance = maxDistance * visData.visibility();
+//            if (maxDistance < CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble()) {
+//                maxDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble() + 0.5;
+//            }
+//        }
 
         if (distanceSqr > maxDistance * maxDistance) return false;
         // 隐身快速失败
