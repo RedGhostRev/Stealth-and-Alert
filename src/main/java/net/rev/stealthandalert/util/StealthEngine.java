@@ -4,7 +4,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.rev.stealthandalert.attachment.AlertData;
-import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.config.CommonConfigs;
 
 import java.util.Map;
@@ -42,7 +42,7 @@ public class StealthEngine {
         int nextMemory = currentMemory;
 
         if (!player.isAlive()) {
-            return new IndividualResult(0F, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt(), AlertData.UNTRACKED, 0);
+            return new IndividualResult(0F, CommonConfigs.DETECTION.reactionTicks.getAsInt(), AlertData.UNTRACKED, 0);
         }
 
         if (canSee) { // 看见了
@@ -58,33 +58,40 @@ public class StealthEngine {
 
             // 涨条期：在AWARE状态下累积
             if (nextPState == AlertData.AWARE) {
+                nextReaction = 0;
                 // 可见度系数
-                float visibility = player.getData(ModAttachments.VISIBILITY_DATA).visibility();
-                double distanceSqr = mob.distanceToSqr(player);
-                float visModifier = Math.clamp(visibility, StealthUtils.VISIBILITY_THRESHOLD, 1F);
-                visModifier *= CommonConfigs.AWARENESS_INCREASE_VISIBILITY_FACTOR.get().floatValue();
+                double visibility = player.getAttributeValue(ModAttributes.VISIBILITY);
+                double rawVis = Math.clamp(visibility, StealthUtils.VISIBILITY_THRESHOLD, 1.0);
+                double threshold = StealthUtils.VISIBILITY_THRESHOLD;
+                double t = (rawVis - threshold) / (1.0 - threshold);
+                double minBase = 0.6;
+                double visModifier = minBase + (1.0 - minBase) * Math.pow(t, 0.5);
+                visModifier *= CommonConfigs.AWARENESS.increaseVisibilityFactor.get();
+                visModifier = Math.clamp(visModifier, 0.1, 10.0);
+                //double visModifier = Math.clamp(visibility, StealthUtils.VISIBILITY_THRESHOLD, 1);
 
                 // 距离系数
-                float distModifier = 1F;
-                if (distanceSqr <= 64.0) {
-                    float dist = (float) Math.sqrt(distanceSqr);
-                    dist = Math.clamp(dist, 0.4F, 8F);
-                    distModifier = (float) (Math.pow(8.0F / dist, 2.5));
-                    distModifier = Math.clamp(distModifier, 1F, 300F);
-                    distModifier *= CommonConfigs.AWARENESS_INCREASE_DISTANCE_FACTOR.get().floatValue();
+                double distanceSqr = mob.distanceToSqr(player);
+                double distModifier = 1F;
+                if (distanceSqr <= 256) {
+                    double dist = Math.sqrt(distanceSqr);
+                    dist = Math.clamp(dist, 0.4, 16);
+                    distModifier = (Math.pow(8.0F / dist, 2.5));
+                    distModifier = Math.clamp(distModifier, 1, 300);
+                    distModifier *= CommonConfigs.AWARENESS.increaseDistanceFactor.get();
                 }
                 // 状态系数
-                float stateModifier = 1F;
+                double stateModifier = 1;
                 if (state == AlertData.SUSPICIOUS) {
-                    stateModifier *= CommonConfigs.AWARENESS_INCREASE_SUSPICIOUS_STATE_FACTOR.get().floatValue();
+                    stateModifier *= CommonConfigs.AWARENESS.increaseSuspiciousFactor.get();
                 } else if (state == AlertData.SEARCHING) {
-                    stateModifier *= CommonConfigs.AWARENESS_INCREASE_SEARCHING_STATE_FACTOR.get().floatValue();
+                    stateModifier *= CommonConfigs.AWARENESS.increaseSearchingFactor.get();
                 }
 
-                float basicIncreaseRate = CommonConfigs.AWARENESS_INCREASE_BASIC_RATE.get().floatValue();
+                double basicIncreaseRate = CommonConfigs.AWARENESS.increaseBasicRate.get();
 
-                float awarenessIncreaseRate = basicIncreaseRate * visModifier * distModifier * stateModifier;
-                nextLevel = Math.min(100.0F, currentLevel + awarenessIncreaseRate);
+                double awarenessIncreaseRate = basicIncreaseRate * visModifier * distModifier * stateModifier;
+                nextLevel = (float) Math.min(100.0, currentLevel + awarenessIncreaseRate);
                 if (nextLevel >= 100.0F) {
                     nextPState = AlertData.TRACKING;
                 }
@@ -93,6 +100,7 @@ public class StealthEngine {
             // 锁定期
             if (nextPState == AlertData.TRACKING) {
                 nextLevel = 100.0F;
+                nextReaction = 0;
                 nextMemory = 1200;
             }
         } else { // 没看见
@@ -101,7 +109,7 @@ public class StealthEngine {
             if (currentPState == AlertData.TRACKING) {
                 // 若处于 TRACKING 状态，则初始 currentReaction 必定为0
                 if (nextReaction <= 0) {
-                    nextReaction = 15;
+                    nextReaction = 30;
                 } else {
                     nextReaction--;
                     if (nextReaction <= 0) {
@@ -112,12 +120,12 @@ public class StealthEngine {
                 // 状态系数
                 float stateModifier = 1F;
                 if (state == AlertData.SUSPICIOUS) {
-                    stateModifier = CommonConfigs.AWARENESS_DECREASE_SUSPICIOUS_STATE_FACTOR.get().floatValue();
+                    stateModifier = CommonConfigs.AWARENESS.decreaseSuspiciousFactor.get().floatValue();
                 } else if (state == AlertData.SEARCHING) {
-                    stateModifier = CommonConfigs.AWARENESS_DECREASE_SEARCHING_STATE_FACTOR.get().floatValue();
+                    stateModifier = CommonConfigs.AWARENESS.decreaseSearchingFactor.get().floatValue();
                 }
 
-                float basicDecreaseRate = CommonConfigs.AWARENESS_DECREASE_BASIC_RATE.get().floatValue();
+                float basicDecreaseRate = CommonConfigs.AWARENESS.decreaseBasicRate.get().floatValue();
                 float awarenessDecreaseRate = basicDecreaseRate * stateModifier;
                 nextLevel = Math.max(0.0F, currentLevel - awarenessDecreaseRate);
                 nextMemory = Math.max(0, --currentMemory); // 只要看不见，记忆就开始衰减
@@ -126,7 +134,7 @@ public class StealthEngine {
             // 阶梯式回落判定
             if (nextLevel <= 0.0F) {
                 nextPState = AlertData.UNTRACKED;
-                nextReaction = CommonConfigs.DETECTION_REACTION_TICKS.getAsInt();
+                nextReaction = CommonConfigs.DETECTION.reactionTicks.getAsInt();
             }
         }
         return new IndividualResult(nextLevel, nextReaction, nextPState, nextMemory);
@@ -220,7 +228,7 @@ public class StealthEngine {
         if (anyTargetVisible) {
             // 只有当全场最高警戒值大于0，即怪物至少对看到的一个人反应过来后，才重置耐心值和状态切换计时器
             if (maxLevel > 0.0F) {
-                nextPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt();
+                nextPatienceTicks = CommonConfigs.DETECTION.patienceTicks.getAsInt();
                 if (!willFighting) {
                     nextStateTicks = 0;
                 }
@@ -234,7 +242,7 @@ public class StealthEngine {
             if (anyoneTracking) {
                 if (nextState < AlertData.FIGHTING && !willFighting) {
                     nextState = AlertData.TRACKING;
-                    nextStateTicks = 15;
+                    nextStateTicks = 10;
                     willFighting = true;
                 }
             } else if (!willFighting) {
@@ -273,7 +281,7 @@ public class StealthEngine {
                 // 则为了确保怪物在战斗中不轻易丢失锁定，为 FIGHTING 状态下的降级设定一个很短的计时
                 if (nextState == AlertData.FIGHTING) {
                     if (nextStateTicks <= 0) {
-                        nextStateTicks = 10;
+                        nextStateTicks = 30;
                     }
                 }
                 if (maxLevel <= 0.0F) {
@@ -307,7 +315,7 @@ public class StealthEngine {
                         nextState = AlertData.IDLE;
                         nextLkp = Optional.empty();
                         nextPrimary = Optional.empty();
-                        nextPatienceTicks = CommonConfigs.PATIENCE_TICKS.getAsInt();
+                        nextPatienceTicks = CommonConfigs.DETECTION.patienceTicks.getAsInt();
                     }
                 }
             }

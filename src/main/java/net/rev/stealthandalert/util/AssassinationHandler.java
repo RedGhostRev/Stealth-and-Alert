@@ -10,12 +10,15 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.Tags;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.AssassinationData;
 import net.rev.stealthandalert.attachment.CrawlData;
@@ -98,13 +101,31 @@ public class AssassinationHandler {
         Entity entity = player.level().getEntity(targetId);
         if (entity == null) return null;
         if (!(entity instanceof LivingEntity target)) return null;
+        if (!target.getType().is(ModTags.Entities.CAN_BE_ASSASSINATED)) return null;
+        if (!target.isAlive()) return null;
+        if (target.isVehicle()) return null;
+        if (target.getType().is(ModTags.Entities.ANIMALS)) {
+            if (target.getType().is(ModTags.Entities.SEEKERS)) {
+                if (!CommonConfigs.ASSASSINATION.canAnimalSeekersBeAssassinated.get()) return null;
+            } else {
+                if (!CommonConfigs.ASSASSINATION.canAnimalsBeAssassinated.get()) return null;
+            }
+        }
+        if (target instanceof Villager || target instanceof WanderingTrader) {
+            if (!CommonConfigs.ASSASSINATION.canVillagersBeAssassinated.getAsBoolean()) {
+                return null;
+            }
+        }
+        if (target.getType().is(Tags.EntityTypes.BOSSES)) {
+            if (!CommonConfigs.ASSASSINATION.canBossesBeAssassinated.getAsBoolean()) return null;
+        }
         if (target instanceof Player) {
-            if (!CommonConfigs.CAN_PLAYER_BE_ASSASSINATED.getAsBoolean()) return null;
+            if (!CommonConfigs.ASSASSINATION.canPlayersBeAssassinated.getAsBoolean()) return null;
         }
         if (!player.hasLineOfSight(target)) return null;
-        if (!target.isAlive()) return null;
-        if (!target.getType().is(ModTags.Entities.CAN_BE_ASSASSINATED)) return null;
-        if (target.getData(ModAttachments.ALERT_DATA).state() == AlertData.FIGHTING) return null;
+        if (target.getType().is(ModTags.Entities.SEEKERS)) {
+            if (target.getData(ModAttachments.ALERT_DATA).state() == AlertData.FIGHTING) return null;
+        }
         if (!player.getItemInHand(InteractionHand.MAIN_HAND).is(ModTags.Items.CAN_ASSASSINATE) &&
                 !player.getItemInHand(InteractionHand.OFF_HAND).is(ModTags.Items.CAN_ASSASSINATE)) return null;
         ModTags.PriorityCategory finalCategory = getFinalCategory(player);
@@ -148,8 +169,24 @@ public class AssassinationHandler {
                 target -> {
                     if (!target.getType().is(ModTags.Entities.CAN_BE_ASSASSINATED)) return false;
                     if (!target.isAlive() || isTargetLocked(target.level(), target.getId())) return false;
+                    if (target.isVehicle()) return false;
+                    if (target.getType().is(ModTags.Entities.ANIMALS)) {
+                        if (target.getType().is(ModTags.Entities.SEEKERS)) {
+                            if (!CommonConfigs.ASSASSINATION.canAnimalSeekersBeAssassinated.get()) return false;
+                        } else {
+                            if (!CommonConfigs.ASSASSINATION.canAnimalsBeAssassinated.get()) return false;
+                        }
+                    }
+                    if (target instanceof Villager || target instanceof WanderingTrader) {
+                        if (!CommonConfigs.ASSASSINATION.canVillagersBeAssassinated.getAsBoolean()) {
+                            return false;
+                        }
+                    }
+                    if (target.getType().is(Tags.EntityTypes.BOSSES)) {
+                        if (!CommonConfigs.ASSASSINATION.canBossesBeAssassinated.getAsBoolean()) return false;
+                    }
                     if (target instanceof Player) {
-                        return CommonConfigs.CAN_PLAYER_BE_ASSASSINATED.getAsBoolean();
+                        return CommonConfigs.ASSASSINATION.canPlayersBeAssassinated.getAsBoolean();
                     }
                     return true;
                 }
@@ -231,6 +268,11 @@ public class AssassinationHandler {
             if (target instanceof Mob mob) {
                 mob.setNoAi(true);
             }
+            if (target.isPassenger()) {
+                if (target.getVehicle() instanceof Mob mob) {
+                    mob.setNoAi(true);
+                }
+            }
             if (target instanceof Creeper creeper) {
                 creeper.setSwellDir(-1);
             }
@@ -252,6 +294,11 @@ public class AssassinationHandler {
         }
         if (target.isAlive() && target instanceof Mob mob) {
             mob.setNoAi(false);
+        }
+        if (target.isPassenger()) {
+            if (target.getVehicle() instanceof Mob mob) {
+                mob.setNoAi(false);
+            }
         }
         target.setInvulnerable(false);
         AssassinationHandler.unlockTarget(player.level(), target.getId());

@@ -107,7 +107,7 @@ public record AlertData(
     }
 
     public static AlertData createDefault() {
-        return new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt(), false, false);
+        return new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt(), false, false);
     }
 }
 

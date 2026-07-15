@@ -19,10 +19,10 @@ public record EntityAlertSettings(
 
     public static EntityAlertSettings fromConfig() {
         return new EntityAlertSettings(
-                CommonConfigs.MAX_DETECTION_RANGE.get(),
-                CommonConfigs.DETECTION_HORIZONTAL_FOV.get(),
-                CommonConfigs.DETECTION_VERTICAL_UP_FOV.get(),
-                CommonConfigs.DETECTION_VERTICAL_DOWN_FOV.get(),
+                CommonConfigs.DETECTION.maxDetectionRange.get(),
+                CommonConfigs.DETECTION.horizontalFov.get(),
+                CommonConfigs.DETECTION.verticalUpFov.get(),
+                CommonConfigs.DETECTION.verticalDownFov.get(),
                 false,
                 List.of(),
                 Map.of()

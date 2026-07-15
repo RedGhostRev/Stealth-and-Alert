@@ -1,10 +1,13 @@
 package net.rev.stealthandalert.datagen;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.util.ModTags;
@@ -50,11 +53,26 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
         tag(ModTags.Entities.DETECTABLE)
                 .add(EntityType.PLAYER);
 
+        for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE) {
+            ResourceLocation registryName = BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
+            if (!registryName.getNamespace().equals("minecraft")) continue;
+            if (entityType == EntityType.WANDERING_TRADER) continue;
+            MobCategory category = entityType.getCategory();
+            if (category == MobCategory.CREATURE || category == MobCategory.WATER_CREATURE
+                    || category == MobCategory.UNDERGROUND_WATER_CREATURE || category == MobCategory.AMBIENT
+                    || category == MobCategory.WATER_AMBIENT || category == MobCategory.AXOLOTLS) {
+                tag(ModTags.Entities.ANIMALS).add(entityType);
+            }
+        }
+
         // 能被刺杀的生物
         // 将铁傀儡排除在外
         tag(ModTags.Entities.CAN_BE_ASSASSINATED)
                 .addTag(ModTags.Entities.SEEKERS)
                 .remove(EntityType.IRON_GOLEM)
+                .addTag(ModTags.Entities.ANIMALS)
+                .add(EntityType.VILLAGER)
+                .add(EntityType.WANDERING_TRADER)
                 .add(EntityType.PLAYER);
     }
 }

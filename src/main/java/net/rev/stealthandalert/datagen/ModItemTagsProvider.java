@@ -45,17 +45,11 @@ public class ModItemTagsProvider extends ItemTagsProvider implements IConditionB
             tag(ModTags.Items.DAGGERS).add(dagger.get());
         }
 
-        tag(ItemTags.WEAPON_ENCHANTABLE)
-                .addTag(ModTags.Items.DAGGERS);
         tag(ItemTags.SHARP_WEAPON_ENCHANTABLE)
                 .addTag(ModTags.Items.DAGGERS);
         tag(ItemTags.SWORD_ENCHANTABLE)
                 .addTag(ModTags.Items.DAGGERS);
         tag(ItemTags.DURABILITY_ENCHANTABLE)
-                .addTag(ModTags.Items.DAGGERS);
-        tag(ItemTags.FIRE_ASPECT_ENCHANTABLE)
-                .addTag(ModTags.Items.DAGGERS);
-        tag(ItemTags.VANISHING_ENCHANTABLE)
                 .addTag(ModTags.Items.DAGGERS);
     }
 }

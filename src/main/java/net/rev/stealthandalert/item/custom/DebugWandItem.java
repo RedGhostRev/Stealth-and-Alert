@@ -24,11 +24,11 @@ public class DebugWandItem extends Item {
         ItemStack stack = player.getItemInHand(usedHand);
 
         if (!level.isClientSide) {
-            boolean currentDebug = ClientConfigs.DEBUG_MODE.get();
+            boolean currentDebug = ClientConfigs.DEBUG_MODE.turnOn.get();
             boolean newDebug = !currentDebug;
 
-            ClientConfigs.DEBUG_MODE.set(newDebug);
-            ClientConfigs.DEBUG_MODE.save();
+            ClientConfigs.DEBUG_MODE.turnOn.set(newDebug);
+            ClientConfigs.DEBUG_MODE.turnOn.save();
 
             String status = newDebug ? LangKeys.DEBUG_MODE_ON : LangKeys.DEBUG_MODE_OFF;
             player.displayClientMessage(Component.translatable(status), true);

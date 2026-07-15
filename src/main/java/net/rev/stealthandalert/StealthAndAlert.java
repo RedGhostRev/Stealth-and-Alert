@@ -11,15 +11,20 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.block.ModBlocks;
 import net.rev.stealthandalert.common.assassination.AssassinationRegistry;
+import net.rev.stealthandalert.component.ModDataComponents;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
+import net.rev.stealthandalert.effect.ModEffects;
+import net.rev.stealthandalert.enchantment.ModEnchantmentEffects;
 import net.rev.stealthandalert.entity.ModEntities;
 import net.rev.stealthandalert.event.StealthSoundEventHandler;
 import net.rev.stealthandalert.item.ModCreativeModeTabs;
 import net.rev.stealthandalert.item.ModItems;
+import net.rev.stealthandalert.potion.ModPotions;
 import net.rev.stealthandalert.sound.ModSounds;
 import org.slf4j.Logger;
 
@@ -43,13 +48,18 @@ public class StealthAndAlert {
         NeoForge.EVENT_BUS.register(this);
         NeoForge.EVENT_BUS.register(StealthSoundEventHandler.class);
 
+
         ModCreativeModeTabs.register(modEventBus);
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModEntities.register(modEventBus);
         ModSounds.register(modEventBus);
-
+        ModEffects.register(modEventBus);
+        ModPotions.register(modEventBus);
+        ModAttributes.register(modEventBus);
+        ModDataComponents.register(modEventBus);
+        ModEnchantmentEffects.register(modEventBus);
         ModAttachments.register(modEventBus);
 
         // Register the item to a creative tab

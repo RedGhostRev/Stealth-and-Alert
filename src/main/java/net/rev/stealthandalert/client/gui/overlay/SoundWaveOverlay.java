@@ -5,6 +5,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.BossHealthOverlay;
+import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -13,9 +14,10 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.config.ClientConfigs;
 
-import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.UUID;
 
+// TODO 改进 HUD
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID, value = Dist.CLIENT)
 public class SoundWaveOverlay {
     public static int lastSoundTick = 0;
@@ -26,8 +28,8 @@ public class SoundWaveOverlay {
     public static double tickMaxAmplitude = 0.0;
     public static boolean hasNewSoundThisTick = false;
 
-//    public static long lastSoundTime = 0;
-//    public static final long RESET_DELAY_MS = 80;
+    // public static long lastSoundTime = 0;
+    // public static final long RESET_DELAY_MS = 80;
 
     public static void receiveRawSound(double rawVolume) {
         double minVolume = 20.0;
@@ -67,7 +69,7 @@ public class SoundWaveOverlay {
     }
 
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        if (!ClientConfigs.SOUND_WAVE_INDICATOR.get()) return;
+        if (!ClientConfigs.SOUND_WAVE_INDICATOR.turnOn.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
 
@@ -88,7 +90,7 @@ public class SoundWaveOverlay {
         }
 
         PoseStack poseStack = graphics.pose();
-        float scale = ClientConfigs.SOUND_WAVE_INDICATOR_SCALE.get().floatValue(); // 缩放比例
+        float scale = ClientConfigs.SOUND_WAVE_INDICATOR.scale.get().floatValue(); // 缩放比例
         int screenWidth = graphics.guiWidth();
         int targetY = 30;
 
@@ -100,8 +102,6 @@ public class SoundWaveOverlay {
 
         poseStack.popPose();
     }
-
-    public static Field bossEventsField = null; // 反射用缓存字段
 
     private static void drawSoundWave(GuiGraphics graphics) {
         int waveWidth = 112; // 横条长
@@ -116,26 +116,15 @@ public class SoundWaveOverlay {
         int baseColor = 0xFFFFFFFF; // 条色
         int borderColor = 0x337F7F7F; // 边框颜色（r:0.5, g:0.5, b:0.5, alpha:0.2）
 
-        int localStartX = -waveWidth / 2 + ClientConfigs.SOUND_WAVE_INDICATOR_POSITION.get().getFirst();
-        int middleY = -23 + ClientConfigs.SOUND_WAVE_INDICATOR_POSITION.get().getLast();
+        int localStartX = -waveWidth / 2 + ClientConfigs.SOUND_WAVE_INDICATOR.x.get();
+        int middleY = -23 + ClientConfigs.SOUND_WAVE_INDICATOR.y.get();
         BossHealthOverlay bossOverlay = Minecraft.getInstance().gui.getBossOverlay();
-        if (ClientConfigs.SOUND_WAVE_INDICATOR_CAN_OFFSET_FROM_BOSS_BAR.get() && bossOverlay != null) {
-            try {
-                if (SoundWaveOverlay.bossEventsField == null) {
-                    SoundWaveOverlay.bossEventsField = BossHealthOverlay.class.getDeclaredField("events");
-                    SoundWaveOverlay.bossEventsField.setAccessible(true);
-                }
-
-                Map<?, ?> eventsMap = (java.util.Map<?, ?>) SoundWaveOverlay.bossEventsField.get(bossOverlay);
-
-                if (eventsMap != null && !eventsMap.isEmpty()) {
-                    int bossCount = eventsMap.size();
-
-                    int allBossBarsHeight = 12 + (bossCount - 1) * 30;
-                    middleY = middleY + allBossBarsHeight + 5;
-                }
-            } catch (Exception e) {
-                StealthAndAlert.LOGGER.warn("Could not get boss events field", e);
+        if (ClientConfigs.SOUND_WAVE_INDICATOR.canOffsetFromBossBar.get()) {
+            Map<UUID, LerpingBossEvent> eventsMap = bossOverlay.events;
+            if (!eventsMap.isEmpty()) {
+                int bossCount = eventsMap.size();
+                int allBossBarsHeight = 12 + (bossCount - 1) * 30;
+                middleY = middleY + allBossBarsHeight + 5;
             }
         }
 

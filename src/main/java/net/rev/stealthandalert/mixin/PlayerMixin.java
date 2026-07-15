@@ -30,4 +30,14 @@ public abstract class PlayerMixin extends LivingEntity {
             ci.cancel();
         }
     }
+
+//    @Redirect(method = "attack",
+//            slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;sweepAttack()V")),
+//            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z",
+//                    ordinal = 0)
+//    )
+//    private boolean stealth_and_alert$redirectSweepHurt(LivingEntity target, DamageSource source, float amount) {
+//        AssassinationDamageSource aSource = AssassinationDamageSource.getSource(this, target, LangKeys.ASSASSINATION, AssassinationHandler.AssassinateHand.RIGHT_HAND);
+//        return target.hurt(aSource, amount);
+//    }
 }

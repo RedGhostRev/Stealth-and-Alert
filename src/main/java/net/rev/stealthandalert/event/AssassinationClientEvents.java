@@ -1,13 +1,16 @@
 package net.rev.stealthandalert.event;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -19,6 +22,7 @@ import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.client.camera.CameraShakeManager;
 import net.rev.stealthandalert.common.animation.AssassinationManager;
 import net.rev.stealthandalert.datagen.LangKeys;
+import net.rev.stealthandalert.util.CommonUtils;
 import net.rev.stealthandalert.util.ModTags;
 
 import java.util.HashMap;
@@ -296,10 +300,37 @@ public class AssassinationClientEvents {
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
+        List<Component> tooltip = event.getToolTip();
+
+        float baseDamage = CommonUtils.getWeaponBaseDamage(stack);
+        float totalMultiplier = CommonUtils.getAssassinationTotalMultiplier(stack);
+        float assassinationDamage = CommonUtils.getAssassinationDamage(baseDamage, totalMultiplier);
+        if (assassinationDamage <= 0F) return;
+        for (int i = 0; i < tooltip.size(); i++) {
+            String text = tooltip.get(i).getString();
+            String attackDamageTranslation = Component.translatable("attribute.name.generic.attack_damage").getString();
+            if (text.contains(attackDamageTranslation)) {
+                String displayAssassination = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(assassinationDamage);
+                MutableComponent assassinateComponent = Component.literal(" ")
+                        .append(Component.literal(displayAssassination))
+                        .append(CommonComponents.SPACE)
+                        .append(Component.translatable(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE))
+                        .withStyle(ChatFormatting.DARK_GREEN);
+                if (event.getFlags().isAdvanced()) {
+                    String displayBase = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(baseDamage);
+                    String displayMultiplier = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(totalMultiplier);
+                    Component formulaComponent = Component.literal(" [" + displayBase + " * " + displayMultiplier + "]")
+                            .withStyle(ChatFormatting.GRAY);
+                    assassinateComponent.append(formulaComponent);
+                }
+                tooltip.add(i + 1, assassinateComponent);
+                break;
+            }
+        }
+
         if (stack.is(ModTags.Items.CAN_ASSASSINATE)) {
-            List<Component> tooltip = event.getToolTip();
             MutableComponent tip = Component.translatable(LangKeys.TOOLTIP_CAN_ASSASSINATE).withStyle(style ->
-                    style.withColor(0xAA0000).withItalic(true));
+                    style.withColor(ChatFormatting.RED).withItalic(true));
             if (tooltip.size() > 1) {
                 tooltip.add(1, tip);
             } else {

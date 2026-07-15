@@ -5,6 +5,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.component.ModDataComponents;
 import net.rev.stealthandalert.item.custom.DaggerItem;
 import net.rev.stealthandalert.item.custom.DebugWandItem;
 import net.rev.stealthandalert.item.custom.PebbleItem;
@@ -31,9 +32,9 @@ public class ModItems {
             () -> new Item(new Item.Properties().food(ModFoodProperties.SHADOW_BERRIES)));
 
     public static final DeferredItem<DaggerItem> SHADOW_CRYSTAL_DAGGER = ITEMS.register("shadow_crystal_dagger",
-            () -> new DaggerItem(ModTiers.SHADOW_CRYSTAL, new Item.Properties().attributes(
-                    DaggerItem.createAttributes(ModTiers.SHADOW_CRYSTAL, 2F, -1.2F)
-            )));
+            () -> new DaggerItem(ModTiers.SHADOW_CRYSTAL, new Item.Properties().
+                    attributes(DaggerItem.createAttributes(ModTiers.SHADOW_CRYSTAL, 2F, -1.2F))
+                    .component(ModDataComponents.ASSASSINATION_BASE_MULTIPLIER, 0.5F)));
 
     public static final DeferredItem<DebugWandItem> DEBUG_WAND = ITEMS.register("debug_wand",
             () -> new DebugWandItem(new Item.Properties().stacksTo(1)));

@@ -13,6 +13,7 @@ import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertSoundData;
 import net.rev.stealthandalert.attachment.CrawlData;
 import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.client.network.S2CAlertDataPacketClientHandler;
 import net.rev.stealthandalert.client.network.S2CAssassinationPacketClientHandler;
 import net.rev.stealthandalert.event.StealthSoundEvent;
@@ -32,11 +33,6 @@ public class NetworkHandler {
                 ((payload, context) -> {
                     S2CAlertDataPacketClientHandler.handle(payload, context);
                 })
-        );
-        registrar.playToClient(
-                S2CVisibilityDataPacket.TYPE,
-                S2CVisibilityDataPacket.STREAM_CODEC,
-                S2CVisibilityDataPacket::handle
         );
 
         registrar.playToClient(
@@ -124,9 +120,11 @@ public class NetworkHandler {
                 C2SBreakPacket.STREAM_CODEC,
                 ((payload, context) -> {
                     if (context.player() instanceof ServerPlayer player) {
-                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(36.0));
+                        double multiplier = player.getAttributeValue(ModAttributes.SOUND_MULTIPLIER);
+                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(36.0 * multiplier));
                         if (player.level().getGameTime() % 8 == 0) {
-                            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, payload.pos().getCenter(), player, 36.0, 5.5, AlertSoundData.LOW));
+                            StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, payload.pos().getCenter(), player, 36.0, 5.5, AlertSoundData.LOW);
+                            bus.post(sEvent);
                         }
                     }
                 })
@@ -140,8 +138,10 @@ public class NetworkHandler {
     }
 
     private static void sendAndPostSound(StealthSoundEvent.Type type, ServerPlayer player, double volume, double radius, int threatLevel) {
-        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(volume));
+        double multiplier = player.getAttributeValue(ModAttributes.SOUND_MULTIPLIER);
+        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(volume * multiplier));
         if (player.level().getGameTime() % 20 != 0) return;
-        bus.post(new StealthSoundEvent(type, player.position(), player, volume, radius, threatLevel));
+        StealthSoundEvent sEvent = new StealthSoundEvent(type, player.position(), player, volume, radius, threatLevel);
+        bus.post(sEvent);
     }
 }

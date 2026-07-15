@@ -21,9 +21,6 @@ public class ModAttachments {
     public static final Supplier<AttachmentType<InvestigateLkpData>> INVESTIGATE_LKP_DATA = ATTACHMENT_TYPES.register("investigate_lkp_data",
             () -> AttachmentType.builder(() -> InvestigateLkpData.DEFAULT).serialize(InvestigateLkpData.CODEC).build());
 
-    public static final Supplier<AttachmentType<VisibilityData>> VISIBILITY_DATA = ATTACHMENT_TYPES.register("visibility_data",
-            () -> AttachmentType.builder(() -> VisibilityData.DEFAULT).serialize(VisibilityData.CODEC).build());
-
     public static final Supplier<AttachmentType<CrawlData>> CRAWL_DATA = ATTACHMENT_TYPES.register("crawl_data",
             () -> AttachmentType.builder(() -> CrawlData.DEFAULT).serialize(CrawlData.CODEC).build());
 

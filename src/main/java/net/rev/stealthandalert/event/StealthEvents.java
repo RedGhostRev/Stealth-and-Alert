@@ -6,6 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
@@ -25,13 +26,16 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.ai.StealthLookAroundGoal;
-import net.rev.stealthandalert.attachment.*;
+import net.rev.stealthandalert.attachment.AlertData;
+import net.rev.stealthandalert.attachment.CrawlData;
+import net.rev.stealthandalert.attachment.InvestigateLkpData;
+import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertSettings;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
 import net.rev.stealthandalert.network.S2CCrawlPacket;
-import net.rev.stealthandalert.network.S2CVisibilityDataPacket;
 import net.rev.stealthandalert.util.AlertLogicHandler;
 import net.rev.stealthandalert.util.AssassinationHandler;
 import net.rev.stealthandalert.util.ModTags;
@@ -131,7 +135,7 @@ public class StealthEvents {
             Map<UUID, Integer> statesMap = new HashMap<>(data.targetStates());
             Map<UUID, Integer> reactionsMap = new HashMap<>(data.targetReactionTicks());
             Map<UUID, Integer> lastDamageTicksMap = new HashMap<>(data.targetMemoryTicks());
-            boolean canPerceive = StealthUtils.hasLineOfSight(mob, player) || (StealthUtils.shouldArouseAlert(mob, player) && reactionsMap.getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.get()) <= 0);
+            boolean canPerceive = StealthUtils.hasLineOfSight(mob, player) || (StealthUtils.shouldArouseAlert(mob, player) && reactionsMap.getOrDefault(uuid, CommonConfigs.DETECTION.reactionTicks.get()) <= 0);
             boolean dataChanged = false;
             if (canPerceive) {
                 lastDamageTicksMap.put(uuid, 1200);
@@ -185,6 +189,13 @@ public class StealthEvents {
                 dataChanged = true;
             }
 
+            int stateChangeTicks;
+            if (data.willFighting()) {
+                stateChangeTicks = data.stateChangeTicks();
+            } else {
+                stateChangeTicks = 0;
+            }
+
             if (dataChanged) {
                 // 写回
                 AlertData newData = new AlertData(
@@ -195,8 +206,8 @@ public class StealthEvents {
                         lastDamageTicksMap,
                         nextLKP,
                         nextPrimary,
-                        0,
-                        CommonConfigs.PATIENCE_TICKS.get(),
+                        stateChangeTicks,
+                        CommonConfigs.DETECTION.patienceTicks.get(),
                         data.canSeeAnyone(),
                         data.willFighting()
                 );
@@ -280,14 +291,10 @@ public class StealthEvents {
         }
         PacketDistributor.sendToPlayer((ServerPlayer) player, new S2CCrawlPacket(crawling));
 
-        float currentVis = StealthUtils.calculateVisibility(player);
-        boolean isVisible;
-        isVisible = !(currentVis <= StealthUtils.VISIBILITY_THRESHOLD);
-
-        player.setData(ModAttachments.VISIBILITY_DATA, new VisibilityData(currentVis, isVisible));
-
-        if (player.tickCount % 2 == 0) {
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new S2CVisibilityDataPacket(currentVis, isVisible));
+        double currentVis = StealthUtils.calculateVisibility(player);
+        AttributeInstance attribute = player.getAttribute(ModAttributes.VISIBILITY);
+        if (attribute != null) {
+            attribute.setBaseValue(currentVis);
         }
     }
 

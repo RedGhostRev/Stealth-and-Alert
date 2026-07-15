@@ -57,20 +57,23 @@ public class StealthSoundEvents {
     public static void onPlayerLooseBow(ArrowLooseEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (!event.getBow().is(Items.BOW)) return;
-            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 42.0, 6.0, AlertSoundData.MEDIUM));
-            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(42.0));
+            StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 42.0, 6.0, AlertSoundData.MEDIUM);
+            bus.post(sEvent);
+            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
         }
     }
 
     @SubscribeEvent
     public static void onPlayerHurtOrAttack(LivingDamageEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 43.0, 5.0, AlertSoundData.LOW));
-            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(43.0));
+            StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 43.0, 5.0, AlertSoundData.LOW);
+            bus.post(sEvent);
+            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
         } else if (!(event.getEntity() instanceof ServerPlayer)) {
             if (event.getSource().getDirectEntity() instanceof ServerPlayer player && event.getSource().is(DamageTypes.PLAYER_ATTACK)) {
-                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, event.getEntity().position(), player, 43.0, 5.0, AlertSoundData.LOW));
-                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(43.0));
+                StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, event.getEntity().position(), player, 43.0, 5.0, AlertSoundData.LOW);
+                bus.post(sEvent);
+                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
             }
         }
     }
@@ -79,8 +82,9 @@ public class StealthSoundEvents {
     @SubscribeEvent
     public static void onPlayerJump(LivingEvent.LivingJumpEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 34.0, 3.0, AlertSoundData.LOW));
-            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+            StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 34.0, 3.0, AlertSoundData.LOW);
+            bus.post(sEvent);
+            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
         }
     }
 
@@ -89,11 +93,13 @@ public class StealthSoundEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (player.onGround()) {
                 if (0.9 < player.fallDistance && player.fallDistance < 5) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 34.0, 3.0, AlertSoundData.LOW));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 34.0, 3.0, AlertSoundData.LOW);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 } else if (player.fallDistance >= 5) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 45.0, 6.0, AlertSoundData.LOW));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(45.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 45.0, 6.0, AlertSoundData.LOW);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 }
             }
         }
@@ -103,11 +109,13 @@ public class StealthSoundEvents {
     public static void onPlayerEatOrDrink(LivingEntityUseItemEvent.Tick event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             if (event.getItem().has(DataComponents.FOOD)) {
-                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 41.0, 2.0, AlertSoundData.LOW));
-                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(41.0));
+                StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 41.0, 2.0, AlertSoundData.LOW);
+                bus.post(sEvent);
+                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
             } else if (event.getItem().is(Items.POTION)) {
-                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 30.0, 2.0, AlertSoundData.LOW));
-                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(30.0));
+                StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 30.0, 2.0, AlertSoundData.LOW);
+                bus.post(sEvent);
+                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
             }
         }
     }
@@ -115,16 +123,18 @@ public class StealthSoundEvents {
     @SubscribeEvent
     public static void onPlayerFinishBreaking(BlockEvent.BreakEvent event) {
         if (event.getPlayer() instanceof ServerPlayer player) {
-            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, event.getPos().getCenter(), player, 44.0, 5.5, AlertSoundData.LOW));
-            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(44.0));
+            StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, event.getPos().getCenter(), player, 44.0, 5.5, AlertSoundData.LOW);
+            bus.post(sEvent);
+            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
         }
     }
 
     @SubscribeEvent
     public static void onPlayerPlace(BlockEvent.EntityPlaceEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, event.getPos().getCenter(), player, 42.0, 4.0, AlertSoundData.LOW));
-            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(42.0));
+            StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, event.getPos().getCenter(), player, 42.0, 4.0, AlertSoundData.LOW);
+            bus.post(sEvent);
+            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
         }
     }
 
@@ -133,9 +143,11 @@ public class StealthSoundEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             Vec3 prev = event.getPrev();
             Vec3 target = event.getTarget();
-            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, prev, player, 42.0, 3.0, AlertSoundData.LOW));
-            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, target, player, 42.0, 3.0, AlertSoundData.LOW));
-            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(42.0));
+            StealthSoundEvent sEventE = new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, prev, player, 42.0, 3.0, AlertSoundData.LOW);
+            bus.post(sEventE);
+            StealthSoundEvent sEventP = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, target, player, 42.0, 3.0, AlertSoundData.LOW);
+            bus.post(sEventP);
+            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEventP.volume));
         }
     }
 
@@ -198,12 +210,14 @@ public class StealthSoundEvents {
             InteractionHand hand = event.getHand();
             ItemStack item = player.getItemInHand(hand);
             if (item.is(Items.FISHING_ROD)) {
-                bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 28.0, 3.0, AlertSoundData.LOW));
-                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(28.0));
+                StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 28.0, 3.0, AlertSoundData.LOW);
+                bus.post(sEvent);
+                PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
             } else if (item.is(Items.FIREWORK_ROCKET)) {
                 if (player.isFallFlying()) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(80.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 }
             }
         }
@@ -222,42 +236,51 @@ public class StealthSoundEvents {
                     if (level.getBlockEntity(pos) instanceof ChestBlockEntity entity) {
                         if (ChestBlock.isChestBlockedAt(level, pos)) return;
                         activeContainers.put(player.getUUID(), new OpenedContainerInfo(pos, entity));
-                        bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 36.0, 5.0, AlertSoundData.LOW));
-                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                        StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 36.0, 5.0, AlertSoundData.LOW);
+                        bus.post(sEvent);
+                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                     }
                 } else if (state.is(Blocks.BARREL)) {
                     if (level.getBlockEntity(pos) instanceof BarrelBlockEntity entity) {
                         activeContainers.put(player.getUUID(), new OpenedContainerInfo(pos, entity));
-                        bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 36.0, 4.0, AlertSoundData.LOW));
-                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                        StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 36.0, 4.0, AlertSoundData.LOW);
+                        bus.post(sEvent);
+                        PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                     }
                 } else if (state.is(BlockTags.WOODEN_DOORS)) {
                     if (state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
                         pos = pos.above();
                     }
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 32.0, 3.0, AlertSoundData.LOW));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(32.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 32.0, 3.0, AlertSoundData.LOW);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
 
                 } else if (state.is(BlockTags.WOODEN_TRAPDOORS)) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 30.0, 2.8, AlertSoundData.LOW));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(30.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 30.0, 2.8, AlertSoundData.LOW);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 } else if (state.is(BlockTags.FENCE_GATES)) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 29.0, 2.5, AlertSoundData.LOW));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(29.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 29.0, 2.5, AlertSoundData.LOW);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 } else if (state.is(Blocks.LEVER)) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 28.0, 2.5, AlertSoundData.LOW));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(28.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 28.0, 2.5, AlertSoundData.LOW);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 } else if (state.is(BlockTags.BUTTONS)) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 28.0, 2.3, AlertSoundData.LOW));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(28.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, pos.getCenter(), player, 28.0, 2.3, AlertSoundData.LOW);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 } else if (itemStack.is(Items.FIREWORK_ROCKET)) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(80.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 }
             } else {
                 if (itemStack.is(Items.FIREWORK_ROCKET)) {
-                    bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM));
-                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(80.0));
+                    StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, player.position(), player, 80.0, 24.0, AlertSoundData.MEDIUM);
+                    bus.post(sEvent);
+                    PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                 }
             }
         }
@@ -291,11 +314,13 @@ public class StealthSoundEvents {
                 if (isValid) {
                     if (entity == info.blockEntity) {
                         if (entity instanceof ChestBlockEntity) {
-                            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, info.pos().getCenter(), player, 34.0, 5.0, AlertSoundData.LOW));
-                            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                            StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, info.pos().getCenter(), player, 34.0, 5.0, AlertSoundData.LOW);
+                            bus.post(sEvent);
+                            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                         } else if (entity instanceof BarrelBlockEntity) {
-                            bus.post(new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, info.pos().getCenter(), player, 34.0, 4.0, AlertSoundData.LOW));
-                            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(34.0));
+                            StealthSoundEvent sEvent = new StealthSoundEvent(StealthSoundEvent.Type.PLAYER_SELF, info.pos().getCenter(), player, 34.0, 4.0, AlertSoundData.LOW);
+                            bus.post(sEvent);
+                            PacketDistributor.sendToPlayer(player, new S2CSoundPacket(sEvent.volume));
                         }
                     }
                 }

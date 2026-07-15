@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -16,18 +17,25 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.rev.stealthandalert.attachment.*;
+import net.rev.stealthandalert.attachment.AlertData;
+import net.rev.stealthandalert.attachment.AlertSoundData;
+import net.rev.stealthandalert.attachment.InvestigateLkpData;
+import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertSettings;
 import net.rev.stealthandalert.event.StealthSoundEvent;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class StealthUtils {
-    public static float VISIBILITY_THRESHOLD = CommonConfigs.VISIBILITY_THRESHOLD.get().floatValue();
+    public static float VISIBILITY_THRESHOLD = CommonConfigs.DETECTION.visibilityThreshold.get().floatValue();
 
     private StealthUtils() {
     }
@@ -116,7 +124,7 @@ public class StealthUtils {
                     mob,
                     mob.getData(ModAttachments.ALERT_DATA).state(),
                     oldData.targetAwareness().getOrDefault(uuid, 0.0F),
-                    oldData.targetReactionTicks().getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()),
+                    oldData.targetReactionTicks().getOrDefault(uuid, CommonConfigs.DETECTION.reactionTicks.getAsInt()),
                     oldData.targetStates().getOrDefault(uuid, AlertData.UNTRACKED),
                     oldData.targetMemoryTicks().getOrDefault(uuid, 0),
                     canSee
@@ -167,14 +175,14 @@ public class StealthUtils {
             } else {
                 if (soundData.threatLevel() <= AlertSoundData.MEDIUM) {
                     if (soundData.volume() <= 42.0) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                     }
                 } else {
                     mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                 }
             }
         }
@@ -186,23 +194,23 @@ public class StealthUtils {
                     if (soundData.distance() > 7) {
                         return visualData;
                     } else if (soundData.distance() > 6) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                     }
                 } else if (soundData.threatLevel() == AlertSoundData.MEDIUM) {
                     if (soundData.distance() > 12) {
                         return visualData;
                     } else if (soundData.distance() > 10) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                     }
                 } else {
                     mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                 }
             }
         }
@@ -218,14 +226,14 @@ public class StealthUtils {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                         }
                     } else {
                         if (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10) {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                         }
                     }
                 } else if (soundData.threatLevel() == AlertSoundData.MEDIUM) {
@@ -236,14 +244,14 @@ public class StealthUtils {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                         }
                     } else {
                         if (soundData.volume() < 35.0 && (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10)) {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                         }
                     }
                 } else {
@@ -251,7 +259,7 @@ public class StealthUtils {
                         return visualData;
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
                     }
                 }
             }
@@ -285,12 +293,12 @@ public class StealthUtils {
 
         // 4.可见度不大于阈值时，最大感知距离检查
         double distanceSqr = mob.distanceToSqr(player);
-        if (!player.getData(ModAttachments.VISIBILITY_DATA).isVisible()) {
+        if (player.getAttributeValue(ModAttributes.VISIBILITY) <= VISIBILITY_THRESHOLD) {
             double minDistance;
             if (mob.getData(ModAttachments.ALERT_DATA).targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED) < AlertData.TRACKING) {
-                minDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE.getAsDouble();
+                minDistance = CommonConfigs.DETECTION.minInvisibleDistance.getAsDouble();
             } else {
-                minDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble();
+                minDistance = CommonConfigs.DETECTION.minInvisibleDistanceToTracking.getAsDouble();
             }
             if (distanceSqr > minDistance * minDistance) return false;
         }
@@ -328,7 +336,7 @@ public class StealthUtils {
         res.forEach((uuid, lres) -> {
             boolean isDeadData = lres.level() <= 0.0F &&
                     lres.pState() == AlertData.UNTRACKED &&
-                    lres.reaction() >= CommonConfigs.DETECTION_REACTION_TICKS.getAsInt() &&
+                    lres.reaction() >= CommonConfigs.DETECTION.reactionTicks.getAsInt() &&
                     lres.memory() <= 0;
             if (!isDeadData) {
                 progress.put(uuid, lres.level());
@@ -377,13 +385,22 @@ public class StealthUtils {
 
     // 视线射线检测
     private static boolean isLineClear(Mob observer, Vec3 start, Vec3 end) {
-        // TODO 能透过玻璃
-        return observer.level().clip(new ClipContext(
+        Level level = observer.level();
+        ClipContext context = new ClipContext(
                 start, end,
                 ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.NONE,
                 observer
-        )).getType() == HitResult.Type.MISS;
+        ) {
+            @Override
+            public @NotNull VoxelShape getBlockShape(BlockState blockState, @NotNull BlockGetter blockGetter, @NotNull BlockPos pos) {
+                if (blockState.is(ModTags.Blocks.SEE_THROUGHS)) {
+                    return Shapes.empty();
+                }
+                return super.getBlockShape(blockState, blockGetter, pos);
+            }
+        };
+        return level.clip(context).getType() == HitResult.Type.MISS;
     }
 
     // FOV判定
@@ -412,9 +429,9 @@ public class StealthUtils {
     }
 
     // 可见度计算
-    public static float calculateVisibility(Player player) {
-        if (player.isInvisible() && isFullyNaked(player)) return 0.0F;
-        if (isFullyHiddenByEnvironment(player)) return 0.0F;
+    public static double calculateVisibility(Player player) {
+        if (player.isInvisible() && isFullyNaked(player)) return 0.0;
+        if (isFullyHiddenByEnvironment(player)) return 0.0;
 
         int skyDarken = player.level().getSkyDarken();
         int ambientLight = player.level().getRawBrightness(player.blockPosition(), skyDarken);
@@ -428,31 +445,32 @@ public class StealthUtils {
 //            effectiveThreshold = 5;
 //        }
 
-        float visibility = 1.0F;
+        double visibility = 1.0;
 
         // 计算
         // 光照修正
-        float adjustedLight = (float) (finalLight - effectiveThreshold) / (15 - effectiveThreshold);
-        float lightMultiplier = 0.2F + adjustedLight * 0.8F;
+        double adjustedLight = (double) (finalLight - effectiveThreshold) / (15 - effectiveThreshold);
+        // adjustedLight = Math.max(adjustedLight, 0.0);
+        double lightMultiplier = 0.2 + adjustedLight * 0.8;
         visibility *= lightMultiplier;
 
         // 环境修正
         if (isInTallGrass(player.level(), player.blockPosition())) {
-            visibility *= 0.5F;
+            visibility *= 0.5;
         }
 
         // 姿态修正
         if (player.isVisuallyCrawling() || player.isVisuallySwimming()) {
-            visibility *= 0.4F;
+            visibility *= 0.4;
         } else if (player.isCrouching()) {
-            visibility *= 0.7F;
+            visibility *= 0.7;
         }
 
         if (player.isSprinting()) {
-            visibility *= 1.25F;
+            visibility *= 1.25;
         }
 
-        return Math.clamp(visibility, 0.0F, 1.0F);
+        return Math.clamp(visibility, 0.0, 1.0);
     }
 
     private static boolean isFullyHiddenByEnvironment(Player player) {
@@ -555,18 +573,18 @@ public class StealthUtils {
 
         for (ItemStack armor : player.getArmorSlots()) {
             if (armor.isEnchanted()) {
-                glintLevel += 3;
+                glintLevel += 4;
             }
         }
 
-        if (player.getMainHandItem().isEnchanted()) glintLevel += 2;
-        if (player.getOffhandItem().isEnchanted()) glintLevel += 2;
+        if (player.getMainHandItem().isEnchanted()) glintLevel += 3;
+        if (player.getOffhandItem().isEnchanted()) glintLevel += 3;
 
         return Math.min(glintLevel, 15);
     }
 
     public static void reactToSound(StealthSoundEvent event) {
-        if (event.volume <= 0F || event.radius <= 0) return;
+        if (event.volume <= 0 || event.radius <= 0) return;
         if (!(event.soundSource instanceof Player)) return;
         Level level = event.soundSource.level();
         Vec3 pos = event.soundPos;

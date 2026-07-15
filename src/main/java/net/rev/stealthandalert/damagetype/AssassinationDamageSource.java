@@ -9,7 +9,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.rev.stealthandalert.util.AssassinationHandler;
 import org.jetbrains.annotations.NotNull;
@@ -59,12 +58,12 @@ public class AssassinationDamageSource extends DamageSource {
         }
     }
 
-    public static AssassinationDamageSource getSource(Player player, LivingEntity target,
+    public static AssassinationDamageSource getSource(LivingEntity attacker, LivingEntity target,
                                                       String rootMessage, AssassinationHandler.AssassinateHand hand) {
         return new AssassinationDamageSource(
                 target.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE)
                         .getHolderOrThrow(ModDamageTypes.ASSASSINATION),
-                player,
+                attacker,
                 rootMessage,
                 hand
         );

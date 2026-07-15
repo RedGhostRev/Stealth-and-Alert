@@ -96,7 +96,6 @@ public class ModClientEvents {
         AlertIndicatorOverlay.FULL_AWARENESS_TICKS.clear();
         AlertIndicatorOverlay.ACTIVE_POOL.clear();
         AlertIndicatorOverlay.EXPIRED_GHOSTS.clear();
-        SoundWaveOverlay.bossEventsField = null;
         SoundWaveOverlay.lastSoundTick = 0;
         SoundWaveOverlay.targetAmplitude = 0.0;
         SoundWaveOverlay.renderAmplitude = 0.0;
@@ -111,7 +110,6 @@ public class ModClientEvents {
         AlertIndicatorOverlay.FULL_AWARENESS_TICKS.clear();
         AlertIndicatorOverlay.ACTIVE_POOL.clear();
         AlertIndicatorOverlay.EXPIRED_GHOSTS.clear();
-        SoundWaveOverlay.bossEventsField = null;
         SoundWaveOverlay.lastSoundTick = 0;
         SoundWaveOverlay.targetAmplitude = 0.0;
         SoundWaveOverlay.renderAmplitude = 0.0;
@@ -213,7 +211,7 @@ public class ModClientEvents {
     @SubscribeEvent
     public static void onRenderNameTag(RenderNameTagEvent event) {
         if (!(event.getEntity() instanceof Mob mob) || !mob.getType().is(ModTags.Entities.SEEKERS)) return;
-        if (!ClientConfigs.DEBUG_MODE.get()) return;
+        if (!ClientConfigs.DEBUG_MODE.turnOn.get()) return;
 
         Player self = Minecraft.getInstance().player;
         if (self == null) return;
