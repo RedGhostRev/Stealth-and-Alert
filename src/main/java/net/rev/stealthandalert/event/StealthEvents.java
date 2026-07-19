@@ -11,16 +11,13 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.animal.Panda;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -31,17 +28,21 @@ import net.rev.stealthandalert.attachment.CrawlData;
 import net.rev.stealthandalert.attachment.InvestigateLkpData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.attribute.ModAttributes;
-import net.rev.stealthandalert.config.CommonConfigs;
-import net.rev.stealthandalert.config.EntityAlertConfigLoader;
-import net.rev.stealthandalert.config.EntityAlertSettings;
+import net.rev.stealthandalert.common.alert.condition.FightBackCondition;
+import net.rev.stealthandalert.common.alert.condition.ProtectOthersCondition;
+import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
+import net.rev.stealthandalert.config.EntityAlertConditionSettings;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
 import net.rev.stealthandalert.network.S2CCrawlPacket;
-import net.rev.stealthandalert.util.AlertLogicHandler;
 import net.rev.stealthandalert.util.AssassinationHandler;
+import net.rev.stealthandalert.util.CommonUtils;
 import net.rev.stealthandalert.util.ModTags;
 import net.rev.stealthandalert.util.StealthUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
 public class StealthEvents {
@@ -113,72 +114,45 @@ public class StealthEvents {
         }
     }
 
-    // 生物受击
+    // SEEKERS 受击
     @SubscribeEvent
-    public static void onMobHurt(LivingIncomingDamageEvent event) {
-        if (!(event.getEntity() instanceof Mob mob) || mob.level().isClientSide()) return;
-        if (!mob.getType().is(ModTags.Entities.SEEKERS)) return;
-
-        if (event.getSource().getEntity() instanceof Player player) {
-            if (player.isCreative() || player.isSpectator()) return;
-            if (AlertLogicHandler.isPlayerPet(mob, player)) return;
-            if (mob.getType().is(ModTags.Entities.CONDITIONAL_SEEKERS)) {
-                EntityAlertSettings settings = EntityAlertConfigLoader.get(mob.getType());
-                if (!settings.logicList().isEmpty() && !settings.logicList().contains(StealthAndAlert.MOD_ID + ":provocation")) {
-                    return;
-                }
-            }
-            AlertData data = mob.getData(ModAttachments.ALERT_DATA);
-            UUID uuid = player.getUUID();
-
-            Map<UUID, Float> progressMap = new HashMap<>(data.targetAwareness());
-            Map<UUID, Integer> statesMap = new HashMap<>(data.targetStates());
-            Map<UUID, Integer> reactionsMap = new HashMap<>(data.targetReactionTicks());
-            Map<UUID, Integer> lastDamageTicksMap = new HashMap<>(data.targetMemoryTicks());
-            boolean canPerceive = StealthUtils.hasLineOfSight(mob, player) || (StealthUtils.shouldArouseAlert(mob, player) && reactionsMap.getOrDefault(uuid, CommonConfigs.DETECTION.reactionTicks.get()) <= 0);
-            boolean dataChanged = false;
-            if (canPerceive) {
-                lastDamageTicksMap.put(uuid, 1200);
-                dataChanged = true;
-            }
-            if ((EntityAlertConfigLoader.get(mob.getType()).ignoreBaby() && mob.isBaby()) ||
-                    (mob instanceof Panda panda && !panda.isAggressive())) {
-                // 写回
-                AlertData newData = new AlertData(
-                        data.state(),
-                        progressMap,
-                        statesMap,
-                        reactionsMap,
-                        lastDamageTicksMap,
-                        data.lastKnownPos(),
-                        data.primaryTarget(),
-                        data.stateChangeTicks(),
-                        data.patienceTicks(),
-                        data.canSeeAnyone(),
-                        data.willFighting()
-                );
-
-                mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                mob.setData(ModAttachments.ALERT_DATA, newData);
-
-                // 确保客户端UI响应
-                PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
+    public static void onSeekersHurt(LivingDamageEvent.Post event) {
+        LivingEntity entity = event.getEntity();
+        if (entity.level().isClientSide() || !(entity instanceof Mob mob)) return;
+        EntityType<?> mobType = mob.getType();
+        if (!mobType.is(ModTags.Entities.SEEKERS)) return;
+        Entity attacker = event.getSource().getEntity();
+        if (!(attacker instanceof Player player)) return;
+        if (player.isCreative() || player.isSpectator()) return;
+        if (CommonUtils.isPlayerPet(mob, player, true)) return;
+        UUID uuid = player.getUUID();
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(mobType);
+        if (mobType.is(ModTags.Entities.CONDITIONAL_SEEKERS)) {
+            if (!settings.alertConditions().containsKey(FightBackCondition.ID)) {
                 return;
+            } else {
+                mob.getData(ModAttachments.EVENT_LISTENER_DATA).updateState(FightBackCondition.ID, uuid, mob.level().getGameTime());
             }
-
-            LivingEntity currentTarget = mob.getTarget();
-            int currentPState = statesMap.getOrDefault(uuid, AlertData.UNTRACKED);
-
-            // 判定：是否在打别人
-            boolean isFightingOthers = (data.state() == AlertData.FIGHTING) && currentTarget != null && currentTarget != player;
-            int nextState = data.state();
-            Optional<Vec3> nextLKP = data.lastKnownPos();
-            Optional<UUID> nextPrimary = data.primaryTarget();
-            // 只有当该玩家还没达到 TRACKING 状态时才更新数据
+        }
+        AlertData data = mob.getData(ModAttachments.ALERT_DATA);
+        Map<UUID, Integer> statesMap = new HashMap<>(data.targetStates());
+        Map<UUID, Integer> reactionMap = new HashMap<>(data.targetReactionTicks());
+        Map<UUID, Integer> memoryMap = new HashMap<>(data.targetMemoryTicks());
+        LivingEntity currentTarget = mob.getTarget();
+        int currentPState = statesMap.getOrDefault(uuid, AlertData.UNTRACKED);
+        // 判定：是否在打别人
+        boolean isFightingOthers = (data.state() == AlertData.FIGHTING) && currentTarget != null && currentTarget != player;
+        int nextState = data.state();
+        Optional<Vec3> nextLKP = data.lastKnownPos();
+        boolean dataChanged = false;
+        boolean skip = settings.detection().ignoreBaby() && mob.isBaby();
+        // 只有当该玩家还没达到 TRACKING 状态时才更新数据
+        int stateChangeTicks = 0;
+        if (!skip) {
             if (currentPState < AlertData.TRACKING) {
                 // progressMap.put(uuid, 100.0F);
                 // statesMap.put(uuid, AlertData.TRACKING);
-                reactionsMap.put(uuid, 0);
+                reactionMap.put(uuid, 0);
 
                 // 根据是否正在打别人，决定全局状态
                 if (!isFightingOthers) {
@@ -188,65 +162,51 @@ public class StealthEvents {
                 }
                 dataChanged = true;
             }
-
-            int stateChangeTicks;
             if (data.willFighting()) {
                 stateChangeTicks = data.stateChangeTicks();
-            } else {
-                stateChangeTicks = 0;
             }
-
-            if (dataChanged) {
-                // 写回
-                AlertData newData = new AlertData(
-                        nextState,
-                        progressMap,
-                        statesMap,
-                        reactionsMap,
-                        lastDamageTicksMap,
-                        nextLKP,
-                        nextPrimary,
-                        stateChangeTicks,
-                        CommonConfigs.DETECTION.patienceTicks.get(),
-                        data.canSeeAnyone(),
-                        data.willFighting()
-                );
-
-                mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                mob.setData(ModAttachments.ALERT_DATA, newData);
-                // 确保客户端UI响应
-                PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
-            }
+        } else {
+            memoryMap.put(uuid, settings.getMemoryTicks());
+            dataChanged = true;
         }
+
+        if (dataChanged) {
+            AlertData newData = mob.setData(ModAttachments.ALERT_DATA, new AlertData(
+                    nextState, data.targetAwareness(), data.targetStates(), reactionMap, memoryMap,
+                    nextLKP, data.primaryTarget(), stateChangeTicks, data.patienceTicks(), data.canSeeAnyone(), data.willFighting()
+            ));
+            mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
+            PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
+        }
+        mob.getData(ModAttachments.EVENT_LISTENER_DATA).updateState("stealth_and_alert:protect_others", uuid, mob.level().getGameTime());
     }
 
     @SubscribeEvent
-    // 适用于铁傀儡仇恨逻辑
-    public static void onVillagerHurt(LivingIncomingDamageEvent event) {
-        if (!(event.getEntity() instanceof Villager villager) || villager.level().isClientSide()) return;
+    public static void onProtectedHurt(LivingDamageEvent.Post event) {
+        LivingEntity entity = event.getEntity();
+        if (!(entity.getType().is(ModTags.Entities.PROTECTED)) || entity.level().isClientSide()) return;
         if (event.getSource().getEntity() instanceof Player player) {
+            if (CommonUtils.isPlayerPet(entity, player, true)) return;
             if (player.isCreative() || player.isSpectator()) return;
-
-            double range = EntityAlertConfigLoader.get(EntityType.IRON_GOLEM).viewRange();
-            List<IronGolem> nearbyGolems = villager.level().getEntitiesOfClass(IronGolem.class,
-                    villager.getBoundingBox().inflate(range));
-
-            for (IronGolem golem : nearbyGolems) {
-                if (StealthUtils.hasLineOfSight(golem, villager)) {
-                    AlertData data = golem.getData(ModAttachments.ALERT_DATA);
-                    Map<UUID, Integer> memoryMap = new HashMap<>(data.targetMemoryTicks());
-                    memoryMap.put(player.getUUID(), 1200);
-
-                    AlertData newData = new AlertData(
-                            data.state(), data.targetAwareness(), data.targetStates(), data.targetReactionTicks(),
-                            memoryMap, data.lastKnownPos(), data.primaryTarget(), data.stateChangeTicks(), data.patienceTicks(), data.canSeeAnyone(), data.willFighting()
-                    );
-
-                    golem.setData(ModAttachments.ALERT_DATA, newData);
-
-                    PacketDistributor.sendToPlayersTrackingEntity(golem, new S2CAlertDataPacket(golem.getId(), newData));
-                }
-            }
+            AlertData data = entity.getData(ModAttachments.ALERT_DATA);
+            Map<UUID, Integer> targetMemoryTicks = new HashMap<>(data.targetMemoryTicks());
+            EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(entity.getType());
+            targetMemoryTicks.put(player.getUUID(), settings.getMemoryTicks());
+            AlertData newData = entity.setData(ModAttachments.ALERT_DATA, new AlertData(
+                    data.state(),
+                    data.targetAwareness(),
+                    data.targetStates(),
+                    data.targetReactionTicks(),
+                    targetMemoryTicks,
+                    data.lastKnownPos(),
+                    data.primaryTarget(),
+                    data.stateChangeTicks(),
+                    data.patienceTicks(),
+                    data.canSeeAnyone(),
+                    data.willFighting()
+            ));
+            PacketDistributor.sendToPlayersTrackingEntity(entity, new S2CAlertDataPacket(entity.getId(), newData));
+            entity.getData(ModAttachments.EVENT_LISTENER_DATA).updateState(ProtectOthersCondition.ID, player.getUUID(), entity.level().getGameTime());
         }
     }
 
@@ -298,13 +258,12 @@ public class StealthEvents {
         }
     }
 
-    // FIXME 可能有潜在的性能问题
     // 分步发包？
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Pre event) {
         if (!(event.getEntity() instanceof Mob mob)) return;
         if (mob.level().isClientSide()) return;
-        if (!(mob.getType().is(ModTags.Entities.SEEKERS))) return;
+        if (!mob.getType().is(ModTags.Entities.SEEKERS) && !mob.getType().is(ModTags.Entities.PROTECTED)) return;
         if (AssassinationHandler.isTargetLocked(mob.level(), mob.getId())) return;
         StealthUtils.processStealthTick(mob);
     }

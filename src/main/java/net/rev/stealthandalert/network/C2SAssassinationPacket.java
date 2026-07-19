@@ -22,9 +22,15 @@ import net.rev.stealthandalert.common.animation.AssassinationSession;
 import net.rev.stealthandalert.common.assassination.AssassinationContext;
 import net.rev.stealthandalert.common.assassination.AssassinationDataRegistry;
 import net.rev.stealthandalert.common.assassination.AssassinationRegistry;
+import net.rev.stealthandalert.config.CommonConfigs;
+import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
+import net.rev.stealthandalert.config.EntityAlertConditionSettings;
+import net.rev.stealthandalert.damagetype.AssassinationDamageSource;
+import net.rev.stealthandalert.datagen.LangKeys;
 import net.rev.stealthandalert.util.AssassinationHandler;
 import net.rev.stealthandalert.util.ModTags;
 import net.rev.stealthandalert.util.SpeedHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -42,7 +48,7 @@ public record C2SAssassinationPacket(Optional<UUID> playerUUID, int targetId) im
             );
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
@@ -53,6 +59,18 @@ public record C2SAssassinationPacket(Optional<UUID> playerUUID, int targetId) im
         ModTags.PriorityCategory category =
                 AssassinationHandler.canAssassinate(player, payload.playerUUID(), payload.targetId(), player.getData(ModAttachments.ASSASSINATION_DATA).isAssassinating());
         if (category != null) {
+            if (!CommonConfigs.ASSASSINATION.alwaysSuccess.get() && target.getType().is(ModTags.Entities.SEEKERS)) {
+                EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(target.getType());
+                if (!(settings.detection().ignoreBaby() && target.isBaby())) {
+                    double chance = settings.getSuccessChance();
+                    if (target.getRandom().nextDouble() >= chance) {
+                        AssassinationDamageSource source = AssassinationDamageSource.getSource(player, target, LangKeys.ASSASSINATION, AssassinationHandler.AssassinateHand.RIGHT_HAND);
+                        entity.hurt(source, 0F);
+                        target.doHurtTarget(player);
+                        return;
+                    }
+                }
+            }
             AssassinationHandler.AssassinateHand hand = AssassinationHandler.getHand(player, category);
 
             double actualDistance = AssassinationHandler.

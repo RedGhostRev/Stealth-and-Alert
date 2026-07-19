@@ -27,6 +27,8 @@ public class CommonConfigs {
 
         public final ModConfigSpec.IntValue patienceTicks;
         public final ModConfigSpec.IntValue reactionTicks;
+        public final ModConfigSpec.IntValue trackingTicks;
+        public final ModConfigSpec.IntValue memoryTicks;
 
         public final ModConfigSpec.DoubleValue visibilityThreshold;
         public final ModConfigSpec.DoubleValue minInvisibleDistance;
@@ -57,15 +59,25 @@ public class CommonConfigs {
                     .translation(LangKeys.VERTICAL_DOWN_FOV)
                     .defineInRange("verticalDownFOV", 60.0, 1.0, 90.0);
 
-            patienceTicks = builder
-                    .comment("The duration of patience before an enemy loses interest in the player (in ticks)")
-                    .translation(LangKeys.PATIENCE_TICKS)
-                    .defineInRange("patienceTicks", 600, 300, 1200);
-
             reactionTicks = builder
                     .comment("The reaction time required for an enemy to fully perceive a player after spotting them (in ticks)")
                     .translation(LangKeys.REACTION_TICKS)
                     .defineInRange("reactionTicks", 10, 0, 100);
+
+            trackingTicks = builder
+                    .comment("The duration before an enemy loses track of a player since unable to see them (in ticks)")
+                    .translation(LangKeys.TRACKING_TICKS)
+                    .defineInRange("trackingTicks", 0, 30, 1200);
+
+            patienceTicks = builder
+                    .comment("The duration of patience before an enemy loses interest in an LKP(Last Known Position) (in ticks)")
+                    .translation(LangKeys.PATIENCE_TICKS)
+                    .defineInRange("patienceTicks", 600, 300, 1200);
+
+            memoryTicks = builder
+                    .comment("The duration of an enemy's memory towards a player who has enraged it (in ticks)")
+                    .translation(LangKeys.MEMORY_TICKS)
+                    .defineInRange("memoryTicks", 1200, 100,  12000);
 
             visibilityThreshold = builder
                     .comment("The visibility threshold for players to enter a fully concealed state (*100%)")
@@ -105,48 +117,52 @@ public class CommonConfigs {
             increaseBasicRate = builder
                     .comment("The basic rate at which awareness increases when an enemy spots a player")
                     .translation(LangKeys.INCREASE_BASIC_RATE)
-                    .defineInRange("increaseBasicRate", 2.0, 0.5, 5.0);
+                    .defineInRange("increaseBasicRate", 2.5, 0.1, 5.0);
 
             increaseVisibilityFactor = builder
                     .comment("The factor by which the player's visibility affects the awareness increase rate")
                     .translation(LangKeys.INCREASE_VISIBILITY_FACTOR)
-                    .defineInRange("increaseVisibilityFactor", 1.0, 0.5, 5.0);
+                    .defineInRange("increaseVisibilityFactor", 1.0, 0.1, 5.0);
 
             increaseDistanceFactor = builder
                     .comment("The factor by which the distance between the player and enemy affects the awareness increase rate")
                     .translation(LangKeys.INCREASE_DISTANCE_FACTOR)
-                    .defineInRange("increaseDistanceFactor", 1.0, 0.5, 5.0);
+                    .defineInRange("increaseDistanceFactor", 1.0, 0.1, 5.0);
 
             increaseSuspiciousFactor = builder
                     .comment("The factor by which the enemy's suspicious state affects the awareness increase rate")
                     .translation(LangKeys.INCREASE_SUSPICIOUS_FACTOR)
-                    .defineInRange("increaseSuspiciousFactor", 1.0, 0.5, 5.0);
+                    .defineInRange("increaseSuspiciousFactor", 1.0, 0.1, 5.0);
 
             increaseSearchingFactor = builder
                     .comment("The factor by which the enemy's searching state affects the awareness increase rate")
                     .translation(LangKeys.INCREASE_SEARCHING_FACTOR)
-                    .defineInRange("increaseSearchingFactor", 1.2, 0.5, 5.0);
+                    .defineInRange("increaseSearchingFactor", 1.2, 0.1, 5.0);
 
             decreaseBasicRate = builder
                     .comment("The basic rate at which awareness decreases when an enemy loses track of the player")
                     .translation(LangKeys.DECREASE_BASIC_RATE)
-                    .defineInRange("decreaseBasicRate", 1.0, 0.5, 5.0);
+                    .defineInRange("decreaseBasicRate", 1.8, 0.1, 5.0);
 
             decreaseSuspiciousFactor = builder
                     .comment("The factor by which the enemy's suspicious state affects the awareness decrease rate")
                     .translation(LangKeys.DECREASE_SUSPICIOUS_FACTOR)
-                    .defineInRange("decreaseSuspiciousFactor", 1.0, 0.5, 5.0);
+                    .defineInRange("decreaseSuspiciousFactor", 1.0, 0.1, 5.0);
 
             decreaseSearchingFactor = builder
                     .comment("The factor by which the enemy's searching state affects the awareness decrease rate")
                     .translation(LangKeys.DECREASE_SEARCHING_FACTOR)
-                    .defineInRange("decreaseSearchingFactor", 0.6, 0.5, 5.0);
+                    .defineInRange("decreaseSearchingFactor", 0.6, 0.1, 5.0);
 
             builder.pop();
         }
     }
 
     public static class Assassination {
+        public final ModConfigSpec.BooleanValue alwaysSuccess;
+        public final ModConfigSpec.DoubleValue successChance;
+
+        public final ModConfigSpec.BooleanValue canPetsBeAssassinated;
         public final ModConfigSpec.BooleanValue canAnimalsBeAssassinated;
         public final ModConfigSpec.BooleanValue canAnimalSeekersBeAssassinated;
         public final ModConfigSpec.BooleanValue canVillagersBeAssassinated;
@@ -157,6 +173,21 @@ public class CommonConfigs {
             builder.comment("Settings related to assassination mechanics")
                     .translation(LangKeys.ASSASSINATION_C)
                     .push("Assassination"); // 进入 Assassination 类别
+
+            alwaysSuccess = builder
+                    .comment("Whether assassinations to SEEKERS can be performed successfully all the time")
+                    .translation(LangKeys.ALWAYS_SUCCESS)
+                    .define("alwaysSuccess", true);
+
+            successChance = builder
+                    .comment("If alwaysSuccess is false, the chance of successfully performing an assassination to SEEKERS")
+                    .translation(LangKeys.SUCCESS_CHANCE)
+                    .defineInRange("successChance", 0.7, 0.0, 1.0);
+
+            canPetsBeAssassinated = builder
+                    .comment("Whether pets can be assassinated by their owners")
+                    .translation(LangKeys.CAN_PETS_BE_ASSASSINATED)
+                    .define("canPetsBeAssassinated", false);
 
             canAnimalsBeAssassinated = builder
                     .comment("Whether normal animals (excluding those in the SEEKERS tag) can be assassinated")

@@ -6,6 +6,8 @@ import net.minecraft.world.phys.Vec3;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.config.CommonConfigs;
+import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
+import net.rev.stealthandalert.config.EntityAlertConditionSettings;
 
 import java.util.Map;
 import java.util.Optional;
@@ -40,9 +42,10 @@ public class StealthEngine {
         int nextReaction = currentReaction;
         int nextPState = currentPState;
         int nextMemory = currentMemory;
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(mob.getType());
 
         if (!player.isAlive()) {
-            return new IndividualResult(0F, CommonConfigs.DETECTION.reactionTicks.getAsInt(), AlertData.UNTRACKED, 0);
+            return new IndividualResult(0F, settings.getReactionTicks(), AlertData.UNTRACKED, 0);
         }
 
         if (canSee) { // 看见了
@@ -101,7 +104,7 @@ public class StealthEngine {
             if (nextPState == AlertData.TRACKING) {
                 nextLevel = 100.0F;
                 nextReaction = 0;
-                nextMemory = 1200;
+                nextMemory = settings.getMemoryTicks();
             }
         } else { // 没看见
             // 回落
@@ -109,7 +112,8 @@ public class StealthEngine {
             if (currentPState == AlertData.TRACKING) {
                 // 若处于 TRACKING 状态，则初始 currentReaction 必定为0
                 if (nextReaction <= 0) {
-                    nextReaction = 30;
+                    nextReaction = settings.getTrackingTicks();
+                    if (nextReaction <= 0) nextPState = AlertData.AWARE;
                 } else {
                     nextReaction--;
                     if (nextReaction <= 0) {
@@ -134,7 +138,7 @@ public class StealthEngine {
             // 阶梯式回落判定
             if (nextLevel <= 0.0F) {
                 nextPState = AlertData.UNTRACKED;
-                nextReaction = CommonConfigs.DETECTION.reactionTicks.getAsInt();
+                nextReaction = settings.getReactionTicks();
             }
         }
         return new IndividualResult(nextLevel, nextReaction, nextPState, nextMemory);
@@ -152,6 +156,7 @@ public class StealthEngine {
         Optional<Vec3> nextLkp = oldData.lastKnownPos();
         Optional<UUID> nextPrimary = oldData.primaryTarget();
         boolean willFighting = oldData.willFighting();
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(mob.getType());
 
         // 找出当前全场最高的警戒值
         float maxLevel = 0.0F;
@@ -228,7 +233,7 @@ public class StealthEngine {
         if (anyTargetVisible) {
             // 只有当全场最高警戒值大于0，即怪物至少对看到的一个人反应过来后，才重置耐心值和状态切换计时器
             if (maxLevel > 0.0F) {
-                nextPatienceTicks = CommonConfigs.DETECTION.patienceTicks.getAsInt();
+                nextPatienceTicks = settings.getPatienceTicks();
                 if (!willFighting) {
                     nextStateTicks = 0;
                 }
@@ -315,7 +320,7 @@ public class StealthEngine {
                         nextState = AlertData.IDLE;
                         nextLkp = Optional.empty();
                         nextPrimary = Optional.empty();
-                        nextPatienceTicks = CommonConfigs.DETECTION.patienceTicks.getAsInt();
+                        nextPatienceTicks = settings.getPatienceTicks();
                     }
                 }
             }

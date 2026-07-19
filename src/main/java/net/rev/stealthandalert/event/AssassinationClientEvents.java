@@ -330,7 +330,7 @@ public class AssassinationClientEvents {
 
         if (stack.is(ModTags.Items.CAN_ASSASSINATE)) {
             MutableComponent tip = Component.translatable(LangKeys.TOOLTIP_CAN_ASSASSINATE).withStyle(style ->
-                    style.withColor(ChatFormatting.RED).withItalic(true));
+                    style.withColor(ChatFormatting.RED));
             if (tooltip.size() > 1) {
                 tooltip.add(1, tip);
             } else {

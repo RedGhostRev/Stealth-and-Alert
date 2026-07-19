@@ -11,6 +11,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.util.ModTags;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
@@ -21,7 +22,7 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider provider) {
+    protected void addTags(HolderLookup.@NotNull Provider provider) {
         tag(ModTags.Entities.SEEKERS)
                 .addTag(ModTags.Entities.CONDITIONAL_SEEKERS)
                 .addTag(EntityTypeTags.ZOMBIES)
@@ -47,8 +48,11 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
                 .add(EntityType.DOLPHIN)
                 .add(EntityType.WOLF)
                 .add(EntityType.POLAR_BEAR)
-                .add(EntityType.PANDA)
                 .add(EntityType.IRON_GOLEM);
+
+        // 受保护的生物，受击后产生仇恨记忆
+        tag(ModTags.Entities.PROTECTED)
+                .add(EntityType.VILLAGER);
 
         tag(ModTags.Entities.DETECTABLE)
                 .add(EntityType.PLAYER);

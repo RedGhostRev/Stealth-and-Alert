@@ -1,7 +1,11 @@
 package net.rev.stealthandalert.util;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.ConditionalEffect;
@@ -50,5 +54,17 @@ public class CommonUtils {
         if (baseDamage <= 0F) return 0F;
         float multiplier = getAssassinationTotalMultiplier(stack);
         return getAssassinationDamage(baseDamage, multiplier);
+    }
+
+    public static boolean isPlayerPet(Entity entity, Player player, boolean withGolem) {
+        if (entity instanceof OwnableEntity ownable) {
+            return player.getUUID().equals(ownable.getOwnerUUID());
+        }
+        if (entity instanceof IronGolem golem) {
+            if (withGolem) {
+                return golem.isPlayerCreated();
+            }
+        }
+        return false;
     }
 }

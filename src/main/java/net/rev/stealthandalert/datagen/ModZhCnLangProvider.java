@@ -43,9 +43,9 @@ public class ModZhCnLangProvider extends LanguageProvider {
 
         // 工具提示
         add(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE, "刺杀伤害");
-        add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "可进行刺杀");
+        add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "可施展刺杀");
         add(LangKeys.TOOLTIP_DEBUG_WAND, "右键以开关调试模式");
-        add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "调试模式：显示带有SEEKERS标签的生物的警戒数据——全局警戒状态、对你的观测状态、主目标、对你的记忆时间、对你的警戒值、全局警戒状态切换计时和耐心值计时");
+        add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "调试模式：显示带有SEEKERS标签的生物的警戒数据：§c\n全局警戒状态\n观测状态\n主目标\n记忆时长\n警戒值\n警戒状态切换计时\n耐心时长");
 
         // 创造模式物品栏
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "潜行与警戒 - 物品");
@@ -88,6 +88,12 @@ public class ModZhCnLangProvider extends LanguageProvider {
         // GUI
         add(LangKeys.GUI_ASSASSINATE, "[%s] 刺杀");
 
+        // 命令
+        add(LangKeys.COMMAND_MOD_ID, "[潜行与警戒]");
+        add(LangKeys.COMMAND_RELOAD, "已重载配置（未生成预设）");
+        add(LangKeys.COMMAND_REGENERATE, "已补全缺失预设并重载配置");
+        add(LangKeys.COMMAND_FORCE_REGENERATE, "已强制覆盖所有预设并重载配置");
+
         // 调试文本
         add(LangKeys.DEBUG_MODE_ON, "§a调试模式：开启");
         add(LangKeys.DEBUG_MODE_OFF, "§c调试模式：关闭");
@@ -122,12 +128,16 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.VERTICAL_DOWN_FOV, "向下FOV");
         add(LangKeys.VERTICAL_DOWN_FOV_TOOLTIP, "敌人向下看的垂直视野范围（角度）");
         add(LangKeys.PATIENCE_TICKS, "耐心时长");
-        add(LangKeys.PATIENCE_TICKS_TOOLTIP, "敌人失去对玩家兴趣前的耐心时间（tick）");
+        add(LangKeys.PATIENCE_TICKS_TOOLTIP, "敌人对LKP（最后已知位置）失去耐心的时间（tick）");
         add(LangKeys.REACTION_TICKS, "反应时长");
         add(LangKeys.REACTION_TICKS_TOOLTIP, "敌人从看到到真正察觉玩家所需的反应时间（tick）");
+        add(LangKeys.TRACKING_TICKS, "追踪时长");
+        add(LangKeys.TRACKING_TICKS_TOOLTIP, "敌人在看不到玩家时，对玩家保持追踪状态的时间（tick）");
+        add(LangKeys.MEMORY_TICKS, "记忆时长");
+        add(LangKeys.MEMORY_TICKS_TOOLTIP, "敌人在被玩家激怒后对玩家的记忆时间（tick）");
         add(LangKeys.VISIBILITY_THRESHOLD, "可见度阈值");
         add(LangKeys.VISIBILITY_THRESHOLD_TOOLTIP, "玩家进入完全隐蔽状态的可见度阈值（*100%）");
-        add(LangKeys.MIN_INVISIBLE_DISTANCE, "完全隐蔽作用失效距离");
+        add(LangKeys.MIN_INVISIBLE_DISTANCE, "完全隐蔽失效距离");
         add(LangKeys.MIN_INVISIBLE_DISTANCE_TOOLTIP, "对于敌人，玩家完全隐蔽作用失效的距离");
         add(LangKeys.MIN_INVISIBLE_DISTANCE_TO_TRACKING, "完全隐蔽失效距离（对追踪者）");
         add(LangKeys.MIN_INVISIBLE_DISTANCE_TO_TRACKING_TOOLTIP, "对于正在追踪的敌人，玩家完全隐蔽作用失效的距离");
@@ -147,6 +157,12 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.DECREASE_SUSPICIOUS_FACTOR_TOOLTIP, "敌人的怀疑状态对警戒值下降速率的影响程度");
         add(LangKeys.DECREASE_SEARCHING_FACTOR, "下降速率搜寻状态影响因子");
         add(LangKeys.DECREASE_SEARCHING_FACTOR_TOOLTIP, "敌人的搜寻状态对警戒值下降速率的影响程度");
+        add(LangKeys.ALWAYS_SUCCESS, "必定成功");
+        add(LangKeys.ALWAYS_SUCCESS_TOOLTIP, "刺杀SEEKERS是否每次都能成功");
+        add(LangKeys.SUCCESS_CHANCE, "成功几率");
+        add(LangKeys.SUCCESS_CHANCE_TOOLTIP, "如果刺杀必定成功被关闭，对SEEKERS成功施展刺杀的几率");
+        add(LangKeys.CAN_PETS_BE_ASSASSINATED, "刺杀宠物");
+        add(LangKeys.CAN_PETS_BE_ASSASSINATED_TOOLTIP, "宠物能否被主人刺杀");
         add(LangKeys.CAN_ANIMALS_BE_ASSASSINATED, "刺杀动物（普通）");
         add(LangKeys.CAN_ANIMALS_BE_ASSASSINATED_TOOLTIP, "普通动物（不包括SEEKERS标签内的动物）能否被刺杀");
         add(LangKeys.CAN_ANIMAL_SEEKERS_BE_ASSASSINATED, "刺杀动物（SEEKERS）");

@@ -6,7 +6,6 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -25,9 +24,10 @@ import net.rev.stealthandalert.attachment.AlertSoundData;
 import net.rev.stealthandalert.attachment.InvestigateLkpData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.attribute.ModAttributes;
+import net.rev.stealthandalert.common.alert.condition.AlertConditionHandler;
 import net.rev.stealthandalert.config.CommonConfigs;
-import net.rev.stealthandalert.config.EntityAlertConfigLoader;
-import net.rev.stealthandalert.config.EntityAlertSettings;
+import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
+import net.rev.stealthandalert.config.EntityAlertConditionSettings;
 import net.rev.stealthandalert.event.StealthSoundEvent;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
 import org.jetbrains.annotations.NotNull;
@@ -43,9 +43,9 @@ public class StealthUtils {
     // 视线检测：如果mob能看到target，则返回true
     public static boolean hasLineOfSight(Mob observer, Entity target) {
         // 距离快速失败
-        EntityAlertSettings settings = EntityAlertConfigLoader.get(observer.getType());
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
         double distanceSqr = observer.distanceToSqr(target);
-        double maxDistance = settings.viewRange();
+        double maxDistance = settings.getViewRange();
 //        VisibilityData visData = target.getData(ModAttachments.VISIBILITY_DATA);
 //        if (visData.isVisible()) {
 //            maxDistance = maxDistance * visData.visibility();
@@ -92,14 +92,13 @@ public class StealthUtils {
         // B: 门卫检查
         if (mob.level().players().isEmpty() && oldData.targetReactionTicks().isEmpty()) return;
 
-        EntityAlertSettings settings = EntityAlertConfigLoader.get(mob.getType());
-        if (settings.ignoreBaby() && mob.isBaby()) return;
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(mob.getType());
 
         // 继承记忆名单
         Set<UUID> trackedPlayers = new HashSet<>(oldData.targetReactionTicks().keySet());
 
         // 扫描周围物理范围内的玩家，加入处理名单
-        double range = settings.viewRange();
+        double range = settings.getViewRange();
         List<Player> nearbyPlayers = mob.level().getEntitiesOfClass(Player.class,
                 mob.getBoundingBox().inflate(range),
                 p -> mob.distanceToSqr(p) <= range * range);
@@ -124,7 +123,7 @@ public class StealthUtils {
                     mob,
                     mob.getData(ModAttachments.ALERT_DATA).state(),
                     oldData.targetAwareness().getOrDefault(uuid, 0.0F),
-                    oldData.targetReactionTicks().getOrDefault(uuid, CommonConfigs.DETECTION.reactionTicks.getAsInt()),
+                    oldData.targetReactionTicks().getOrDefault(uuid, settings.getReactionTicks()),
                     oldData.targetStates().getOrDefault(uuid, AlertData.UNTRACKED),
                     oldData.targetMemoryTicks().getOrDefault(uuid, 0),
                     canSee
@@ -141,18 +140,22 @@ public class StealthUtils {
         );
 
         // E: 打包
-        AlertData newData = assembleData(resultsMap, gRes);
+        AlertData newData = assembleData(resultsMap, gRes, settings);
 
+        boolean skip = (settings.detection().ignoreBaby() && mob.isBaby()) || mob.getType().is(ModTags.Entities.PROTECTED);
         // 获取调查数据和听觉数据并组合比较
-        InvestigateLkpData investData = mob.getData(ModAttachments.INVESTIGATE_LKP_DATA);
-        AlertSoundData soundData = mob.getData(ModAttachments.ALERT_SOUND_DATA);
-        newData = dealWithVisualAndSound(mob, newData, soundData, investData);
+        if (!skip) {
+            InvestigateLkpData investData = mob.getData(ModAttachments.INVESTIGATE_LKP_DATA);
+            AlertSoundData soundData = mob.getData(ModAttachments.ALERT_SOUND_DATA);
+            newData = dealWithVisualAndSound(mob, newData, soundData, investData, settings);
+        }
         // F: 写回并同步
         mob.setData(ModAttachments.ALERT_DATA, newData);
         mob.setData(ModAttachments.ALERT_SOUND_DATA, AlertSoundData.DEFAULT);
         PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
 
         // 处理敌人针对主目标的行为
+        if (skip) return;
         UUID primaryUuid = newData.primaryTarget().orElse(null);
         boolean canSeePrimary;
         if (primaryUuid != null) {
@@ -164,7 +167,7 @@ public class StealthUtils {
         AlertActionHandler.execute(mob, newData, canSeePrimary);
     }
 
-    private static AlertData dealWithVisualAndSound(Mob mob, AlertData visualData, AlertSoundData soundData, InvestigateLkpData investData) {
+    private static AlertData dealWithVisualAndSound(Mob mob, AlertData visualData, AlertSoundData soundData, InvestigateLkpData investData, EntityAlertConditionSettings settings) {
         if (soundData.equals(AlertSoundData.DEFAULT)) return visualData;
         if (soundData.pos().isEmpty()) return visualData;
         if (visualData.canSeeAnyone() || soundData.source().isEmpty() || (mob.getType().is(ModTags.Entities.CONDITIONAL_SEEKERS) && !visualData.targetMemoryTicks().containsKey(soundData.source().get())) || visualData.willFighting() || visualData.state() == AlertData.FIGHTING)
@@ -175,14 +178,14 @@ public class StealthUtils {
             } else {
                 if (soundData.threatLevel() <= AlertSoundData.MEDIUM) {
                     if (soundData.volume() <= 42.0) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, settings.getPatienceTicks());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                     }
                 } else {
                     mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                 }
             }
         }
@@ -194,23 +197,23 @@ public class StealthUtils {
                     if (soundData.distance() > 7) {
                         return visualData;
                     } else if (soundData.distance() > 6) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, settings.getPatienceTicks());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                     }
                 } else if (soundData.threatLevel() == AlertSoundData.MEDIUM) {
                     if (soundData.distance() > 12) {
                         return visualData;
                     } else if (soundData.distance() > 10) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, settings.getPatienceTicks());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                     }
                 } else {
                     mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                 }
             }
         }
@@ -226,14 +229,14 @@ public class StealthUtils {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                         }
                     } else {
                         if (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10) {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                         }
                     }
                 } else if (soundData.threatLevel() == AlertSoundData.MEDIUM) {
@@ -244,14 +247,14 @@ public class StealthUtils {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                         }
                     } else {
                         if (soundData.volume() < 35.0 && (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10)) {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                         }
                     }
                 } else {
@@ -259,7 +262,7 @@ public class StealthUtils {
                         return visualData;
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                     }
                 }
             }
@@ -284,12 +287,12 @@ public class StealthUtils {
         }
 
         // 3.属性检查
-        if (AlertLogicHandler.isPlayerPet(mob, player)) {
+        if (CommonUtils.isPlayerPet(mob, player, true)) {
             return false;
         }
-        if (mob instanceof Panda panda) {
-            if (!panda.isAggressive()) return false;
-        }
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(mob.getType());
+        if (mob.getType().is(ModTags.Entities.PROTECTED) || (mob.isBaby() && settings.detection().ignoreBaby()))
+            return false;
 
         // 4.可见度不大于阈值时，最大感知距离检查
         double distanceSqr = mob.distanceToSqr(player);
@@ -313,20 +316,11 @@ public class StealthUtils {
         if (!mob.getType().is(ModTags.Entities.CONDITIONAL_SEEKERS)) return true;
 
         // 5.意图检查
-        EntityAlertSettings settings = EntityAlertConfigLoader.get(mob.getType());
-        if (settings.logicList().isEmpty()) return true;
-
-        for (String logic : settings.logicList()) {
-            if (AlertLogicHandler.checkLogic(logic, mob, player, settings)) {
-                return true;
-            }
-        }
-
-        return false;
+        return AlertConditionHandler.checkAllConditions(mob, player, settings);
     }
 
     // 打包数据
-    private static AlertData assembleData(Map<UUID, StealthEngine.IndividualResult> res, StealthEngine.GlobalResult gRes) {
+    private static AlertData assembleData(Map<UUID, StealthEngine.IndividualResult> res, StealthEngine.GlobalResult gRes, EntityAlertConditionSettings settings) {
         Map<UUID, Float> progress = new HashMap<>();
         Map<UUID, Integer> states = new HashMap<>();
         Map<UUID, Integer> reactions = new HashMap<>();
@@ -336,7 +330,7 @@ public class StealthUtils {
         res.forEach((uuid, lres) -> {
             boolean isDeadData = lres.level() <= 0.0F &&
                     lres.pState() == AlertData.UNTRACKED &&
-                    lres.reaction() >= CommonConfigs.DETECTION.reactionTicks.getAsInt() &&
+                    lres.reaction() >= settings.getReactionTicks() &&
                     lres.memory() <= 0;
             if (!isDeadData) {
                 progress.put(uuid, lres.level());
@@ -407,14 +401,14 @@ public class StealthUtils {
     private static boolean isWithinFOV(Mob observer, Vec3 lookVec, Vec3 targetDir) {
         boolean isVerticalLooking = Math.abs(lookVec.x) < 0.0001 && Math.abs(lookVec.z) < 0.0001;
 
-        EntityAlertSettings settings = EntityAlertConfigLoader.get(observer.getType());
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
         // 水平角度判定
         if (!isVerticalLooking) {
             Vec3 lookHorizontal = new Vec3(lookVec.x, 0, lookVec.z).normalize();
             Vec3 targetHorizontal = new Vec3(targetDir.x, 0, targetDir.z).normalize();
 
             double horizontalDot = lookHorizontal.dot(targetHorizontal);
-            double horizontalThreshold = Math.cos(Math.toRadians(settings.horizontalFov() / 2.0));
+            double horizontalThreshold = Math.cos(Math.toRadians(settings.getHorizontalFov()) / 2.0);
 
             if (horizontalDot < horizontalThreshold) return false;
         }
@@ -422,8 +416,8 @@ public class StealthUtils {
         // 垂直角度判定
         double pitchToTargetDegrees = Math.toDegrees(Math.asin(targetDir.y));
 
-        double maxUpPitch = settings.maxUpPitch();
-        double maxDownPitch = -settings.maxDownPitch();
+        double maxUpPitch = settings.getMaxUpPitch();
+        double maxDownPitch = -settings.getMaxDownPitch();
 
         return pitchToTargetDegrees >= maxDownPitch && pitchToTargetDegrees <= maxUpPitch;
     }
@@ -483,9 +477,7 @@ public class StealthUtils {
         BlockState feetState = level.getBlockState(center);
         BlockState headState = level.getBlockState(center.above());
 
-        if (feetState.is(BlockTags.LEAVES) && headState.is(BlockTags.LEAVES)) return true;
-
-        return false;
+        return feetState.is(BlockTags.LEAVES) && headState.is(BlockTags.LEAVES);
     }
 
     private static boolean isInTallGrass(Level level, BlockPos pos) {

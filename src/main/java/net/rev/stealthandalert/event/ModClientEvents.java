@@ -210,7 +210,7 @@ public class ModClientEvents {
     // DEBUG内容
     @SubscribeEvent
     public static void onRenderNameTag(RenderNameTagEvent event) {
-        if (!(event.getEntity() instanceof Mob mob) || !mob.getType().is(ModTags.Entities.SEEKERS)) return;
+        if (!(event.getEntity() instanceof Mob mob) || (!mob.getType().is(ModTags.Entities.SEEKERS) && !mob.getType().is(ModTags.Entities.PROTECTED))) return;
         if (!ClientConfigs.DEBUG_MODE.turnOn.get()) return;
 
         Player self = Minecraft.getInstance().player;

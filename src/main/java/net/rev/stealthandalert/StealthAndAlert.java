@@ -13,11 +13,12 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.block.ModBlocks;
+import net.rev.stealthandalert.common.alert.condition.ModAlertConditions;
 import net.rev.stealthandalert.common.assassination.AssassinationRegistry;
 import net.rev.stealthandalert.component.ModDataComponents;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.config.CommonConfigs;
-import net.rev.stealthandalert.config.EntityAlertConfigLoader;
+import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
 import net.rev.stealthandalert.effect.ModEffects;
 import net.rev.stealthandalert.enchantment.ModEnchantmentEffects;
 import net.rev.stealthandalert.entity.ModEntities;
@@ -72,7 +73,8 @@ public class StealthAndAlert {
 
     private void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
-            EntityAlertConfigLoader.load();
+            EntityAlertConditionConfigLoader.load(true, false);
+            ModAlertConditions.registerAll();
             AssassinationRegistry.init();
         });
     }

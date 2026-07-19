@@ -26,6 +26,7 @@ import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.common.animation.IAnimationVisuals;
 import net.rev.stealthandalert.config.CommonConfigs;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -93,6 +94,7 @@ public class AssassinationHandler {
         return AssassinateHand.RIGHT_HAND;
     }
 
+    @Nullable
     public static ModTags.PriorityCategory canAssassinate(Player player, Optional<UUID> playerUUID, int targetId, boolean isAssassinating) {
         if (playerUUID.isEmpty() || targetId < 0 || isAssassinating) return null;
         if (player.isUsingItem()) return null;
@@ -104,6 +106,9 @@ public class AssassinationHandler {
         if (!target.getType().is(ModTags.Entities.CAN_BE_ASSASSINATED)) return null;
         if (!target.isAlive()) return null;
         if (target.isVehicle()) return null;
+        if (CommonUtils.isPlayerPet(target, player, false)) {
+            if (!CommonConfigs.ASSASSINATION.canPetsBeAssassinated.get()) return null;
+        }
         if (target.getType().is(ModTags.Entities.ANIMALS)) {
             if (target.getType().is(ModTags.Entities.SEEKERS)) {
                 if (!CommonConfigs.ASSASSINATION.canAnimalSeekersBeAssassinated.get()) return null;
@@ -170,6 +175,9 @@ public class AssassinationHandler {
                     if (!target.getType().is(ModTags.Entities.CAN_BE_ASSASSINATED)) return false;
                     if (!target.isAlive() || isTargetLocked(target.level(), target.getId())) return false;
                     if (target.isVehicle()) return false;
+                    if (CommonUtils.isPlayerPet(target, player, false)) {
+                        if (!CommonConfigs.ASSASSINATION.canPetsBeAssassinated.get()) return false;
+                    }
                     if (target.getType().is(ModTags.Entities.ANIMALS)) {
                         if (target.getType().is(ModTags.Entities.SEEKERS)) {
                             if (!CommonConfigs.ASSASSINATION.canAnimalSeekersBeAssassinated.get()) return false;
@@ -306,7 +314,7 @@ public class AssassinationHandler {
 
     public static void execute(Player player, LivingEntity target, DamageSource source) {
         if (player.level().isClientSide()) return;
-        target.hurt(source, Float.MAX_VALUE);
+        target.hurt(source, Integer.MAX_VALUE);
     }
 
     public static void execute(Player player, LivingEntity target, DamageSource source, float amount) {

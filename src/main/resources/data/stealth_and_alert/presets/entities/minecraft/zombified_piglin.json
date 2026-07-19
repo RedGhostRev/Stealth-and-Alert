@@ -1,11 +1,15 @@
 {
-  "ignore_baby": false,
-  "logic_list": [
-    "stealth_and_alert:provocation",
-    "stealth_and_alert:social_revenge"
-  ],
-  "params": {
-    "stealth_and_alert:social_revenge.horizontal_range": "33.0",
-    "stealth_and_alert:social_revenge.vertical_range": "10.0"
+  "detection": {
+    "ignore_baby": false
+  },
+  "alert_conditions": {
+    "stealth_and_alert:fight_back": {},
+    "stealth_and_alert:protect_others": {
+      "entities": [
+        "minecraft:zombified_piglin"
+      ],
+      "horizontal_range": 33.0,
+      "vertical_range": 10.0
+    }
   }
 }

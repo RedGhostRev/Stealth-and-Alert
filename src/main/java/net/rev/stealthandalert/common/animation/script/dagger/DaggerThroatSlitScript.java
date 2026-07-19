@@ -22,7 +22,7 @@ public class DaggerThroatSlitScript extends AssassinationScript {
 
     @Override
     public long getTotalTicks() {
-        return 44;
+        return 35;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class DaggerThroatSlitScript extends AssassinationScript {
 
     @Override
     public void onServerTick(@NotNull ServerPlayer player, @NotNull LivingEntity target, long currentTick) {
-        if (currentTick == 25L) {
+        if (currentTick == 20L) {
             if (target.isAlive()) {
                 AssassinationDamageSource source = AssassinationDamageSource.getSource(player, target, LangKeys.DAGGER_THROAT_SLIT, getHand());
                 AssassinationHandler.execute(player, target, source);
@@ -46,7 +46,7 @@ public class DaggerThroatSlitScript extends AssassinationScript {
         // long elapsedTicks = player.level().getGameTime() - data.startTick();
         if (player instanceof LocalPlayer localPlayer) {
             AssassinationStateHandler.disableInput(localPlayer);
-            if (currentTick == 25L) {
+            if (currentTick == 20L) {
                 CameraShakeManager.triggerShake(5, 1F);
             }
         }

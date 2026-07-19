@@ -81,6 +81,12 @@ public class LangKeys {
     // GUI Texts
     public static final String GUI_ASSASSINATE = "gui." + MOD_ID + "assassinate";
 
+    // Command Texts
+    public static final String COMMAND_MOD_ID = command("mod_id");
+    public static final String COMMAND_RELOAD = command("reload");
+    public static final String COMMAND_REGENERATE = command("regenerate");
+    public static final String COMMAND_FORCE_REGENERATE = command("force_regenerate");
+
     // Debug Texts
     public static final String DEBUG_MODE_ON = "debug." + MOD_ID + "debug_mode_on";
     public static final String DEBUG_MODE_OFF = "debug." + MOD_ID + "debug_mode_off";
@@ -118,6 +124,10 @@ public class LangKeys {
     public static final String PATIENCE_TICKS_TOOLTIP = tooltip(PATIENCE_TICKS);
     public static final String REACTION_TICKS = config("reactionTicks");
     public static final String REACTION_TICKS_TOOLTIP = tooltip(REACTION_TICKS);
+    public static final String TRACKING_TICKS = config("trackingTicks");
+    public static final String TRACKING_TICKS_TOOLTIP = tooltip(TRACKING_TICKS);
+    public static final String MEMORY_TICKS = config("memoryTicks");
+    public static final String MEMORY_TICKS_TOOLTIP = tooltip(MEMORY_TICKS);
     public static final String VISIBILITY_THRESHOLD = config("visibilityThreshold");
     public static final String VISIBILITY_THRESHOLD_TOOLTIP = tooltip(VISIBILITY_THRESHOLD);
     public static final String MIN_INVISIBLE_DISTANCE = config("minInvisibleDistance");
@@ -140,6 +150,12 @@ public class LangKeys {
     public static final String DECREASE_SUSPICIOUS_FACTOR_TOOLTIP = tooltip(DECREASE_SUSPICIOUS_FACTOR);
     public static final String DECREASE_SEARCHING_FACTOR = config("decreaseSearchingFactor");
     public static final String DECREASE_SEARCHING_FACTOR_TOOLTIP = tooltip(DECREASE_SEARCHING_FACTOR);
+    public static final String ALWAYS_SUCCESS = config("alwaysSuccess");
+    public static final String ALWAYS_SUCCESS_TOOLTIP = tooltip(ALWAYS_SUCCESS);
+    public static final String SUCCESS_CHANCE = config("successChance");
+    public static final String SUCCESS_CHANCE_TOOLTIP = tooltip(SUCCESS_CHANCE);
+    public static final String CAN_PETS_BE_ASSASSINATED = config("canPetsBeAssassinated");
+    public static final String CAN_PETS_BE_ASSASSINATED_TOOLTIP = tooltip(CAN_PETS_BE_ASSASSINATED);
     public static final String CAN_ANIMALS_BE_ASSASSINATED = config("canAnimalsBeAssassinated");
     public static final String CAN_ANIMALS_BE_ASSASSINATED_TOOLTIP = tooltip(CAN_ANIMALS_BE_ASSASSINATED);
     public static final String CAN_ANIMAL_SEEKERS_BE_ASSASSINATED = config("canAnimalSeekersBeAssassinated");
@@ -195,6 +211,10 @@ public class LangKeys {
     public static final String ALERT_SYMBOL_SCALE_TOOLTIP = tooltip(ALERT_SYMBOL_SCALE);
     public static final String DEBUG_TURN_ON = DEBUG_MODE + ".turnOn";
     public static final String DEBUG_TURN_ON_TOOLTIP = tooltip(DEBUG_TURN_ON);
+
+    private static String command(String name) {
+        return "commands." + MOD_ID + "." + name;
+    }
 
     private static String config(String name) {
         return "config." + MOD_ID + "." + name;

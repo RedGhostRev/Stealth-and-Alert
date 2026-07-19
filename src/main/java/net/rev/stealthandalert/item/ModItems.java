@@ -34,7 +34,7 @@ public class ModItems {
     public static final DeferredItem<DaggerItem> SHADOW_CRYSTAL_DAGGER = ITEMS.register("shadow_crystal_dagger",
             () -> new DaggerItem(ModTiers.SHADOW_CRYSTAL, new Item.Properties().
                     attributes(DaggerItem.createAttributes(ModTiers.SHADOW_CRYSTAL, 2F, -1.2F))
-                    .component(ModDataComponents.ASSASSINATION_BASE_MULTIPLIER, 0.5F)));
+                    .component(ModDataComponents.ASSASSINATION_BASE_MULTIPLIER, 0.3F)));
 
     public static final DeferredItem<DebugWandItem> DEBUG_WAND = ITEMS.register("debug_wand",
             () -> new DebugWandItem(new Item.Properties().stacksTo(1)));

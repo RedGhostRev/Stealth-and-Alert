@@ -43,9 +43,9 @@ public class ModEnUsLangProvider extends LanguageProvider {
 
         // Tooltips
         add(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE, "Assassination Damage");
-        add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "Can perform assassinations");
+        add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "Assassination-Capable");
         add(LangKeys.TOOLTIP_DEBUG_WAND, "Right-click to toggle debug mode");
-        add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "Debug Mode: Displays alert data for mobs with the SEEKERS tag — Global Alert State, Observation State towards you, Primary Target, Memory Time towards you, Alert Level towards you, Global State Transition Timer, and Patience Timer.");
+        add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "Debug Mode: Displays alert information for mobs with the SEEKERS tag:§c\nGlobal Alert State\nObservation State\nPrimary Target\nMemory Ticks\nAwareness Progress\nState Transition Ticks\nPatience Ticks");
 
         // Creative Tabs
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "Stealth and Alert - Items");
@@ -88,6 +88,12 @@ public class ModEnUsLangProvider extends LanguageProvider {
         // GUI
         add(LangKeys.GUI_ASSASSINATE, "[%s] Assassinate");
 
+        // Commands
+        add(LangKeys.COMMAND_MOD_ID, "[Stealth & Alert]");
+        add(LangKeys.COMMAND_RELOAD, "Reloaded configuration (presets not generated)");
+        add(LangKeys.COMMAND_REGENERATE, "Generated missing presets and reloaded configuration");
+        add(LangKeys.COMMAND_FORCE_REGENERATE, "Forcefully overwritten all presets and reloaded configuration");
+
         // Debug Texts
         add(LangKeys.DEBUG_MODE_ON, "§aDEBUG MODE: ON");
         add(LangKeys.DEBUG_MODE_OFF, "§cDEBUG MODE: OFF");
@@ -122,9 +128,13 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.VERTICAL_DOWN_FOV, "Downward FOV");
         add(LangKeys.VERTICAL_DOWN_FOV_TOOLTIP, "The vertical downward field of view of enemies (in degrees)");
         add(LangKeys.PATIENCE_TICKS, "Patience Duration");
-        add(LangKeys.PATIENCE_TICKS_TOOLTIP, "The duration of patience before an enemy loses interest in the player (in ticks)");
-        add(LangKeys.REACTION_TICKS, "Reaction Time");
+        add(LangKeys.PATIENCE_TICKS_TOOLTIP, "The duration of patience before an enemy loses interest in an LKP(Last Known Position) (in ticks)");
+        add(LangKeys.REACTION_TICKS, "Reaction Duration");
         add(LangKeys.REACTION_TICKS_TOOLTIP, "The reaction time required for an enemy to fully perceive a player after spotting them (in ticks)");
+        add(LangKeys.TRACKING_TICKS, "Tracking Duration");
+        add(LangKeys.TRACKING_TICKS_TOOLTIP, "The duration before an enemy loses track of a player since unable to see them (in ticks)");
+        add(LangKeys.MEMORY_TICKS, "Memory Duration");
+        add(LangKeys.MEMORY_TICKS_TOOLTIP, "The duration of an enemy's memory towards a player who has enraged it (in ticks)");
         add(LangKeys.VISIBILITY_THRESHOLD, "Visibility Threshold");
         add(LangKeys.VISIBILITY_THRESHOLD_TOOLTIP, "The visibility threshold for players to enter a fully concealed state (*100%)");
         add(LangKeys.MIN_INVISIBLE_DISTANCE, "Min Invisible Distance");
@@ -147,6 +157,12 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.DECREASE_SUSPICIOUS_FACTOR_TOOLTIP, "The factor by which the enemy's suspicious state affects the awareness decrease rate");
         add(LangKeys.DECREASE_SEARCHING_FACTOR, "Decrease Searching Factor");
         add(LangKeys.DECREASE_SEARCHING_FACTOR_TOOLTIP, "The factor by which the enemy's searching state affects the awareness decrease rate");
+        add(LangKeys.ALWAYS_SUCCESS, "Always Success");
+        add(LangKeys.ALWAYS_SUCCESS_TOOLTIP, "Whether assassinations to SEEKERS can be performed successfully all the time");
+        add(LangKeys.SUCCESS_CHANCE, "Success Chance");
+        add(LangKeys.SUCCESS_CHANCE_TOOLTIP, "If Assassination Always Success is false, the chance of successfully performing an assassination to SEEKERS");
+        add(LangKeys.CAN_PETS_BE_ASSASSINATED, "Assassinate Pets");
+        add(LangKeys.CAN_PETS_BE_ASSASSINATED_TOOLTIP, "Whether pets can be assassinated by their owners");
         add(LangKeys.CAN_ANIMALS_BE_ASSASSINATED, "Assassinate Animals (Normal)");
         add(LangKeys.CAN_ANIMALS_BE_ASSASSINATED_TOOLTIP, "Whether normal animals (excluding those in the SEEKERS tag) can be assassinated");
         add(LangKeys.CAN_ANIMAL_SEEKERS_BE_ASSASSINATED, "Assassinate Animals (SEEKERS)");

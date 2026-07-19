@@ -40,6 +40,7 @@ public class ModTags {
         public static final TagKey<EntityType<?>> ANIMALS = createTag("animals");
         public static final TagKey<EntityType<?>> SEEKERS = createTag("seekers");
         public static final TagKey<EntityType<?>> CONDITIONAL_SEEKERS = createTag("conditional_seekers");
+        public static final TagKey<EntityType<?>> PROTECTED = createTag("protected");
         public static final TagKey<EntityType<?>> DETECTABLE = createTag("detectable");
         public static final TagKey<EntityType<?>> CAN_BE_ASSASSINATED = createTag("can_be_assassinated");
     }
