@@ -1,4 +1,4 @@
-# Entity Configuration Guide / 实体配置指南
+# 实体配置指南
 
 本指南用于说明如何通过 JSON 配置文件自定义 `潜行与警戒` 模组中各个实体的侦测、刺杀和警戒条件。
 
@@ -15,7 +15,7 @@
   * 修改其他模组实体（如暮色森林的米诺陶）：`config/stealth_and_alert/entities/twilightforest/minotaur.json`
 
 ### 2. 模组开发者预设路径
-如果你是其他模组的开发者，希望为自己的生物提供默认的警觉配置，只需将 JSON 文件打包进你的模组 JAR 包：
+如果你是其他模组的开发者，希望为自己的生物提供默认的警戒配置，只需将 JSON 文件打包进你的模组 JAR 包：
 > `data/stealth_and_alert/presets/entities/<命名空间>/<实体ID>.json`
 
 *当游戏启动时，本模组会自动扫描所有模组的该目录，并释放未存在的配置文件到玩家的 `config` 文件夹中。*
@@ -51,21 +51,21 @@
 > [!TIP]
 > 在 `detection` 对象中，若将数值设为 `-1` 或直接省略该字段，系统会自动继承 `stealth_and_alert-common.toml` 中的全局通用配置；`ignore_baby` 默认为 `false`。
 
-| 字段名 | 数据类型 | 说明 |
-| :--- | :--- | :--- |
-| **`detection`** | Object | **控制侦测机制的主节点** |
+| 字段名 | 数据类型    | 说明 |
+| :--- |:--------| :--- |
+| **`detection`** | Object  | **控制侦测机制的主节点** |
 | `detection.ignore_baby` | Boolean | 该生物的幼崽是否能被触发警戒 |
-| `detection.detection_range` | Double | 视野最远距离 |
-| `detection.horizontal_fov` | Double | 水平 FOV |
-| `detection.vertical_up_fov` | Double | 向上 FOV |
-| `detection.vertical_down_fov` | Double | 向下 FOV |
-| `detection.reaction_ticks` | Int | 初次看到玩家时的反应时长 |
-| `detection.tracking_ticks` | Int | 看不到玩家时的追踪时长 |
-| `detection.patience_ticks` | Int | 对 LKP 感兴趣的耐心时长 |
-| `detection.memory_ticks` | Int | 被玩家激怒后对玩家的记忆时长 |
-| **`assassination`** | Object | **控制刺杀机制的主节点** |
-| `assassination.success_chance` | Boolean | 刺杀成功率，仅当全局配置中的刺杀必定成功被关闭后才起作用 |
-| **`alert_conditions`** | Object | **控制警戒条件的主节点，仅对 `conditional_seekers` 标签生物有效，其中所有项均可省略** |
+| `detection.detection_range` | Double  | 视野最远距离 |
+| `detection.horizontal_fov` | Double  | 水平 FOV |
+| `detection.vertical_up_fov` | Double  | 向上 FOV |
+| `detection.vertical_down_fov` | Double  | 向下 FOV |
+| `detection.reaction_ticks` | Int     | 初次看到玩家时的反应时长 |
+| `detection.tracking_ticks` | Int     | 看不到玩家时的追踪时长 |
+| `detection.patience_ticks` | Int     | 对 LKP 感兴趣的耐心时长 |
+| `detection.memory_ticks` | Int     | 被玩家激怒后对玩家的记忆时长 |
+| **`assassination`** | Object  | **控制刺杀机制的主节点** |
+| `assassination.success_chance` | Double  | 刺杀成功率，仅当全局配置中的刺杀必定成功被关闭后才起作用 |
+| **`alert_conditions`** | Object  | **控制警戒条件的主节点，仅对 `conditional_seekers` 标签生物有效，其中所有项均可省略** |
 
 
 `alert_conditions` 可用来控制中立生物对玩家的仇恨产生条件，即警戒条件。当然，普通敌对生物也可以应用这些条件。
@@ -82,7 +82,7 @@
 
 ### 1. 结构与基本语法
 
-`alert_conditions` 内部采用双层 Map 结构：**外层为条件类型），内层为具体的参数配置**。
+`alert_conditions` 内部采用双层 Map 结构：**外层为条件类型，内层为具体的参数配置**。
 
 ```json
 "alert_conditions": {
@@ -130,7 +130,7 @@
     "invert": false
   }
   ```
-- `threshold`（`int`） 指定了光照强度阈值。默认情况下，当光照强度小于或等于这个阈值时，生物即对玩家产生警戒。
+- `threshold` (`Int`) 指定了光照强度阈值。默认情况下，当光照强度小于或等于这个阈值时，生物即对玩家产生警戒。
 - `invert` 指定了本条件判定逻辑是否反转，不填时默认为 `false`。当为 `true` 时，光照条件反转。
 
 > `stealth_and_alert:eye_contact`
@@ -189,5 +189,5 @@
     "range": 32.0
   }
   ```
-- `threshold`（`Int`） 指定了一个阈值，当附近村民对玩家的声望小于或等于这个阈值时，生物即对玩家产生警戒。不填时默认值为 `-15`。
-- `range` 指定了距离该生物多近范围内的村民的声望可以被检测。不填时默认值为 `16.0`
+- `threshold` (`Int`) 指定了一个阈值，当附近村民对玩家的声望小于或等于这个阈值时，生物即对玩家产生警戒。不填时默认值为 `-15`。
+- `range` 指定了距离该生物多近范围内的村民的声望可以被检测。不填时默认值为 `16.0`。
