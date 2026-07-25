@@ -14,7 +14,7 @@
   },
   "pattern": [
     " S ",
-    " C ",
+    "CC ",
     " T "
   ],
   "result": {

@@ -77,6 +77,13 @@ config="${mod_id}.mixins.json"
     # Side this dependency is applied on - BOTH, CLIENT, or SERVER
     side="BOTH"
 
+[[dependencies.${mod_id}]]
+    modId="playeranimator"
+    type="required"
+    versionRange="[${player_animator_version},)"
+    ordering="NONE"
+    side="BOTH"
+
 # Here's another dependency
 [[dependencies.${mod_id}]]
     modId="minecraft"

@@ -6,13 +6,17 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.BossHealthOverlay;
+import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.rev.stealthandalert.StealthAndAlert;
-import net.rev.stealthandalert.attachment.ModAttachments;
-import net.rev.stealthandalert.attachment.VisibilityData;
+import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.util.StealthUtils;
+
+import java.util.Map;
+import java.util.UUID;
 
 
 public class VisibilityBarOverlay {
@@ -28,18 +32,19 @@ public class VisibilityBarOverlay {
             "textures/gui/visibility_eye_frame.png");
     private static final ResourceLocation VISIBILITY_SLASH_FRAME = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
             "textures/gui/visibility_slash_frame.png");
-    private static float displayedVisibility = 0F;
+    private static double displayedVisibility = 0;
 
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        if (!ClientConfigs.VISIBILITY_INDICATOR.get()) return;
+        if (!ClientConfigs.VISIBILITY_INDICATOR.turnOn.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         if (mc.player == null) return;
-        VisibilityData data = mc.player.getData(ModAttachments.VISIBILITY_DATA);
-        float visibility = 0;
+        if (mc.player.isSpectator()) return;
+        double visibility = 0;
         if (!mc.isPaused()) {
-            visibility = data.visibility();
-            float lerpSpeed = 0.01F;
+            AttributeInstance attribute = mc.player.getAttribute(ModAttributes.VISIBILITY);
+            visibility = mc.player.getAttributeValue(ModAttributes.VISIBILITY);
+            double lerpSpeed = 0.01;
 
             displayedVisibility = Mth.lerp(lerpSpeed, displayedVisibility, visibility);
         }
@@ -51,26 +56,15 @@ public class VisibilityBarOverlay {
         int width = 38;
         int imageSize = 128;
         int uOffsetMid = imageSize / 2 - width / 2;
-        int x = -width / 2 + ClientConfigs.VISIBILITY_INDICATOR_POSITION.get().getFirst();
-        int y = -imageSize / 2 +4 + ClientConfigs.VISIBILITY_INDICATOR_POSITION.get().getLast();
+        int x = -width / 2 + ClientConfigs.VISIBILITY_INDICATOR.x.get();
+        int y = -imageSize / 2 + 4 + ClientConfigs.VISIBILITY_INDICATOR.y.get();
         BossHealthOverlay bossOverlay = mc.gui.getBossOverlay();
-        if (ClientConfigs.VISIBILITY_INDICATOR_CAN_OFFSET_FROM_BOSS_BAR.get() && bossOverlay != null) {
-            try {
-                if (SoundWaveOverlay.bossEventsField == null) {
-                    SoundWaveOverlay.bossEventsField = BossHealthOverlay.class.getDeclaredField("events");
-                    SoundWaveOverlay.bossEventsField.setAccessible(true);
-                }
-
-                java.util.Map<?, ?> eventsMap = (java.util.Map<?, ?>) SoundWaveOverlay.bossEventsField.get(bossOverlay);
-
-                if (eventsMap != null && !eventsMap.isEmpty()) {
-                    int bossCount = eventsMap.size();
-
-                    int allBossBarsHeight = 12 + (bossCount - 1) * 30;
-                    y = y + allBossBarsHeight + 5;
-                }
-            } catch (Exception e) {
-                StealthAndAlert.LOGGER.warn("Could not get boss events field", e);
+        if (ClientConfigs.VISIBILITY_INDICATOR.canOffsetFromBossBar.get()) {
+            Map<UUID, LerpingBossEvent> eventsMap = bossOverlay.events;
+            if (!eventsMap.isEmpty()) {
+                int bossCount = eventsMap.size();
+                int allBossBarsHeight = 12 + (bossCount - 1) * 30;
+                y = y + allBossBarsHeight + 5;
             }
         }
 
@@ -81,7 +75,7 @@ public class VisibilityBarOverlay {
         PoseStack pose = graphics.pose();
         pose.pushPose();
         pose.translate(centerX, centerY, 0F);
-        float scale = ClientConfigs.VISIBILITY_INDICATOR_SCALE.get().floatValue();
+        float scale = ClientConfigs.VISIBILITY_INDICATOR.scale.get().floatValue();
         pose.scale(scale, scale, 1.0F);
 
         if (displayedVisibility > StealthUtils.VISIBILITY_THRESHOLD) {

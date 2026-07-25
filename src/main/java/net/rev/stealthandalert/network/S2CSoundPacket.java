@@ -5,9 +5,12 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.client.gui.overlay.SoundWaveOverlay;
+import org.jetbrains.annotations.NotNull;
 
 public record S2CSoundPacket(double volume) implements CustomPacketPayload {
     public static final Type<S2CSoundPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(
@@ -20,13 +23,16 @@ public record S2CSoundPacket(double volume) implements CustomPacketPayload {
     );
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
     public static void handle(S2CSoundPacket payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            SoundWaveOverlay.receiveRawSound(payload.volume());
+            Player player = context.player();
+            double multiplier = player.getAttributeValue(ModAttributes.SOUND_MULTIPLIER);
+            double volume = payload.volume * multiplier;
+            SoundWaveOverlay.receiveRawSound(volume);
         });
     }
 }

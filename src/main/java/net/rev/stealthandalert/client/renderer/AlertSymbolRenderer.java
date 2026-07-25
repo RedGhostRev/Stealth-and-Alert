@@ -44,7 +44,9 @@ public class AlertSymbolRenderer {
 
     @SubscribeEvent
     public static void onRenderAlertSymbol(RenderNameTagEvent event) {
-        if (!ClientConfigs.ALERT_SYMBOL.get()) return;
+        if (!ClientConfigs.ALERT_SYMBOL.turnOn.get()) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.hideGui) return;
         if (!(event.getEntity() instanceof Mob mob) || !mob.getType().is(ModTags.Entities.SEEKERS)) return;
         if (!mob.isAlive() || mob.isDeadOrDying() || mob.isRemoved()) return;
 
@@ -56,25 +58,25 @@ public class AlertSymbolRenderer {
         poseStack.pushPose();
 
         float yOffset = mob.getBbHeight();
-        float base = ClientConfigs.DEBUG_MODE.get() ? 1.0F : 0.5F;
+        float base = ClientConfigs.DEBUG_MODE.turnOn.get() ? 1.0F : 0.5F;
         yOffset += base;
 
         boolean hasName = mob.hasCustomName();
         boolean isAlwaysVisible = mob.isCustomNameVisible();
-        boolean isLookingAt = Minecraft.getInstance().crosshairPickEntity == mob;
+        boolean isLookingAt = mc.crosshairPickEntity == mob;
         boolean isNameTagRenderingNow = hasName && (isAlwaysVisible || isLookingAt);
 
         if (isNameTagRenderingNow) {
             yOffset += 0.5F;
         }
         poseStack.translate(0.0F, yOffset, 0.0F);
-        poseStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
-        float scale = ClientConfigs.ALERT_SYMBOL_SCALE.get().floatValue();
+        poseStack.mulPose(mc.getEntityRenderDispatcher().cameraOrientation());
+        float scale = ClientConfigs.ALERT_SYMBOL.scale.get().floatValue();
         poseStack.scale(scale, -scale, scale);
         Matrix4f savedMatrix = new Matrix4f(poseStack.last().pose());
         poseStack.popPose();
 
-        float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+        float partialTick = mc.getTimer().getGameTimeDeltaPartialTick(true);
         int tickCount = mob.tickCount;
 
         boolean canSee = data.canSeeAnyone();

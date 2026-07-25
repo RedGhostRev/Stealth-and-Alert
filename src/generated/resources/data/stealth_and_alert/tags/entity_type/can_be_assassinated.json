@@ -1,0 +1,12 @@
+{
+  "remove": [
+    "minecraft:iron_golem"
+  ],
+  "values": [
+    "#stealth_and_alert:seekers",
+    "#stealth_and_alert:animals",
+    "minecraft:villager",
+    "minecraft:wandering_trader",
+    "minecraft:player"
+  ]
+}

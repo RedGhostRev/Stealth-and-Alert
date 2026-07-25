@@ -34,6 +34,15 @@ public class DataGenerators {
         generator.addProvider(event.includeServer(), new ModEntityTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
         generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput, lookupProvider));
 
+//        DatapackBuiltinEntriesProvider datapackProvider = new DatapackBuiltinEntriesProvider(
+//                packOutput, lookupProvider, BUILDER, Set.of(StealthAndAlert.MOD_ID)
+//        );
+        ModDatapackProvider datapackProvider = new ModDatapackProvider(packOutput, lookupProvider);
+        generator.addProvider(event.includeServer(), datapackProvider);
+        generator.addProvider(event.includeServer(), new ModEnchantmentTagsProvider(packOutput, datapackProvider.getRegistryProvider(), existingFileHelper));
+        generator.addProvider(event.includeServer(), new ModDamageTypeTagsProvider(packOutput, datapackProvider.getRegistryProvider(), existingFileHelper));
+        generator.addProvider(event.includeServer(), new ModGlobalLootModifierProvider(packOutput, lookupProvider));
+
         generator.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, existingFileHelper));
         generator.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
 

@@ -1,16 +1,24 @@
 {
-  "ignore_baby": true,
-  "logic_list": [
-    "stealth_and_alert:provocation",
-    "stealth_and_alert:social_revenge",
-    "stealth_and_alert:item_wearing",
-    "stealth_and_alert:action_on_container"
-  ],
-  "params": {
-    "stealth_and_alert:social_revenge.horizontal_range": "16.0",
-    "stealth_and_alert:social_revenge.vertical_range": "10.0",
-    "stealth_and_alert:social_revenge.relatables": "minecraft:piglin_brute",
-    "stealth_and_alert:item_wearing.forbidden_tag": "minecraft:piglin_loved",
-    "stealth_and_alert:action_on_container.range": "32.0"
+  "detection": {
+    "ignore_baby": true,
+    "reaction_ticks": 8,
+    "tracking_ticks": 35,
+    "patience_ticks": 800,
+    "memory_ticks": 2400
+  },
+  "alert_conditions": {
+    "stealth_and_alert:fight_back": {},
+    "stealth_and_alert:protect_others": {
+      "entities": [
+        "minecraft:piglin",
+        "minecraft:piglin_brute"
+      ]
+    },
+    "stealth_and_alert:item_wearing": {
+      "items": ["#minecraft:piglin_loved"]
+    },
+    "stealth_and_alert:action_on_container": {
+      "range": 16
+    }
   }
 }

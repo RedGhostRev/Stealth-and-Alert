@@ -6,6 +6,9 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
+import org.jetbrains.annotations.NotNull;
 
 
 public class DaggerItem extends SwordItem {
@@ -16,10 +19,18 @@ public class DaggerItem extends SwordItem {
     }
 
     @Override
-    public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
+    public boolean supportsEnchantment(@NotNull ItemStack stack, Holder<Enchantment> enchantment) {
         if (enchantment.is(Enchantments.SWEEPING_EDGE)) {
             return false;
         }
         return super.supportsEnchantment(stack, enchantment);
+    }
+
+    @Override
+    public boolean canPerformAction(@NotNull ItemStack stack, @NotNull ItemAbility itemAbility) {
+        if (itemAbility == ItemAbilities.SWORD_SWEEP) {
+            return false;
+        }
+        return super.canPerformAction(stack, itemAbility);
     }
 }

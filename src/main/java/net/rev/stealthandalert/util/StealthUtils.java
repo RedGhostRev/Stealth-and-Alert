@@ -4,74 +4,33 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.animal.Panda;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.rev.stealthandalert.attachment.*;
+import net.rev.stealthandalert.attachment.AlertData;
+import net.rev.stealthandalert.attachment.AlertSoundData;
+import net.rev.stealthandalert.attachment.InvestigateLkpData;
+import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.ModAttributes;
+import net.rev.stealthandalert.common.alert.condition.AlertConditionHandler;
 import net.rev.stealthandalert.config.CommonConfigs;
-import net.rev.stealthandalert.config.EntityAlertConfigLoader;
-import net.rev.stealthandalert.config.EntityAlertSettings;
+import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
+import net.rev.stealthandalert.config.EntityAlertConditionSettings;
 import net.rev.stealthandalert.event.StealthSoundEvent;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
 
 import java.util.*;
 
 public class StealthUtils {
-    public static float VISIBILITY_THRESHOLD = CommonConfigs.VISIBILITY_THRESHOLD.get().floatValue();
+    public static float VISIBILITY_THRESHOLD = CommonConfigs.DETECTION.visibilityThreshold.get().floatValue();
 
     private StealthUtils() {
-    }
-
-    // 视线检测：如果mob能看到target，则返回true
-    public static boolean hasLineOfSight(Mob observer, Entity target) {
-        // 距离快速失败
-        EntityAlertSettings settings = EntityAlertConfigLoader.get(observer.getType());
-        double distanceSqr = observer.distanceToSqr(target);
-        double maxDistance = settings.viewRange();
-        VisibilityData visData = target.getData(ModAttachments.VISIBILITY_DATA);
-        if (visData.isVisible()) {
-            maxDistance = maxDistance * visData.visibility();
-            if (maxDistance < CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble()) {
-                maxDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble() + 0.5;
-            }
-        }
-
-        if (distanceSqr > maxDistance * maxDistance) return false;
-        // 隐身快速失败
-        if (target instanceof Player player) {
-            if (player.isInvisible() && isFullyNaked(player)) {
-                return false;
-            }
-        }
-
-        // 获取观察方向与目标向量
-        Vec3 eyePos = observer.getEyePosition();
-        Vec3 lookVec = observer.getViewVector(1.0F);
-        Vec3 targetVec = target.getEyePosition().subtract(eyePos);
-        Vec3 targetDir = targetVec.normalize();
-
-        // 水平与垂直FOV判定
-        if (!isWithinFOV(observer, lookVec, targetDir)) return false;
-
-        // 多点物理遮挡检查
-        return canSeeAnyPart(observer, target, eyePos);
-    }
-
-    public static boolean isFullyNaked(Player player) {
-        for (ItemStack armor : player.getArmorSlots()) {
-            if (!armor.isEmpty()) return false;
-        }
-        return true;
     }
 
     // 新感知系统
@@ -84,14 +43,13 @@ public class StealthUtils {
         // B: 门卫检查
         if (mob.level().players().isEmpty() && oldData.targetReactionTicks().isEmpty()) return;
 
-        EntityAlertSettings settings = EntityAlertConfigLoader.get(mob.getType());
-        if (settings.ignoreBaby() && mob.isBaby()) return;
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(mob.getType());
 
         // 继承记忆名单
         Set<UUID> trackedPlayers = new HashSet<>(oldData.targetReactionTicks().keySet());
 
         // 扫描周围物理范围内的玩家，加入处理名单
-        double range = settings.viewRange();
+        double range = settings.getViewRange();
         List<Player> nearbyPlayers = mob.level().getEntitiesOfClass(Player.class,
                 mob.getBoundingBox().inflate(range),
                 p -> mob.distanceToSqr(p) <= range * range);
@@ -116,7 +74,7 @@ public class StealthUtils {
                     mob,
                     mob.getData(ModAttachments.ALERT_DATA).state(),
                     oldData.targetAwareness().getOrDefault(uuid, 0.0F),
-                    oldData.targetReactionTicks().getOrDefault(uuid, CommonConfigs.DETECTION_REACTION_TICKS.getAsInt()),
+                    oldData.targetReactionTicks().getOrDefault(uuid, settings.getReactionTicks()),
                     oldData.targetStates().getOrDefault(uuid, AlertData.UNTRACKED),
                     oldData.targetMemoryTicks().getOrDefault(uuid, 0),
                     canSee
@@ -133,18 +91,22 @@ public class StealthUtils {
         );
 
         // E: 打包
-        AlertData newData = assembleData(resultsMap, gRes);
+        AlertData newData = assembleData(resultsMap, gRes, settings);
 
+        boolean skip = (settings.detection().ignoreBaby() && mob.isBaby()) || mob.getType().is(ModTags.Entities.PROTECTED);
         // 获取调查数据和听觉数据并组合比较
-        InvestigateLkpData investData = mob.getData(ModAttachments.INVESTIGATE_LKP_DATA);
-        AlertSoundData soundData = mob.getData(ModAttachments.ALERT_SOUND_DATA);
-        newData = dealWithVisualAndSound(mob, newData, soundData, investData);
+        if (!skip) {
+            InvestigateLkpData investData = mob.getData(ModAttachments.INVESTIGATE_LKP_DATA);
+            AlertSoundData soundData = mob.getData(ModAttachments.ALERT_SOUND_DATA);
+            newData = dealWithVisualAndSound(mob, newData, soundData, investData, settings);
+        }
         // F: 写回并同步
         mob.setData(ModAttachments.ALERT_DATA, newData);
         mob.setData(ModAttachments.ALERT_SOUND_DATA, AlertSoundData.DEFAULT);
         PacketDistributor.sendToPlayersTrackingEntity(mob, new S2CAlertDataPacket(mob.getId(), newData));
 
         // 处理敌人针对主目标的行为
+        if (skip) return;
         UUID primaryUuid = newData.primaryTarget().orElse(null);
         boolean canSeePrimary;
         if (primaryUuid != null) {
@@ -156,7 +118,7 @@ public class StealthUtils {
         AlertActionHandler.execute(mob, newData, canSeePrimary);
     }
 
-    private static AlertData dealWithVisualAndSound(Mob mob, AlertData visualData, AlertSoundData soundData, InvestigateLkpData investData) {
+    private static AlertData dealWithVisualAndSound(Mob mob, AlertData visualData, AlertSoundData soundData, InvestigateLkpData investData, EntityAlertConditionSettings settings) {
         if (soundData.equals(AlertSoundData.DEFAULT)) return visualData;
         if (soundData.pos().isEmpty()) return visualData;
         if (visualData.canSeeAnyone() || soundData.source().isEmpty() || (mob.getType().is(ModTags.Entities.CONDITIONAL_SEEKERS) && !visualData.targetMemoryTicks().containsKey(soundData.source().get())) || visualData.willFighting() || visualData.state() == AlertData.FIGHTING)
@@ -167,14 +129,14 @@ public class StealthUtils {
             } else {
                 if (soundData.threatLevel() <= AlertSoundData.MEDIUM) {
                     if (soundData.volume() <= 42.0) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, settings.getPatienceTicks());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                     }
                 } else {
                     mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                 }
             }
         }
@@ -186,23 +148,23 @@ public class StealthUtils {
                     if (soundData.distance() > 7) {
                         return visualData;
                     } else if (soundData.distance() > 6) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, settings.getPatienceTicks());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                     }
                 } else if (soundData.threatLevel() == AlertSoundData.MEDIUM) {
                     if (soundData.distance() > 12) {
                         return visualData;
                     } else if (soundData.distance() > 10) {
-                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SUSPICIOUS, soundData.pos(), 0, settings.getPatienceTicks());
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                     }
                 } else {
                     mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                    return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                 }
             }
         }
@@ -218,14 +180,14 @@ public class StealthUtils {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                         }
                     } else {
                         if (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10) {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                         }
                     }
                 } else if (soundData.threatLevel() == AlertSoundData.MEDIUM) {
@@ -236,14 +198,14 @@ public class StealthUtils {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                         }
                     } else {
                         if (soundData.volume() < 35.0 && (!investData.isSearchingAround() || Math.abs(mob.getY() - soundData.pos().get().y()) > 10)) {
                             return visualData;
                         } else {
                             mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                            return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                         }
                     }
                 } else {
@@ -251,7 +213,7 @@ public class StealthUtils {
                         return visualData;
                     } else {
                         mob.setData(ModAttachments.INVESTIGATE_LKP_DATA, InvestigateLkpData.DEFAULT);
-                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt());
+                        return visualData.withSound(AlertData.SEARCHING, soundData.pos(), 0, settings.getPatienceTicks());
                     }
                 }
             }
@@ -276,28 +238,28 @@ public class StealthUtils {
         }
 
         // 3.属性检查
-        if (AlertLogicHandler.isPlayerPet(mob, player)) {
+        if (CommonUtils.isPlayerPet(mob, player, true)) {
             return false;
         }
-        if (mob instanceof Panda panda) {
-            if (!panda.isAggressive()) return false;
-        }
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(mob.getType());
+        if (mob.getType().is(ModTags.Entities.PROTECTED) || (mob.isBaby() && settings.detection().ignoreBaby()))
+            return false;
 
         // 4.可见度不大于阈值时，最大感知距离检查
         double distanceSqr = mob.distanceToSqr(player);
-        if (!player.getData(ModAttachments.VISIBILITY_DATA).isVisible()) {
+        if (player.getAttributeValue(ModAttributes.VISIBILITY) <= VISIBILITY_THRESHOLD) {
             double minDistance;
             if (mob.getData(ModAttachments.ALERT_DATA).targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED) < AlertData.TRACKING) {
-                minDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE.getAsDouble();
+                minDistance = CommonConfigs.DETECTION.minInvisibleDistance.getAsDouble();
             } else {
-                minDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble();
+                minDistance = CommonConfigs.DETECTION.minInvisibleDistanceToTracking.getAsDouble();
             }
             if (distanceSqr > minDistance * minDistance) return false;
         }
 
         boolean isTouching = mob.getBoundingBox().intersects(player.getBoundingBox().inflate(0.4));
         // 5.视线与碰撞检查
-        if (!isTouching && !StealthUtils.hasLineOfSight(mob, player)) {
+        if (!isTouching && !CommonUtils.hasLineOfSight(mob, player)) {
             return false;
         }
 
@@ -305,20 +267,11 @@ public class StealthUtils {
         if (!mob.getType().is(ModTags.Entities.CONDITIONAL_SEEKERS)) return true;
 
         // 5.意图检查
-        EntityAlertSettings settings = EntityAlertConfigLoader.get(mob.getType());
-        if (settings.logicList().isEmpty()) return true;
-
-        for (String logic : settings.logicList()) {
-            if (AlertLogicHandler.checkLogic(logic, mob, player, settings)) {
-                return true;
-            }
-        }
-
-        return false;
+        return AlertConditionHandler.checkAllConditions(mob, player, settings);
     }
 
     // 打包数据
-    private static AlertData assembleData(Map<UUID, StealthEngine.IndividualResult> res, StealthEngine.GlobalResult gRes) {
+    private static AlertData assembleData(Map<UUID, StealthEngine.IndividualResult> res, StealthEngine.GlobalResult gRes, EntityAlertConditionSettings settings) {
         Map<UUID, Float> progress = new HashMap<>();
         Map<UUID, Integer> states = new HashMap<>();
         Map<UUID, Integer> reactions = new HashMap<>();
@@ -328,7 +281,7 @@ public class StealthUtils {
         res.forEach((uuid, lres) -> {
             boolean isDeadData = lres.level() <= 0.0F &&
                     lres.pState() == AlertData.UNTRACKED &&
-                    lres.reaction() >= CommonConfigs.DETECTION_REACTION_TICKS.getAsInt() &&
+                    lres.reaction() >= settings.getReactionTicks() &&
                     lres.memory() <= 0;
             if (!isDeadData) {
                 progress.put(uuid, lres.level());
@@ -358,63 +311,10 @@ public class StealthUtils {
         );
     }
 
-    // 三点检查
-    private static boolean canSeeAnyPart(Mob observer, Entity target, Vec3 start) {
-        Vec3[] checkPoints = {
-                // 头
-                target.getEyePosition(),
-                // 胸
-                target.position().add(0, target.getBbHeight() / 2.0, 0),
-                // 脚
-                target.position().add(0, 0.1, 0)
-        };
-
-        for (Vec3 end : checkPoints) {
-            if (isLineClear(observer, start, end)) return true;
-        }
-        return false;
-    }
-
-    // 视线射线检测
-    private static boolean isLineClear(Mob observer, Vec3 start, Vec3 end) {
-        // TODO 能透过玻璃
-        return observer.level().clip(new ClipContext(
-                start, end,
-                ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE,
-                observer
-        )).getType() == HitResult.Type.MISS;
-    }
-
-    // FOV判定
-    private static boolean isWithinFOV(Mob observer, Vec3 lookVec, Vec3 targetDir) {
-        boolean isVerticalLooking = Math.abs(lookVec.x) < 0.0001 && Math.abs(lookVec.z) < 0.0001;
-
-        EntityAlertSettings settings = EntityAlertConfigLoader.get(observer.getType());
-        // 水平角度判定
-        if (!isVerticalLooking) {
-            Vec3 lookHorizontal = new Vec3(lookVec.x, 0, lookVec.z).normalize();
-            Vec3 targetHorizontal = new Vec3(targetDir.x, 0, targetDir.z).normalize();
-
-            double horizontalDot = lookHorizontal.dot(targetHorizontal);
-            double horizontalThreshold = Math.cos(Math.toRadians(settings.horizontalFov() / 2.0));
-
-            if (horizontalDot < horizontalThreshold) return false;
-        }
-
-        // 垂直角度判定
-        double pitchToTargetDegrees = Math.toDegrees(Math.asin(targetDir.y));
-
-        double maxUpPitch = settings.maxUpPitch();
-        double maxDownPitch = -settings.maxDownPitch();
-
-        return pitchToTargetDegrees >= maxDownPitch && pitchToTargetDegrees <= maxUpPitch;
-    }
-
     // 可见度计算
-    public static float calculateVisibility(Player player) {
-        if (player.isInvisible() && isFullyNaked(player)) return 0.0F;
-        if (isFullyHiddenByEnvironment(player)) return 0.0F;
+    public static double calculateVisibility(Player player) {
+        if (player.isInvisible() && CommonUtils.isFullyNaked(player)) return 0.0;
+        if (isFullyHiddenByEnvironment(player)) return 0.0;
 
         int skyDarken = player.level().getSkyDarken();
         int ambientLight = player.level().getRawBrightness(player.blockPosition(), skyDarken);
@@ -428,31 +328,32 @@ public class StealthUtils {
 //            effectiveThreshold = 5;
 //        }
 
-        float visibility = 1.0F;
+        double visibility = 1.0;
 
         // 计算
         // 光照修正
-        float adjustedLight = (float) (finalLight - effectiveThreshold) / (15 - effectiveThreshold);
-        float lightMultiplier = 0.2F + adjustedLight * 0.8F;
+        double adjustedLight = (double) (finalLight - effectiveThreshold) / (15 - effectiveThreshold);
+        // adjustedLight = Math.max(adjustedLight, 0.0);
+        double lightMultiplier = 0.2 + adjustedLight * 0.8;
         visibility *= lightMultiplier;
 
         // 环境修正
         if (isInTallGrass(player.level(), player.blockPosition())) {
-            visibility *= 0.5F;
+            visibility *= 0.5;
         }
 
         // 姿态修正
         if (player.isVisuallyCrawling() || player.isVisuallySwimming()) {
-            visibility *= 0.4F;
+            visibility *= 0.4;
         } else if (player.isCrouching()) {
-            visibility *= 0.7F;
+            visibility *= 0.7;
         }
 
         if (player.isSprinting()) {
-            visibility *= 1.25F;
+            visibility *= 1.25;
         }
 
-        return Math.clamp(visibility, 0.0F, 1.0F);
+        return Math.clamp(visibility, 0.0, 1.0);
     }
 
     private static boolean isFullyHiddenByEnvironment(Player player) {
@@ -465,9 +366,7 @@ public class StealthUtils {
         BlockState feetState = level.getBlockState(center);
         BlockState headState = level.getBlockState(center.above());
 
-        if (feetState.is(BlockTags.LEAVES) && headState.is(BlockTags.LEAVES)) return true;
-
-        return false;
+        return feetState.is(BlockTags.LEAVES) && headState.is(BlockTags.LEAVES);
     }
 
     private static boolean isInTallGrass(Level level, BlockPos pos) {
@@ -555,18 +454,18 @@ public class StealthUtils {
 
         for (ItemStack armor : player.getArmorSlots()) {
             if (armor.isEnchanted()) {
-                glintLevel += 3;
+                glintLevel += 4;
             }
         }
 
-        if (player.getMainHandItem().isEnchanted()) glintLevel += 2;
-        if (player.getOffhandItem().isEnchanted()) glintLevel += 2;
+        if (player.getMainHandItem().isEnchanted()) glintLevel += 3;
+        if (player.getOffhandItem().isEnchanted()) glintLevel += 3;
 
         return Math.min(glintLevel, 15);
     }
 
     public static void reactToSound(StealthSoundEvent event) {
-        if (event.volume <= 0F || event.radius <= 0) return;
+        if (event.volume <= 0 || event.radius <= 0) return;
         if (!(event.soundSource instanceof Player)) return;
         Level level = event.soundSource.level();
         Vec3 pos = event.soundPos;

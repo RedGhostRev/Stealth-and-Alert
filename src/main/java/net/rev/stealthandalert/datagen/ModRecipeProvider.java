@@ -68,7 +68,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(recipeOutput);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SHADOW_CRYSTAL_DAGGER)
                 .pattern(" S ")
-                .pattern(" C ")
+                .pattern("CC ")
                 .pattern(" T ")
                 .define('S', ModItems.SHADOW_CRYSTAL_SHARD)
                 .define('C', ModItems.SHADOW_CRYSTAL)

@@ -18,6 +18,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.SHADOW_CRYSTAL.get());
         basicItem(ModItems.SHADOW_CRYSTAL_SHARD.get());
         basicItem(ModItems.SHADOW_BERRIES.get());
+        basicItem(ModItems.MUSIC_DISC_DAISY_BELL.get());
         handheldItem(ModItems.SHADOW_CRYSTAL_DAGGER.get());
         handheldItem(ModItems.DEBUG_WAND.get());
     }

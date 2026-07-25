@@ -1,11 +1,15 @@
 {
-  "view_range": 64.0,
-  "horizontal_fov": 360.0,
-  "logic_list": [
-    "stealth_and_alert:provocation",
-    "stealth_and_alert:eye_contact"
-  ],
-  "params": {
-    "stealth_and_alert:eye_contact.pumpkin_mask": "true"
+  "detection": {
+    "detection_range": 64.0,
+    "horizontal_fov": 360.0
+  },
+  "assassination": {
+    "success_chance": 0.0
+  },
+  "alert_conditions": {
+    "stealth_and_alert:fight_back": {},
+    "stealth_and_alert:eye_contact": {
+      "pumpkin_mask": true
+    }
   }
 }

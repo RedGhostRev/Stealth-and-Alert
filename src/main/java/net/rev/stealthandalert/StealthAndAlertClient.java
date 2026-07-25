@@ -8,6 +8,9 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.rev.stealthandalert.client.animation.ClientAnimationHandler;
 import net.rev.stealthandalert.entity.ModEntities;
 
 // This class will not load on dedicated servers. Accessing client side code from here is safe.
@@ -16,13 +19,18 @@ import net.rev.stealthandalert.entity.ModEntities;
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID, value = Dist.CLIENT)
 public class StealthAndAlertClient {
     public StealthAndAlertClient(ModContainer container) {
-
+        registerConfigScreen(container);
     }
 
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
+            ClientAnimationHandler.initializePlayerAnimationFactory();
             EntityRenderers.register(ModEntities.PEBBLE.get(), ThrownItemRenderer::new);
         });
+    }
+
+    private static void registerConfigScreen(ModContainer container) {
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 }

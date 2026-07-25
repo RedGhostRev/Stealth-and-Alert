@@ -1,11 +1,10 @@
 {
-  "ignore_baby": true,
-  "logic_list": [
-    "stealth_and_alert:provocation",
-    "stealth_and_alert:social_revenge"
-  ],
-  "params": {
-    "stealth_and_alert:social_revenge.horizontal_range": "16.0",
-    "stealth_and_alert:social_revenge.vertical_range": "10.0"
+  "alert_conditions": {
+    "stealth_and_alert:fight_back": {},
+    "stealth_and_alert:protect_others": {
+      "entities": [
+        "minecraft:dolphin"
+      ]
+    }
   }
 }

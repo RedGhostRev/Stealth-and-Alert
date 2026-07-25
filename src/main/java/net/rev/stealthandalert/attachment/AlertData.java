@@ -8,6 +8,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 import net.rev.stealthandalert.config.CommonConfigs;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +71,7 @@ public record AlertData(
 
     public static final StreamCodec<ByteBuf, AlertData> STREAM_CODEC = new StreamCodec<>() {
         @Override
-        public AlertData decode(ByteBuf buf) {
+        public @NotNull AlertData decode(@NotNull ByteBuf buf) {
             return new AlertData(
                     ByteBufCodecs.VAR_INT.decode(buf),                           // state
                     PROGRESS_MAP_CODEC.decode(buf),                              // targetAwareness
@@ -87,7 +88,7 @@ public record AlertData(
         }
 
         @Override
-        public void encode(ByteBuf buf, AlertData data) {
+        public void encode(@NotNull ByteBuf buf, AlertData data) {
             ByteBufCodecs.VAR_INT.encode(buf, data.state());
             PROGRESS_MAP_CODEC.encode(buf, data.targetAwareness());
             INT_MAP_CODEC.encode(buf, data.targetStates());
@@ -107,7 +108,7 @@ public record AlertData(
     }
 
     public static AlertData createDefault() {
-        return new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.PATIENCE_TICKS.getAsInt(), false, false);
+        return new AlertData(IDLE, Map.of(), Map.of(), Map.of(), Map.of(), Optional.empty(), Optional.empty(), 0, CommonConfigs.DETECTION.patienceTicks.getAsInt(), false, false);
     }
 }
 

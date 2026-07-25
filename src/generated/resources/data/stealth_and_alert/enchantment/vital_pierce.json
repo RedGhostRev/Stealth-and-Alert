@@ -1,0 +1,32 @@
+{
+  "anvil_cost": 2,
+  "description": {
+    "translate": "enchantment.stealth_and_alert.vital_pierce"
+  },
+  "effects": {
+    "stealth_and_alert:add_assassination_multiplier": [
+      {
+        "effect": {
+          "type": "minecraft:linear",
+          "base": 0.2,
+          "per_level_above_first": 0.2
+        }
+      }
+    ]
+  },
+  "max_cost": {
+    "base": 25,
+    "per_level_above_first": 11
+  },
+  "max_level": 5,
+  "min_cost": {
+    "base": 10,
+    "per_level_above_first": 11
+  },
+  "primary_items": "#minecraft:enchantable/weapon",
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#minecraft:enchantable/weapon",
+  "weight": 1
+}

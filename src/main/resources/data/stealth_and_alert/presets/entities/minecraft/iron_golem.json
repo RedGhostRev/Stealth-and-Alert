@@ -1,10 +1,14 @@
 {
-  "logic_list": [
-    "stealth_and_alert:provocation",
-    "stealth_and_alert:village_reputation"
-  ],
-  "params": {
-    "stealth_and_alert:village_reputation.threshold": "-15",
-    "stealth_and_alert:village_reputation.range": "16.0"
+  "alert_conditions": {
+    "stealth_and_alert:fight_back": {},
+    "stealth_and_alert:protect_others": {
+      "entities": [
+        "minecraft:villager"
+      ]
+    },
+    "stealth_and_alert:village_reputation": {
+      "threshold": -15,
+      "range": 32.0
+    }
   }
 }

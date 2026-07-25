@@ -28,9 +28,9 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     protected void generate() {
         dropSelf(ModBlocks.PEBBLE_BLOCK.get());
         add(ModBlocks.SHADOW_CRYSTAL_ORE.get(),
-                block -> createMultipleDrops(block, ModItems.SHADOW_CRYSTAL.get(), 2.0F, 3.0F));
+                block -> createMultipleDrops(block, ModItems.SHADOW_CRYSTAL.get(), 1.0F, 3.0F));
         add(ModBlocks.DEEPSLATE_SHADOW_CRYSTAL_ORE.get(),
-                block -> createMultipleDrops(block, ModItems.SHADOW_CRYSTAL.get(), 2.0F, 3.0F));
+                block -> createMultipleDrops(block, ModItems.SHADOW_CRYSTAL.get(), 1.0F, 3.0F));
     }
 
     protected LootTable.Builder createMultipleDrops(Block block, Item item, float minCount, float maxCount) {

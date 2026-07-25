@@ -30,17 +30,13 @@ public class StealthSoundClientEvents {
             if (player.isInWater() || player.isFallFlying()) {
                 double speedPerTick = Math.sqrt(realMoveX * realMoveX + realMoveY * realMoveY + realMoveZ * realMoveZ);
                 double speedPerSecond = speedPerTick * 20;
+                PacketDistributor.sendToServer(new C2SSpeedPacket(speedPerSecond));
 
-                if (speedPerSecond >= 0.5) {
-                    PacketDistributor.sendToServer(new C2SSpeedPacket(speedPerSecond));
-                }
             } else if (player.onGround()) {
                 double speedPerTick = Math.sqrt(realMoveX * realMoveX + realMoveZ * realMoveZ);
                 double speedPerSecond = speedPerTick * 20;
+                PacketDistributor.sendToServer(new C2SSpeedPacket(speedPerSecond));
 
-                if (speedPerSecond >= 0.5) {
-                    PacketDistributor.sendToServer(new C2SSpeedPacket(speedPerSecond));
-                }
             }
         }
     }

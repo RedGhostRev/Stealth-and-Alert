@@ -5,6 +5,8 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.BossHealthOverlay;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -13,11 +15,14 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.config.ClientConfigs;
 
-import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.UUID;
 
+// TODO 改进 HUD
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID, value = Dist.CLIENT)
 public class SoundWaveOverlay {
+    public static long lastRenderTime = 0;
+
     public static int lastSoundTick = 0;
     public static double targetAmplitude = 0.0;
     public static double renderAmplitude = 0.0;
@@ -26,15 +31,14 @@ public class SoundWaveOverlay {
     public static double tickMaxAmplitude = 0.0;
     public static boolean hasNewSoundThisTick = false;
 
-//    public static long lastSoundTime = 0;
-//    public static final long RESET_DELAY_MS = 80;
-
     public static void receiveRawSound(double rawVolume) {
         double minVolume = 20.0;
         double maxVolume = 60.0;
         double clamped = Mth.clamp(rawVolume, minVolume, maxVolume);
         double normalized = (clamped - minVolume) / (maxVolume - minVolume);
         double scaledAmplitude = Math.log(1 + normalized * 9) / Math.log(10);
+
+        if (scaledAmplitude <= 0.0) return;
 
         if (!hasNewSoundThisTick || scaledAmplitude > tickMaxAmplitude) {
             tickMaxAmplitude = scaledAmplitude;
@@ -67,28 +71,43 @@ public class SoundWaveOverlay {
     }
 
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        if (!ClientConfigs.SOUND_WAVE_INDICATOR.get()) return;
+        if (!ClientConfigs.SOUND_WAVE_INDICATOR.turnOn.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
+        LocalPlayer player = mc.player;
+        if (player == null) return;
+        if (player.isSpectator()) return;
 
         if (!mc.isPaused()) {
-            double baseSpeed = 0.03;
-            double speedFactor = renderAmplitude > 0 ? (baseSpeed + renderAmplitude * 0.02) : 0.0;
-            timeTracker += speedFactor;
+            long currentTime = System.currentTimeMillis();
+            if (lastRenderTime == 0) lastRenderTime = currentTime;
+
+            float deltaFrames = (currentTime - lastRenderTime) / 16.666f;
+            lastRenderTime = currentTime;
+            if (deltaFrames > 5.0f) deltaFrames = 5.0f;
+
+            double baseSpeed = 0.1;
+            double speedFactor = renderAmplitude > 0 ? (baseSpeed + renderAmplitude * 0.1) : 0.0;
+            timeTracker += speedFactor * deltaFrames;
+
+            float upSpeed = (float) (1.0 - Math.pow(1.0 - 0.3, deltaFrames));
+            float downSpeed = (float) (1.0 - Math.pow(1.0 - 0.4, deltaFrames));
 
             if (targetAmplitude >= renderAmplitude) {
-                renderAmplitude = Mth.lerp(0.14, renderAmplitude, targetAmplitude);
+                renderAmplitude = Mth.lerp(upSpeed, renderAmplitude, targetAmplitude);
             } else {
-                renderAmplitude = Mth.lerp(0.65, renderAmplitude, targetAmplitude);
+                renderAmplitude = Mth.lerp(downSpeed, renderAmplitude, targetAmplitude);
             }
 
             if (renderAmplitude < 0.01) {
                 renderAmplitude = 0.0;
             }
+        } else {
+            lastRenderTime = System.currentTimeMillis();
         }
 
         PoseStack poseStack = graphics.pose();
-        float scale = ClientConfigs.SOUND_WAVE_INDICATOR_SCALE.get().floatValue(); // 缩放比例
+        float scale = ClientConfigs.SOUND_WAVE_INDICATOR.scale.get().floatValue(); // 缩放比例
         int screenWidth = graphics.guiWidth();
         int targetY = 30;
 
@@ -100,8 +119,6 @@ public class SoundWaveOverlay {
 
         poseStack.popPose();
     }
-
-    public static Field bossEventsField = null; // 反射用缓存字段
 
     private static void drawSoundWave(GuiGraphics graphics) {
         int waveWidth = 112; // 横条长
@@ -116,26 +133,15 @@ public class SoundWaveOverlay {
         int baseColor = 0xFFFFFFFF; // 条色
         int borderColor = 0x337F7F7F; // 边框颜色（r:0.5, g:0.5, b:0.5, alpha:0.2）
 
-        int localStartX = -waveWidth / 2 + ClientConfigs.SOUND_WAVE_INDICATOR_POSITION.get().getFirst();
-        int middleY = -23 + ClientConfigs.SOUND_WAVE_INDICATOR_POSITION.get().getLast();
+        int localStartX = -waveWidth / 2 + ClientConfigs.SOUND_WAVE_INDICATOR.x.get();
+        int middleY = -23 + ClientConfigs.SOUND_WAVE_INDICATOR.y.get();
         BossHealthOverlay bossOverlay = Minecraft.getInstance().gui.getBossOverlay();
-        if (ClientConfigs.SOUND_WAVE_INDICATOR_CAN_OFFSET_FROM_BOSS_BAR.get() && bossOverlay != null) {
-            try {
-                if (SoundWaveOverlay.bossEventsField == null) {
-                    SoundWaveOverlay.bossEventsField = BossHealthOverlay.class.getDeclaredField("events");
-                    SoundWaveOverlay.bossEventsField.setAccessible(true);
-                }
-
-                Map<?, ?> eventsMap = (java.util.Map<?, ?>) SoundWaveOverlay.bossEventsField.get(bossOverlay);
-
-                if (eventsMap != null && !eventsMap.isEmpty()) {
-                    int bossCount = eventsMap.size();
-
-                    int allBossBarsHeight = 12 + (bossCount - 1) * 30;
-                    middleY = middleY + allBossBarsHeight + 5;
-                }
-            } catch (Exception e) {
-                StealthAndAlert.LOGGER.warn("Could not get boss events field", e);
+        if (ClientConfigs.SOUND_WAVE_INDICATOR.canOffsetFromBossBar.get()) {
+            Map<UUID, LerpingBossEvent> eventsMap = bossOverlay.events;
+            if (!eventsMap.isEmpty()) {
+                int bossCount = eventsMap.size();
+                int allBossBarsHeight = 12 + (bossCount - 1) * 30;
+                middleY = middleY + allBossBarsHeight + 5;
             }
         }
 
@@ -149,7 +155,9 @@ public class SoundWaveOverlay {
             double progress = (double) i / totalBars;
             double randomSeed = Math.sin(i * 12.9898) * 43758.5453;
             double localFrequency = (randomSeed - Math.floor(randomSeed)) * 0.15 + 0.9;
-            double rawNoise = (Math.sin(timeTracker * localFrequency) + 1.0) / 2.0;
+
+            double rawNoise = (Math.sin(timeTracker * localFrequency + randomSeed) + 1.0) / 2.0;
+
             double microNoise = (randomSeed - Math.floor(randomSeed));
             double randomHeightFactor = Mth.lerp(0.4, rawNoise, microNoise);
 

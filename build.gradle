@@ -19,6 +19,15 @@ group = mod_group_id
 
 repositories {
     // Add here additional repositories if required by some of the dependencies below.
+//    maven {
+//        url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+//        content {
+//            includeGroup("software.bernie.geckolib")
+//        }
+//    }
+    maven {
+        url = "https://maven.kosmx.dev/"
+    }
 }
 
 base {
@@ -38,7 +47,7 @@ neoForge {
     }
 
     // This line is optional. Access Transformers are automatically detected
-    // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformers = project.files('src/main/templates/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -47,6 +56,12 @@ neoForge {
             client()
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        clientTwo {
+            client()
+            programArguments.addAll ('--username', 'Rev')
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
@@ -133,6 +148,8 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+//    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation "dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -148,7 +165,8 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_license            : mod_license,
             mod_version            : mod_version,
             mod_authors            : mod_authors,
-            mod_description        : mod_description
+            mod_description        : mod_description,
+            player_animator_version: player_animator_version
     ]
     inputs.properties replaceProperties
     expand replaceProperties
