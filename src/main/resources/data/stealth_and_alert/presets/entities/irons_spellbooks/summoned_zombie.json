@@ -1,0 +1,9 @@
+{
+  "alert_conditions": {
+    "stealth_and_alert:fight_back": {},
+    "stealth_and_alert:fight_for_owner": {},
+    "stealth_and_alert:protect_others": {
+      "entities": ["irons_spellbooks:summoned_zombie"]
+    }
+  }
+}

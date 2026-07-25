@@ -1,8 +1,13 @@
 {
   "remove": [
+    "irons_spellbooks:priest",
     "minecraft:iron_golem"
   ],
   "values": [
+    {
+      "id": "dummmmmmy:target_dummy",
+      "required": false
+    },
     "#stealth_and_alert:seekers",
     "#stealth_and_alert:animals",
     "minecraft:villager",

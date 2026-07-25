@@ -39,6 +39,10 @@ public class ModAlertConditions {
                 ResourceLocation.fromNamespaceAndPath(MOD_ID, "village_reputation"),
                 new VillageReputationCondition()
         );
+        AlertConditionRegistry.register(
+                ResourceLocation.fromNamespaceAndPath(MOD_ID, "fight_for_owner"),
+                new FightForOwnerCondition()
+        );
 
         StealthAndAlert.LOGGER.info("成功注册了所有条件！");
     }

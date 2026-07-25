@@ -1,0 +1,21 @@
+{
+  "detection": {
+    "detection_range": 72.0,
+    "horizontal_fov": 140.0,
+    "vertical_up_fov": 60.0,
+    "vertical_down_fov": 70.0,
+    "reaction_ticks": 5,
+    "tracking_ticks": 60,
+    "patience_ticks": 1200,
+    "memory_ticks": 2400
+  },
+  "assassination": {
+    "success_chance": 0.65
+  },
+  "alert_conditions": {
+    "stealth_and_alert:fight_back": {},
+    "stealth_and_alert:action_on_container": {
+      "range": 16
+    }
+  }
+}

@@ -31,6 +31,8 @@ public class CommonConfigs {
         public final ModConfigSpec.IntValue memoryTicks;
 
         public final ModConfigSpec.DoubleValue visibilityThreshold;
+        public final ModConfigSpec.DoubleValue visibilityMaxDetectionRangeReductionPercentage;
+        public final ModConfigSpec.EnumValue<DetectionRangeReduction> visibilityDetectionRangeReductionModel;
         public final ModConfigSpec.DoubleValue minInvisibleDistance;
         public final ModConfigSpec.DoubleValue minInvisibleDistanceToTracking;
 
@@ -77,24 +79,43 @@ public class CommonConfigs {
             memoryTicks = builder
                     .comment("The duration of an enemy's memory towards a player who has enraged it (in ticks)")
                     .translation(LangKeys.MEMORY_TICKS)
-                    .defineInRange("memoryTicks", 1200, 100,  12000);
+                    .defineInRange("memoryTicks", 1200, 100, 12000);
 
             visibilityThreshold = builder
                     .comment("The visibility threshold for players to enter a fully concealed state (*100%)")
                     .translation(LangKeys.VISIBILITY_THRESHOLD)
                     .defineInRange("visibilityThreshold", 0.05, 0.01, 0.5);
 
+            visibilityMaxDetectionRangeReductionPercentage = builder
+                    .comment("The max reduction percentage of an enemy's detection range influenced by visibility")
+                    .translation(LangKeys.VISIBILITY_DETECTION_RANGE)
+                    .defineInRange("visibilityMaxDetectionRangeReductionPercentage", 0.6, 0.1, 1.0);
+
+            visibilityDetectionRangeReductionModel = builder
+                    .comment("The mathematical model for reduction of enemies' detection range influenced by visibility",
+                            "LINEAR: Steadily reducing",
+                            "SQUARE ROOT: Reducing quickly at first, then slowly",
+                            "SMOOTHSTEP: Reducing slowly at first and end, quickly at medium")
+                    .translation(LangKeys.VISIBILITY_DETECTION_RANGE_MODEL)
+                    .defineEnum("visibilityDetectionRangeReductionModel", DetectionRangeReduction.SMOOTHSTEP);
+
             minInvisibleDistance = builder
                     .comment("The distance within which complete concealment fails against enemies")
                     .translation(LangKeys.MIN_INVISIBLE_DISTANCE)
-                    .defineInRange("minInvisibleDistance", 2.0, 2.0, 8.0);
+                    .defineInRange("minInvisibleDistance", 2.0, 1.0, 8.0);
 
             minInvisibleDistanceToTracking = builder
                     .comment("The distance within which complete concealment fails against tracking enemies")
                     .translation(LangKeys.MIN_INVISIBLE_DISTANCE_TO_TRACKING)
-                    .defineInRange("minInvisibleDistanceToTracking", 5.0, 1.0, 10.0);
+                    .defineInRange("minInvisibleDistanceToTracking", 6.0, 1.0, 16.0);
 
             builder.pop();
+        }
+
+        public enum DetectionRangeReduction {
+            LINEAR,
+            SQUARE_ROOT,
+            SMOOTHSTEP
         }
     }
 

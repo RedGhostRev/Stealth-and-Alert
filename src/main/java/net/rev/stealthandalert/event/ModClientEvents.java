@@ -26,6 +26,7 @@ import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.datagen.LangKeys;
 import net.rev.stealthandalert.network.C2SAssassinationPacket;
 import net.rev.stealthandalert.network.C2SCrawlPacket;
+import net.rev.stealthandalert.screen.custom.EditHudsScreen;
 import net.rev.stealthandalert.util.AssassinationHandler;
 import net.rev.stealthandalert.util.ClientUtils;
 import net.rev.stealthandalert.util.ModTags;
@@ -76,6 +77,7 @@ public class ModClientEvents {
         event.register(ModKeyMappings.CRAWL_KEY);
         event.register(ModKeyMappings.ASSASSINATE_KEY);
         event.register(ModKeyMappings.MARK_KEY);
+        event.register(ModKeyMappings.EDIT_HUDS_KEY);
     }
 
     @SubscribeEvent
@@ -90,6 +92,15 @@ public class ModClientEvents {
                 mc.player.connection.send(new C2SCrawlPacket(!crawling));
             }
         }
+    }
+
+    public static boolean bossbarShown;
+    public static int bossbarHeight;
+
+    @SubscribeEvent
+    public static void onRenderBossBar(CustomizeGuiOverlayEvent.BossEventProgress event) {
+        bossbarHeight = event.getY() + event.getIncrement();
+        bossbarShown = true;
     }
 
     @SubscribeEvent
@@ -128,6 +139,13 @@ public class ModClientEvents {
         while (ModKeyMappings.MARK_KEY.consumeClick()) {
             ClientMarkManager.mark();
         }
+
+        while (ModKeyMappings.EDIT_HUDS_KEY.consumeClick()) {
+            if (mc.screen == null) {
+                mc.setScreen(new EditHudsScreen());
+            }
+        }
+        bossbarShown = false;
     }
 
     // DEBUG内容

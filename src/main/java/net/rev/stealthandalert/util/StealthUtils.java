@@ -3,10 +3,8 @@ package net.rev.stealthandalert.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,7 +26,7 @@ import net.rev.stealthandalert.network.S2CAlertDataPacket;
 import java.util.*;
 
 public class StealthUtils {
-    public static float VISIBILITY_THRESHOLD = CommonConfigs.DETECTION.visibilityThreshold.get().floatValue();
+    public static double VISIBILITY_THRESHOLD = CommonConfigs.DETECTION.visibilityThreshold.get();
 
     private StealthUtils() {
     }
@@ -247,7 +245,7 @@ public class StealthUtils {
 
         // 4.可见度不大于阈值时，最大感知距离检查
         double distanceSqr = mob.distanceToSqr(player);
-        if (player.getAttributeValue(ModAttributes.VISIBILITY) <= VISIBILITY_THRESHOLD) {
+        if (player.getAttributeValue(ModAttributes.VISIBILITY) <= VISIBILITY_THRESHOLD + 0.0001) {
             double minDistance;
             if (mob.getData(ModAttachments.ALERT_DATA).targetStates().getOrDefault(player.getUUID(), AlertData.UNTRACKED) < AlertData.TRACKING) {
                 minDistance = CommonConfigs.DETECTION.minInvisibleDistance.getAsDouble();
@@ -313,40 +311,51 @@ public class StealthUtils {
 
     // 可见度计算
     public static double calculateVisibility(Player player) {
-        if (player.isInvisible() && CommonUtils.isFullyNaked(player)) return 0.0;
         if (isFullyHiddenByEnvironment(player)) return 0.0;
 
-        int skyDarken = player.level().getSkyDarken();
-        int ambientLight = player.level().getRawBrightness(player.blockPosition(), skyDarken);
-        int emittedLight = getPlayerEmittedLight(player);
-        int finalLight = Math.max(ambientLight, emittedLight);
+        Level level = player.level();
+        BlockPos pos = player.blockPosition();
 
-        int effectiveThreshold = 2;
-//        if (player.isCrouching()) {
-//            effectiveThreshold = 4;
-//        } else if (player.isVisuallyCrawling() || player.isVisuallySwimming()) {
-//            effectiveThreshold = 5;
-//        }
+        // 光照修正
+        int blockLight = level.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, pos);
+        int skyLight = level.getBrightness(net.minecraft.world.level.LightLayer.SKY, pos);
+        if (level.dimensionType().hasSkyLight()) {
+            skyLight = Math.max(0, skyLight - level.getSkyDarken());
+        } else {
+            skyLight = 0;
+        }
+
+        int ambientLight = Math.max(blockLight, skyLight);
+
+        if (!level.dimensionType().hasSkyLight()) {
+            // 如果玩家完全站在一片漆黑的地方
+            if (ambientLight == 0) {
+                if (level.dimension() == Level.END) {
+                    ambientLight = 3; // 末地
+                } else if (level.dimension() == Level.NETHER) {
+                    ambientLight = 4; // 下界
+                }
+            }
+        }
+
+        double lightPercent = (double) ambientLight / 15.0;
+        double adjustedLight = Math.sqrt(lightPercent); // 平方根曲线
+
+        double lightMultiplier = 0.15 + adjustedLight * 0.85;
 
         double visibility = 1.0;
-
-        // 计算
-        // 光照修正
-        double adjustedLight = (double) (finalLight - effectiveThreshold) / (15 - effectiveThreshold);
-        // adjustedLight = Math.max(adjustedLight, 0.0);
-        double lightMultiplier = 0.2 + adjustedLight * 0.8;
         visibility *= lightMultiplier;
 
         // 环境修正
-        if (isInTallGrass(player.level(), player.blockPosition())) {
+        if (isInTallGrass(level, pos)) {
             visibility *= 0.5;
         }
 
         // 姿态修正
         if (player.isVisuallyCrawling() || player.isVisuallySwimming()) {
-            visibility *= 0.4;
+            visibility *= 0.65;
         } else if (player.isCrouching()) {
-            visibility *= 0.7;
+            visibility *= 0.8;
         }
 
         if (player.isSprinting()) {
@@ -445,23 +454,6 @@ public class StealthUtils {
         }
 
         return true;
-    }
-
-    private static int getPlayerEmittedLight(Player player) {
-        if (player.hasEffect(MobEffects.GLOWING)) return 15;
-
-        int glintLevel = 0;
-
-        for (ItemStack armor : player.getArmorSlots()) {
-            if (armor.isEnchanted()) {
-                glintLevel += 4;
-            }
-        }
-
-        if (player.getMainHandItem().isEnchanted()) glintLevel += 3;
-        if (player.getOffhandItem().isEnchanted()) glintLevel += 3;
-
-        return Math.min(glintLevel, 15);
     }
 
     public static void reactToSound(StealthSoundEvent event) {

@@ -11,6 +11,7 @@ import net.minecraft.world.level.ItemLike;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.block.ModBlocks;
 import net.rev.stealthandalert.item.ModItems;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -26,7 +27,7 @@ public class ModRecipeProvider extends RecipeProvider {
     );
 
     @Override
-    protected void buildRecipes(RecipeOutput recipeOutput) {
+    protected void buildRecipes(@NotNull RecipeOutput recipeOutput) {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.PEBBLE, 9)
                 .requires(ModBlocks.PEBBLE_BLOCK)
                 .unlockedBy("has_pebble_block", has(ModBlocks.PEBBLE_BLOCK))
@@ -81,7 +82,7 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     protected static void oreSmelting(
-            RecipeOutput recipeOutput, List<ItemLike> ingredients, RecipeCategory category, ItemLike result, float experience, int cookingTime, String group
+            @NotNull RecipeOutput recipeOutput, List<ItemLike> ingredients, @NotNull RecipeCategory category, @NotNull ItemLike result, float experience, int cookingTime, @NotNull String group
     ) {
         oreCooking(
                 recipeOutput,
@@ -98,7 +99,7 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     protected static void oreBlasting(
-            RecipeOutput recipeOutput, List<ItemLike> ingredients, RecipeCategory category, ItemLike result, float experience, int cookingTime, String group
+            @NotNull RecipeOutput recipeOutput, List<ItemLike> ingredients, @NotNull RecipeCategory category, @NotNull ItemLike result, float experience, int cookingTime, @NotNull String group
     ) {
         oreCooking(
                 recipeOutput,
@@ -115,15 +116,15 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     protected static <T extends AbstractCookingRecipe> void oreCooking(
-            RecipeOutput recipeOutput,
+            @NotNull RecipeOutput recipeOutput,
             RecipeSerializer<T> serializer,
-            AbstractCookingRecipe.Factory<T> recipeFactory,
+            AbstractCookingRecipe.@NotNull Factory<T> recipeFactory,
             List<ItemLike> ingredients,
-            RecipeCategory category,
-            ItemLike result,
+            @NotNull RecipeCategory category,
+            @NotNull ItemLike result,
             float experience,
             int cookingTime,
-            String group,
+            @NotNull String group,
             String suffix
     ) {
         for (ItemLike itemlike : ingredients) {

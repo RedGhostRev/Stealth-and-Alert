@@ -7,6 +7,7 @@ import net.minecraft.tags.DamageTypeTags;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.damagetype.ModDamageTypes;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -16,7 +17,7 @@ public class ModDamageTypeTagsProvider extends DamageTypeTagsProvider {
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider provider) {
+    protected void addTags(HolderLookup.@NotNull Provider provider) {
         this.tag(DamageTypeTags.BYPASSES_ARMOR).add(ModDamageTypes.ASSASSINATION);
         this.tag(DamageTypeTags.BYPASSES_SHIELD).add(ModDamageTypes.ASSASSINATION);
         this.tag(DamageTypeTags.BYPASSES_INVULNERABILITY).add(ModDamageTypes.ASSASSINATION);

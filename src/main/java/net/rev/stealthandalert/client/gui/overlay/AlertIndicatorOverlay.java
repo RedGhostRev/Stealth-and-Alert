@@ -327,7 +327,8 @@ public class AlertIndicatorOverlay {
     private static void drawIndicatorLayer(GuiGraphics graphics, int radius, int imgSize, float levelPercent,
                                            float r, float g, float b, float a, float zOffSet) {
         int maxW = 62;
-        int currentW = Math.max(2, (int) (maxW * levelPercent) & ~1);
+        int currentW = Math.max(0, (int) (maxW * levelPercent) & ~1);
+        if (currentW == 0) return;
         int uOffSet = (imgSize / 2) - (currentW / 2);
 
         int drawX = -currentW / 2;
@@ -345,7 +346,8 @@ public class AlertIndicatorOverlay {
     private static void drawIndicatorLayerFrame(GuiGraphics graphics, int radius, int imgSize, float levelPercent,
                                                 float r, float g, float b, float a, float zOffSet) {
         int maxW = 64;
-        int currentW = Math.max(2, (int) (maxW * levelPercent) & ~1);
+        int currentW = Math.max(0, (int) (maxW * levelPercent) & ~1);
+        if (currentW == 0) return;
         int uOffSet = (imgSize / 2) - (currentW / 2);
 
         int drawX = -currentW / 2;

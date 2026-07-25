@@ -5,18 +5,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.BossHealthOverlay;
-import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attribute.ModAttributes;
+import net.rev.stealthandalert.compat.CompatHandler;
+import net.rev.stealthandalert.compat.jade.JadeCompat;
 import net.rev.stealthandalert.config.ClientConfigs;
+import net.rev.stealthandalert.event.ModClientEvents;
+import net.rev.stealthandalert.screen.custom.EditHudsScreen;
 import net.rev.stealthandalert.util.StealthUtils;
-
-import java.util.Map;
-import java.util.UUID;
 
 
 public class VisibilityBarOverlay {
@@ -32,7 +30,7 @@ public class VisibilityBarOverlay {
             "textures/gui/visibility_eye_frame.png");
     private static final ResourceLocation VISIBILITY_SLASH_FRAME = ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID,
             "textures/gui/visibility_slash_frame.png");
-    private static double displayedVisibility = 0;
+    public static double displayedVisibility = 0;
 
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         if (!ClientConfigs.VISIBILITY_INDICATOR.turnOn.get()) return;
@@ -42,7 +40,6 @@ public class VisibilityBarOverlay {
         if (mc.player.isSpectator()) return;
         double visibility = 0;
         if (!mc.isPaused()) {
-            AttributeInstance attribute = mc.player.getAttribute(ModAttributes.VISIBILITY);
             visibility = mc.player.getAttributeValue(ModAttributes.VISIBILITY);
             double lerpSpeed = 0.01;
 
@@ -58,13 +55,25 @@ public class VisibilityBarOverlay {
         int uOffsetMid = imageSize / 2 - width / 2;
         int x = -width / 2 + ClientConfigs.VISIBILITY_INDICATOR.x.get();
         int y = -imageSize / 2 + 4 + ClientConfigs.VISIBILITY_INDICATOR.y.get();
-        BossHealthOverlay bossOverlay = mc.gui.getBossOverlay();
-        if (ClientConfigs.VISIBILITY_INDICATOR.canOffsetFromBossBar.get()) {
-            Map<UUID, LerpingBossEvent> eventsMap = bossOverlay.events;
-            if (!eventsMap.isEmpty()) {
-                int bossCount = eventsMap.size();
-                int allBossBarsHeight = 12 + (bossCount - 1) * 30;
-                y = y + allBossBarsHeight + 5;
+        if (!(mc.screen instanceof EditHudsScreen)) {
+            int maxYOffset = 0;
+            float scale = ClientConfigs.VISIBILITY_INDICATOR.scale.get().floatValue();
+            if (ClientConfigs.VISIBILITY_INDICATOR.canOffsetFromBossBar.get()) {
+                if (ModClientEvents.bossbarShown) {
+                    maxYOffset = ModClientEvents.bossbarHeight - 5;
+                }
+            }
+            if (CompatHandler.HAS_JADE) {
+                if (ClientConfigs.VISIBILITY_INDICATOR.canOffsetFromJade.get()) {
+                    if (JadeCompat.isJadeOverlayVisible()) {
+                        int jadeHeight = JadeCompat.getJadeOverlayBottomY();
+                        maxYOffset = Math.max(maxYOffset, jadeHeight + 5);
+                    }
+                }
+            }
+            if (maxYOffset > 0) {
+                y = y + maxYOffset + 10;
+                y = ((int) (y / scale));
             }
         }
 
@@ -78,7 +87,7 @@ public class VisibilityBarOverlay {
         float scale = ClientConfigs.VISIBILITY_INDICATOR.scale.get().floatValue();
         pose.scale(scale, scale, 1.0F);
 
-        if (displayedVisibility > StealthUtils.VISIBILITY_THRESHOLD) {
+        if (displayedVisibility > StealthUtils.VISIBILITY_THRESHOLD + 0.01) {
             graphics.blit(VISIBILITY_BAR, x, y, uOffsetMid, 0, width, imageSize, imageSize, imageSize);
 
             int uOffsetLeft = 8;
@@ -110,7 +119,7 @@ public class VisibilityBarOverlay {
         graphics.blit(VISIBILITY_EYE_FRAME, x + 7, y, uOffsetEye - 1, 0, 24, imageSize, imageSize, imageSize);
         graphics.setColor(1F, 1F, 1F, 1F);
 
-        if (displayedVisibility <= StealthUtils.VISIBILITY_THRESHOLD) {
+        if (displayedVisibility <= StealthUtils.VISIBILITY_THRESHOLD + 0.01) {
             pose.pushPose();
             pose.translate(0F, 0F, 0.1F);
             int uOffsetSlash = 57;

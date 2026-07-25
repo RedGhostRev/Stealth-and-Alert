@@ -58,6 +58,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.CRAWL, "Crawl");
         add(LangKeys.ASSASSINATE, "Assassinate");
         add(LangKeys.MARK, "Mark with Spyglass");
+        add(LangKeys.EDIT_HUDS, "Edit HUDs Visually");
 
         // Subtitles
         add(LangKeys.PEBBLE_LAND, "Pebble lands");
@@ -92,6 +93,10 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.GUI_ASSASSINATE, "[%s] Assassinate");
         add(LangKeys.GUI_MARK, "[%s] Mark");
         add(LangKeys.GUI_UNMARK, "[%s] Unmark");
+        // Jade
+        add(LangKeys.JADE_CONFIG, "Alert Information");
+        add(LangKeys.JADE_ALERT_STATE, "Alert State: ");
+        add(LangKeys.JADE_ALERT_AWARENESS, "Alert Awareness: %s%%");
 
         // Commands
         add(LangKeys.COMMAND_MOD_ID, "[Stealth & Alert]");
@@ -104,7 +109,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.DEBUG_MODE_OFF, "§cDEBUG MODE: OFF");
         add(LangKeys.DEBUG_ALERT_STATE_IDLE, "§7IDLE");
         add(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS, "§fSUSPICIOUS");
-        add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§6SEARCHING");
+        add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§eSEARCHING");
         add(LangKeys.DEBUG_ALERT_STATE_FIGHTING, "§cFIGHTING");
         add(LangKeys.DEBUG_TARGET_ALERT_STATE_UNTRACKED, "§7UNTRACKED");
         add(LangKeys.DEBUG_TARGET_ALERT_STATE_AWARE, "§fAWARE");
@@ -142,6 +147,14 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.MEMORY_TICKS_TOOLTIP, "The duration of an enemy's memory towards a player who has enraged it (in ticks)");
         add(LangKeys.VISIBILITY_THRESHOLD, "Visibility Threshold");
         add(LangKeys.VISIBILITY_THRESHOLD_TOOLTIP, "The visibility threshold for players to enter a fully concealed state (*100%)");
+        add(LangKeys.VISIBILITY_DETECTION_RANGE, "Visibility Max Detection Range Reduction Percentage");
+        add(LangKeys.VISIBILITY_DETECTION_RANGE_TOOLTIP, "The max reduction percentage of an enemy's detection range influenced by visibility");
+        add(LangKeys.VISIBILITY_DETECTION_RANGE_MODEL, "Visibility Detection Range Reduction Model");
+        add(LangKeys.VISIBILITY_DETECTION_RANGE_MODEL_TOOLTIP, """
+                The mathematical model for reduction of enemies' detection range influenced by visibility
+                LINEAR: Steadily reducing
+                SQUARE ROOT: Reducing quickly at first, then slowly
+                SMOOTHSTEP: Reducing slowly at first and end, quickly at medium""");
         add(LangKeys.MIN_INVISIBLE_DISTANCE, "Min Invisible Distance");
         add(LangKeys.MIN_INVISIBLE_DISTANCE_TOOLTIP, "The distance within which complete concealment fails against enemies");
         add(LangKeys.MIN_INVISIBLE_DISTANCE_TO_TRACKING, "Min Invisible Distance (Tracking)");
@@ -208,7 +221,9 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.VISIBILITY_INDICATOR_POSITION_Y, "Y");
         add(LangKeys.VISIBILITY_INDICATOR_POSITION_Y_TOOLTIP, "The Y offset of the visibility indicator on the screen");
         add(LangKeys.VISIBILITY_INDICATOR_BOSS_BAR, "Offset from Boss Bar");
-        add(LangKeys.VISIBILITY_INDICATOR_BOSS_BAR_TOOLTIP, "Whether the visibility indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted the position");
+        add(LangKeys.VISIBILITY_INDICATOR_BOSS_BAR_TOOLTIP, "Whether the visibility indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted position or scale of indicator");
+        add(LangKeys.VISIBILITY_INDICATOR_JADE, "Offset from Jade Tooltip");
+        add(LangKeys.VISIBILITY_INDICATOR_JADE_TOOLTIP, "Whether the visibility indicator offsets when Jade mod's tooltip is visible. Recommended to turn off if you have manually adjusted position or scale of indicator or Jade tooltip");
         add(LangKeys.SOUND_WAVE_INDICATOR_TURN_ON, "Enable Sound Wave Indicator");
         add(LangKeys.SOUND_WAVE_INDICATOR_TURN_ON_TOOLTIP, "Whether to display the sound wave indicator on the screen");
         add(LangKeys.SOUND_SCALE, "Scale");
@@ -220,7 +235,9 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.SOUND_WAVE_INDICATOR_POSITION_Y, "Y");
         add(LangKeys.SOUND_WAVE_INDICATOR_POSITION_Y_TOOLTIP, "The Y offset of the sound wave indicator on the screen");
         add(LangKeys.SOUND_BOSS_BAR, "Offset from Boss Bar");
-        add(LangKeys.SOUND_BOSS_BAR_TOOLTIP, "Whether the sound wave indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted the position");
+        add(LangKeys.SOUND_BOSS_BAR_TOOLTIP, "Whether the sound wave indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted position or scale of indicator");
+        add(LangKeys.SOUND_JADE, "Offset from Jade Tooltip");
+        add(LangKeys.SOUND_JADE_TOOLTIP, "Whether the sound wave indicator offsets when Jade mod's tooltip is visible. Recommended to turn off if you have manually adjusted position or scale of indicator or Jade tooltip");
         add(LangKeys.ALERT_SYMBOL_TURN_ON, "Enable Alert Symbol");
         add(LangKeys.ALERT_SYMBOL_TURN_ON_TOOLTIP, "Whether to display the alert symbol above enemies' heads");
         add(LangKeys.ALERT_SYMBOL_SCALE, "Scale");

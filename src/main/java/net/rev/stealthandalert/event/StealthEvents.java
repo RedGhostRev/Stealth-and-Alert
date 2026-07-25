@@ -29,6 +29,7 @@ import net.rev.stealthandalert.attachment.InvestigateLkpData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.common.alert.condition.FightBackCondition;
+import net.rev.stealthandalert.common.alert.condition.FightForOwnerCondition;
 import net.rev.stealthandalert.common.alert.condition.ProtectOthersCondition;
 import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertConditionSettings;
@@ -208,6 +209,27 @@ public class StealthEvents {
             PacketDistributor.sendToPlayersTrackingEntity(entity, new S2CAlertDataPacket(entity.getId(), newData));
             entity.getData(ModAttachments.EVENT_LISTENER_DATA).updateState(ProtectOthersCondition.ID, player.getUUID(), entity.level().getGameTime());
         }
+    }
+
+    @SubscribeEvent
+    public static void onOwnerGetHurt(LivingDamageEvent.Post event) {
+        Entity attacker = event.getSource().getEntity();
+        if (!(attacker instanceof Player player)) return;
+        if (player.isCreative() || player.isSpectator()) return;
+        LivingEntity owner = event.getEntity();
+        if (owner == player) return;
+        owner.getData(ModAttachments.EVENT_LISTENER_DATA).updateState(FightForOwnerCondition.ID, player.getUUID(), owner.level().getGameTime());
+    }
+
+    @SubscribeEvent
+    public static void onOwnerHurtOthers(LivingDamageEvent.Post event) {
+        Entity attacker = event.getSource().getEntity();
+        if (!(attacker instanceof LivingEntity owner)) return;
+        LivingEntity target = event.getEntity();
+        if (!(target instanceof Player player)) return;
+        if (owner == player) return;
+        if (player.isCreative() || player.isSpectator()) return;
+        owner.getData(ModAttachments.EVENT_LISTENER_DATA).updateState(FightForOwnerCondition.ID, player.getUUID(), owner.level().getGameTime());
     }
 
     // 为 SEEKERS 新增、删除特定 Goal

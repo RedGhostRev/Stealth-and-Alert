@@ -104,6 +104,11 @@
 - 对于大部分中立生物来说，一般是必选项。
 - 该条件目前没有任何参数，但是在 JSON 中仍然要写成 `"stealth_and_alert:fight_back": {}`
 
+> `stealth_and_alert:fight_for_owner`
+- 拥有此条件的生物，在玩家攻击其主人或被其主人攻击时，会对玩家产生警戒
+- 典型代表：狼。
+- 和上面一样，该条件目前没有任何参数，但是仍必须写成 `"stealth_and_alert:fight_for_owner": {}`
+
 > `stealth_and_alert:protect_others`
 - 拥有此条件的生物，在指定的其他生物被玩家攻击后，会对玩家产生警戒。
 - 典型代表：猪灵、狼、铁傀儡。

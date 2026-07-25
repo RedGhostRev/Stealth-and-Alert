@@ -6,8 +6,8 @@
     "TargetConditionsMixin"
   ],
   "client": [
-    "MinecraftMixin",
-    "EntityMixin"
+    "EntityMixin",
+    "MinecraftMixin"
   ],
   "server": [
   ],

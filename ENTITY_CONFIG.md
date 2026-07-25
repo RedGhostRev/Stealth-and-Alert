@@ -109,6 +109,11 @@ Here's a full JSON template including all configurable settings.
 - For most neutral mobs, this is generally a mandatory option.
 - This condition currently has no parameters, but must still be written in JSON as `"stealth_and_alert:fight_back": {}`
 
+> `stealth_and_alert:fight_for_owner`
+- Mobs with this condition become alert towards a player when the player attacked or was attacked by their owners.
+- Typical example: Wolf.
+- Like above, this condition has no parameters currently but should still be written as `"stealth_and_alert:fight_for_owner": {}`
+
 > `stealth_and_alert:protect_others`
 - Mobs with this condition will become alert towards a player when a specified other mob is attacked by the player.
 - Typical examples: Piglin, Wolf, Iron Golem.

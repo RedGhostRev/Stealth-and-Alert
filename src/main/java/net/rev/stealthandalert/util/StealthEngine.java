@@ -246,7 +246,7 @@ public class StealthEngine {
 
             if (anyoneTracking) {
                 if (nextState < AlertData.FIGHTING && !willFighting) {
-                    nextState = AlertData.TRACKING;
+                    nextState = AlertData.SEARCHING;
                     nextStateTicks = 10;
                     willFighting = true;
                 }
@@ -286,7 +286,13 @@ public class StealthEngine {
                 // 则为了确保怪物在战斗中不轻易丢失锁定，为 FIGHTING 状态下的降级设定一个很短的计时
                 if (nextState == AlertData.FIGHTING) {
                     if (nextStateTicks <= 0) {
-                        nextStateTicks = 30;
+                        nextStateTicks = settings.getTrackingTicks();
+                    }
+                    if (nextPrimary.isPresent() && oldData.targetStates().getOrDefault(nextPrimary.get(), AlertData.UNTRACKED) == AlertData.TRACKING) {
+                        Player primary = mob.level().getPlayerByUUID(nextPrimary.get());
+                        if (primary != null) {
+                            nextLkp = Optional.of(primary.position());
+                        }
                     }
                 }
                 if (maxLevel <= 0.0F) {

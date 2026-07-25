@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.BossHealthOverlay;
-import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
@@ -13,10 +11,11 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.compat.CompatHandler;
+import net.rev.stealthandalert.compat.jade.JadeCompat;
 import net.rev.stealthandalert.config.ClientConfigs;
-
-import java.util.Map;
-import java.util.UUID;
+import net.rev.stealthandalert.event.ModClientEvents;
+import net.rev.stealthandalert.screen.custom.EditHudsScreen;
 
 // TODO 改进 HUD
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID, value = Dist.CLIENT)
@@ -135,13 +134,25 @@ public class SoundWaveOverlay {
 
         int localStartX = -waveWidth / 2 + ClientConfigs.SOUND_WAVE_INDICATOR.x.get();
         int middleY = -23 + ClientConfigs.SOUND_WAVE_INDICATOR.y.get();
-        BossHealthOverlay bossOverlay = Minecraft.getInstance().gui.getBossOverlay();
-        if (ClientConfigs.SOUND_WAVE_INDICATOR.canOffsetFromBossBar.get()) {
-            Map<UUID, LerpingBossEvent> eventsMap = bossOverlay.events;
-            if (!eventsMap.isEmpty()) {
-                int bossCount = eventsMap.size();
-                int allBossBarsHeight = 12 + (bossCount - 1) * 30;
-                middleY = middleY + allBossBarsHeight + 5;
+        if (!(Minecraft.getInstance().screen instanceof EditHudsScreen)) {
+            int maxYOffset = 0;
+            float scale = ClientConfigs.SOUND_WAVE_INDICATOR.scale.get().floatValue();
+            if (ClientConfigs.VISIBILITY_INDICATOR.canOffsetFromBossBar.get()) {
+                if (ModClientEvents.bossbarShown) {
+                    maxYOffset = ModClientEvents.bossbarHeight - 5;
+                }
+            }
+            if (CompatHandler.HAS_JADE) {
+                if (ClientConfigs.VISIBILITY_INDICATOR.canOffsetFromJade.get()) {
+                    if (JadeCompat.isJadeOverlayVisible()) {
+                        int jadeHeight = JadeCompat.getJadeOverlayBottomY();
+                        maxYOffset = Math.max(maxYOffset, jadeHeight + 5);
+                    }
+                }
+            }
+            if (maxYOffset > 0) {
+                middleY = middleY + maxYOffset;
+                middleY = ((int) (middleY / scale));
             }
         }
 

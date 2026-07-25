@@ -8,6 +8,34 @@
     "minecraft:dolphin",
     "minecraft:wolf",
     "minecraft:polar_bear",
-    "minecraft:iron_golem"
+    "minecraft:iron_golem",
+    {
+      "id": "irons_spellbooks:priest",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:apothecarist",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:cryomancer",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:pyromancer",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:summoned_polar_bear",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:summoned_zombie",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:summoned_skeleton",
+      "required": false
+    }
   ]
 }

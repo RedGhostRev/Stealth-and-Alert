@@ -16,6 +16,7 @@ import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.rev.stealthandalert.block.ModBlocks;
 import net.rev.stealthandalert.item.ModItems;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -47,7 +48,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     }
 
     @Override
-    protected Iterable<Block> getKnownBlocks() {
+    protected @NotNull Iterable<Block> getKnownBlocks() {
         return ModBlocks.BLOCKS.getEntries().stream().map(Holder::value)::iterator;
     }
 }

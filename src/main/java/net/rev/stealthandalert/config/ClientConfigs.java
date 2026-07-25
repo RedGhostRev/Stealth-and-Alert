@@ -50,6 +50,7 @@ public class ClientConfigs {
         public final ModConfigSpec.IntValue x;
         public final ModConfigSpec.IntValue y;
         public final ModConfigSpec.BooleanValue canOffsetFromBossBar;
+        public final ModConfigSpec.BooleanValue canOffsetFromJade;
 
         public VisibilityIndicator(ModConfigSpec.Builder builder) {
             builder.comment("Settings for the visibility indicator HUD, which displays your current visibility")
@@ -71,9 +72,12 @@ public class ClientConfigs {
                     .translation(LangKeys.VISIBILITY_INDICATOR_POSITION_Y)
                     .defineInRange("visibilityIndicatorPositionY", 0, -32768, 32767);
             builder.pop();
-            canOffsetFromBossBar = builder.comment("Whether the visibility indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted the position")
+            canOffsetFromBossBar = builder.comment("Whether the visibility indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted position or scale of indicator")
                     .translation(LangKeys.VISIBILITY_INDICATOR_BOSS_BAR)
                     .define("visibilityIndicatorCanOffsetFromBossBar", true);
+            canOffsetFromJade = builder.comment("Whether the visibility indicator offsets when Jade mod's tooltip is visible. Recommended to turn off if you have manually adjusted position or scale of indicator or Jade tooltip")
+                    .translation(LangKeys.VISIBILITY_INDICATOR_JADE)
+                    .define("visibilityIndicatorCanOffsetFromJade", true);
 
             builder.pop();
         }
@@ -85,6 +89,7 @@ public class ClientConfigs {
         public final ModConfigSpec.IntValue x;
         public final ModConfigSpec.IntValue y;
         public final ModConfigSpec.BooleanValue canOffsetFromBossBar;
+        public final ModConfigSpec.BooleanValue canOffsetFromJade;
 
         public SoundWaveIndicator(ModConfigSpec.Builder builder) {
             builder.comment("Settings for the sound wave indicator HUD, which displays the sound you are producing")
@@ -108,9 +113,12 @@ public class ClientConfigs {
                     .defineInRange("soundWaveIndicatorPositionY", 0, -32768, 32767);
             builder.pop();
 
-            canOffsetFromBossBar = builder.comment("Whether the sound wave indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted the position")
+            canOffsetFromBossBar = builder.comment("Whether the sound wave indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted position or scale of indicator")
                     .translation(LangKeys.SOUND_BOSS_BAR)
                     .define("soundWaveIndicatorCanOffsetFromBossBar", true);
+            canOffsetFromJade = builder.comment("Whether the sound wave indicator offsets when Jade mod's tooltip is visible. Recommended to turn off if you have manually adjusted position or scale of indicator or Jade tooltip")
+                    .translation(LangKeys.SOUND_JADE)
+                    .define("soundWaveIndicatorCanOffsetFromJade", true);
 
             builder.pop();
         }

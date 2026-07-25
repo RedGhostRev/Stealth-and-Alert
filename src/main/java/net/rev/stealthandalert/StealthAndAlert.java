@@ -11,10 +11,12 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.GlobalVisibilityModifier;
 import net.rev.stealthandalert.attribute.ModAttributes;
 import net.rev.stealthandalert.block.ModBlocks;
 import net.rev.stealthandalert.common.alert.condition.ModAlertConditions;
 import net.rev.stealthandalert.common.assassination.AssassinationRegistry;
+import net.rev.stealthandalert.compat.CompatHandler;
 import net.rev.stealthandalert.component.ModDataComponents;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.config.CommonConfigs;
@@ -77,7 +79,9 @@ public class StealthAndAlert {
         event.enqueueWork(() -> {
             EntityAlertConditionConfigLoader.load(true, false);
             ModAlertConditions.registerAll();
+            GlobalVisibilityModifier.init();
             AssassinationRegistry.init();
+            CompatHandler.init();
         });
     }
 

@@ -52,6 +52,7 @@ public class LangKeys {
     public static final String CRAWL = "key." + MOD_ID + ".crawl";
     public static final String ASSASSINATE = "key." + MOD_ID + ".assassinate";
     public static final String MARK = "key." + MOD_ID + ".mark";
+    public static final String EDIT_HUDS = "key." + MOD_ID + ".edit_huds";
 
     // Subtitles
     public static final String PEBBLE_LAND = "subtitles." + MOD_ID + ".pebble_land";
@@ -85,6 +86,10 @@ public class LangKeys {
     public static final String GUI_ASSASSINATE = "gui." + MOD_ID + "assassinate";
     public static final String GUI_MARK = "gui." + MOD_ID + "mark";
     public static final String GUI_UNMARK = "gui." + MOD_ID + "unmark";
+    // Jade
+    public static final String JADE_CONFIG = "config.jade.plugin_stealth_and_alert.alert";
+    public static final String JADE_ALERT_STATE = "config.jade.stealth_and_alert.alert_state";
+    public static final String JADE_ALERT_AWARENESS = "config.jade.stealth_and_alert.alert_awareness";
 
     // Command Texts
     public static final String COMMAND_MOD_ID = command("mod_id");
@@ -134,6 +139,10 @@ public class LangKeys {
     public static final String MEMORY_TICKS = config("memoryTicks");
     public static final String MEMORY_TICKS_TOOLTIP = tooltip(MEMORY_TICKS);
     public static final String VISIBILITY_THRESHOLD = config("visibilityThreshold");
+    public static final String VISIBILITY_DETECTION_RANGE = config("visibilityMaxDetectionRangeReductionPercentage");
+    public static final String VISIBILITY_DETECTION_RANGE_TOOLTIP = tooltip(VISIBILITY_DETECTION_RANGE);
+    public static final String VISIBILITY_DETECTION_RANGE_MODEL = config("visibilityDetectionRangeReductionModel");
+    public static final String VISIBILITY_DETECTION_RANGE_MODEL_TOOLTIP = tooltip(VISIBILITY_DETECTION_RANGE_MODEL);
     public static final String VISIBILITY_THRESHOLD_TOOLTIP = tooltip(VISIBILITY_THRESHOLD);
     public static final String MIN_INVISIBLE_DISTANCE = config("minInvisibleDistance");
     public static final String MIN_INVISIBLE_DISTANCE_TOOLTIP = tooltip(MIN_INVISIBLE_DISTANCE);
@@ -202,6 +211,8 @@ public class LangKeys {
     public static final String VISIBILITY_INDICATOR_POSITION_Y_TOOLTIP = tooltip(VISIBILITY_INDICATOR_POSITION_Y);
     public static final String VISIBILITY_INDICATOR_BOSS_BAR = VISIBILITY_INDICATOR + ".canOffsetFromBossBar";
     public static final String VISIBILITY_INDICATOR_BOSS_BAR_TOOLTIP = tooltip(VISIBILITY_INDICATOR_BOSS_BAR);
+    public static final String VISIBILITY_INDICATOR_JADE = VISIBILITY_INDICATOR + ".canOffsetFromJade";
+    public static final String VISIBILITY_INDICATOR_JADE_TOOLTIP = tooltip(VISIBILITY_INDICATOR_JADE);
     public static final String SOUND_WAVE_INDICATOR_TURN_ON = SOUND_WAVE_INDICATOR + ".turnOn";
     public static final String SOUND_WAVE_INDICATOR_TURN_ON_TOOLTIP = tooltip(SOUND_WAVE_INDICATOR_TURN_ON);
     public static final String SOUND_SCALE = SOUND_WAVE_INDICATOR + ".scale";
@@ -214,6 +225,8 @@ public class LangKeys {
     public static final String SOUND_WAVE_INDICATOR_POSITION_Y_TOOLTIP = tooltip(SOUND_WAVE_INDICATOR_POSITION_Y);
     public static final String SOUND_BOSS_BAR = SOUND_WAVE_INDICATOR + ".canOffsetFromBossBar";
     public static final String SOUND_BOSS_BAR_TOOLTIP = tooltip(SOUND_BOSS_BAR);
+    public static final String SOUND_JADE = SOUND_WAVE_INDICATOR + ".canOffsetFromJade";
+    public static final String SOUND_JADE_TOOLTIP = tooltip(SOUND_JADE);
     public static final String ALERT_SYMBOL_TURN_ON = ALERT_SYMBOL + ".turnOn";
     public static final String ALERT_SYMBOL_TURN_ON_TOOLTIP = tooltip(ALERT_SYMBOL_TURN_ON);
     public static final String ALERT_SYMBOL_SCALE = ALERT_SYMBOL + ".scale";

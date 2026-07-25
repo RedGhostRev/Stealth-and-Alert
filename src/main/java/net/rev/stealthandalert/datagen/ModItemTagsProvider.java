@@ -13,6 +13,7 @@ import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.item.ModItems;
 import net.rev.stealthandalert.item.custom.DaggerItem;
 import net.rev.stealthandalert.util.ModTags;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
@@ -23,9 +24,9 @@ public class ModItemTagsProvider extends ItemTagsProvider implements IConditionB
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider provider) {
-        tag(ModTags.Items.CAN_BACKSTAB)
-                .addTag(ModTags.Items.DAGGERS);
+    protected void addTags(HolderLookup.@NotNull Provider provider) {
+//        tag(ModTags.Items.CAN_BACKSTAB)
+//                .addTag(ModTags.Items.DAGGERS);
 
         tag(ModTags.Items.CAN_ASSASSINATE)
                 .addTag(ModTags.Items.CAN_ASSASSINATE_DAGGERS)

@@ -58,6 +58,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.CRAWL, "匍匐");
         add(LangKeys.ASSASSINATE, "刺杀");
         add(LangKeys.MARK, "用望远镜标记");
+        add(LangKeys.EDIT_HUDS, "可视化编辑HUD");
 
         // 字幕
         add(LangKeys.PEBBLE_LAND, "石子：落地");
@@ -92,6 +93,10 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.GUI_ASSASSINATE, "[%s] 刺杀");
         add(LangKeys.GUI_MARK, "[%s] 标记");
         add(LangKeys.GUI_UNMARK, "[%s] 取消标记");
+        // Jade
+        add(LangKeys.JADE_CONFIG, "警戒信息");
+        add(LangKeys.JADE_ALERT_STATE, "警戒状态：");
+        add(LangKeys.JADE_ALERT_AWARENESS, "警戒值：%s%%");
 
         // 命令
         add(LangKeys.COMMAND_MOD_ID, "[潜行与警戒]");
@@ -104,7 +109,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.DEBUG_MODE_OFF, "§c调试模式：关闭");
         add(LangKeys.DEBUG_ALERT_STATE_IDLE, "§7空闲");
         add(LangKeys.DEBUG_ALERT_STATE_SUSPICIOUS, "§f怀疑");
-        add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§6搜寻");
+        add(LangKeys.DEBUG_ALERT_STATE_SEARCHING, "§e搜寻");
         add(LangKeys.DEBUG_ALERT_STATE_FIGHTING, "§c战斗");
         add(LangKeys.DEBUG_TARGET_ALERT_STATE_UNTRACKED, "§7未察觉");
         add(LangKeys.DEBUG_TARGET_ALERT_STATE_AWARE, "§f察觉");
@@ -142,6 +147,14 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.MEMORY_TICKS_TOOLTIP, "敌人在被玩家激怒后对玩家的记忆时间（tick）");
         add(LangKeys.VISIBILITY_THRESHOLD, "可见度阈值");
         add(LangKeys.VISIBILITY_THRESHOLD_TOOLTIP, "玩家进入完全隐蔽状态的可见度阈值（*100%）");
+        add(LangKeys.VISIBILITY_DETECTION_RANGE, "可见度对侦测距离最大衰减比例");
+        add(LangKeys.VISIBILITY_DETECTION_RANGE_TOOLTIP, "可见度对敌人侦测距离能够衰减的最大百分比");
+        add(LangKeys.VISIBILITY_DETECTION_RANGE_MODEL, "可见度对侦测距离衰减模型");
+        add(LangKeys.VISIBILITY_DETECTION_RANGE_MODEL_TOOLTIP, """
+                可见度对敌人侦测距离进行衰减的数学模型
+                LINEAR：平稳衰减
+                SQUARE ROOT：衰减开始快，随后慢
+                SMOOTHSTEP：衰减在开始和末尾慢，中间快""");
         add(LangKeys.MIN_INVISIBLE_DISTANCE, "完全隐蔽失效距离");
         add(LangKeys.MIN_INVISIBLE_DISTANCE_TOOLTIP, "对于敌人，玩家完全隐蔽作用失效的距离");
         add(LangKeys.MIN_INVISIBLE_DISTANCE_TO_TRACKING, "完全隐蔽失效距离（对追踪者）");
@@ -208,7 +221,9 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.VISIBILITY_INDICATOR_POSITION_Y, "Y");
         add(LangKeys.VISIBILITY_INDICATOR_POSITION_Y_TOOLTIP, "可见度指示器在屏幕上位置的Y偏移");
         add(LangKeys.VISIBILITY_INDICATOR_BOSS_BAR, "随BOSS血条偏移");
-        add(LangKeys.VISIBILITY_INDICATOR_BOSS_BAR_TOOLTIP, "屏幕上增加BOSS血条时，可见度指示器是否随之偏移；当你已经调整过指示器位置时，建议关闭");
+        add(LangKeys.VISIBILITY_INDICATOR_BOSS_BAR_TOOLTIP, "屏幕上增加BOSS血条时，可见度指示器是否随之偏移；当你已经调整过指示器位置或缩放时，建议关闭");
+        add(LangKeys.VISIBILITY_INDICATOR_JADE, "随Jade提示框偏移");
+        add(LangKeys.VISIBILITY_INDICATOR_JADE_TOOLTIP, "屏幕上显示Jade提示框时，可见度指示器是否随之偏移；当你已经调整过指示器或Jade提示框的位置或缩放时，建议关闭");
         add(LangKeys.SOUND_WAVE_INDICATOR_TURN_ON, "开启声波指示器");
         add(LangKeys.SOUND_WAVE_INDICATOR_TURN_ON_TOOLTIP, "是否在屏幕上显示声波指示器");
         add(LangKeys.SOUND_SCALE, "缩放");
@@ -220,7 +235,9 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.SOUND_WAVE_INDICATOR_POSITION_Y, "Y");
         add(LangKeys.SOUND_WAVE_INDICATOR_POSITION_Y_TOOLTIP, "声波指示器在屏幕上位置的Y偏移");
         add(LangKeys.SOUND_BOSS_BAR, "随BOSS血条偏移");
-        add(LangKeys.SOUND_BOSS_BAR_TOOLTIP, "屏幕上增加BOSS血条时，声波指示器是否随之偏移；当你已经调整过指示器位置时，建议关闭");
+        add(LangKeys.SOUND_BOSS_BAR_TOOLTIP, "屏幕上增加BOSS血条时，声波指示器是否随之偏移；当你已经调整过指示器位置或缩放时，建议关闭");
+        add(LangKeys.SOUND_JADE, "随Jade提示框偏移");
+        add(LangKeys.SOUND_JADE_TOOLTIP, "屏幕上显示Jade提示框时，声波指示器是否随之偏移；当你已经调整过指示器或Jade提示框的位置或缩放时，建议关闭");
         add(LangKeys.ALERT_SYMBOL_TURN_ON, "开启警戒标志");
         add(LangKeys.ALERT_SYMBOL_TURN_ON_TOOLTIP, "是否在敌人头顶显示警戒标志");
         add(LangKeys.ALERT_SYMBOL_SCALE, "缩放");

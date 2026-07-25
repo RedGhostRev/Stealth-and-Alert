@@ -20,11 +20,11 @@ public class ModEffects {
                     .addAttributeModifier(ModAttributes.VISIBILITY,
                             ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "ethereal"),
                             -0.2,
-                            AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                     .addAttributeModifier(ModAttributes.SOUND_MULTIPLIER,
                             ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "ethereal"),
                             -0.05,
-                            AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
     public static void register(IEventBus eventBus) {
         MOB_EFFECTS.register(eventBus);

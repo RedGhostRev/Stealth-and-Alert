@@ -16,6 +16,30 @@
     "minecraft:silverfish",
     "minecraft:piglin_brute",
     "minecraft:hoglin",
-    "minecraft:blaze"
+    "minecraft:blaze",
+    {
+      "id": "irons_spellbooks:necromancer",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:archevoker",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:ice_spider",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:catacombs_zombie",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:magehunter_vindicator",
+      "required": false
+    },
+    {
+      "id": "irons_spellbooks:citadel_keeper",
+      "required": false
+    }
   ]
 }

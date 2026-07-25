@@ -27,4 +27,10 @@ public class ModKeyMappings {
             GLFW.GLFW_MOUSE_BUTTON_LEFT,
             LangKeys.CATEGORY
     );
+
+    public static final KeyMapping EDIT_HUDS_KEY = new KeyMapping(
+            LangKeys.EDIT_HUDS,
+            GLFW.GLFW_KEY_KP_SUBTRACT,
+            LangKeys.CATEGORY
+    );
 }

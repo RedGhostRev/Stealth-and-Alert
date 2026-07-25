@@ -23,7 +23,11 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.rev.stealthandalert.attribute.ModAttributes;
+import net.rev.stealthandalert.compat.CompatHandler;
+import net.rev.stealthandalert.compat.ironsspellbooks.IronsSpellbooksCompat;
 import net.rev.stealthandalert.component.ModDataComponents;
+import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertConditionSettings;
 import net.rev.stealthandalert.enchantment.ModEnchantmentEffects;
@@ -31,6 +35,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CommonUtils {
     public static float getWeaponBaseDamage(ItemStack stack) {
@@ -73,6 +78,10 @@ public class CommonUtils {
 
     public static boolean isPlayerPet(Entity entity, Player player, boolean withGolem) {
         if (player == null) return false;
+        if (CompatHandler.HAS_IRONS_SPELLBOOKS) {
+            UUID ownerUuid = IronsSpellbooksCompat.getOwnerUuid(entity);
+            if (player.getUUID().equals(ownerUuid)) return true;
+        }
         if (entity instanceof OwnableEntity ownable) {
             return player.getUUID().equals(ownable.getOwnerUUID());
         }
@@ -90,12 +99,38 @@ public class CommonUtils {
         return false;
     }
 
+    public static double calculateReduction(double visibility, double threshold, CommonConfigs.Detection.DetectionRangeReduction model) {
+        double maxReduction = CommonConfigs.DETECTION.visibilityMaxDetectionRangeReductionPercentage.get();
+        if (model == CommonConfigs.Detection.DetectionRangeReduction.LINEAR) {
+            double percentage = Math.clamp((visibility - threshold) / (1.0 - threshold), 0.0, 1.0);
+            maxReduction = Math.clamp(maxReduction, 0.0, 1.0);
+            return maxReduction * (1.0 - percentage);
+        } else if (model == CommonConfigs.Detection.DetectionRangeReduction.SQUARE_ROOT) {
+            double linearPercent = Math.clamp((visibility - threshold) / (1.0 - threshold), 0.0, 1.0);
+            double stealthDegree = 1.0 - linearPercent;
+            double curvedStealth = Math.sqrt(stealthDegree);
+            return maxReduction * curvedStealth;
+        } else {
+            // Smoothstep
+            double linearPercent = Math.clamp((visibility - threshold) / (1.0 - threshold), 0.0, 1.0);
+            double stealthDegree = 1.0 - linearPercent;
+            double curvedStealth = stealthDegree * stealthDegree * (3.0 - 2.0 * stealthDegree);
+            return maxReduction * curvedStealth;
+        }
+    }
+
     // 视线检测：如果mob能看到target，则返回true
     public static boolean hasLineOfSight(Mob observer, Entity target) {
         // 距离快速失败
         EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
         double distanceSqr = observer.distanceToSqr(target);
         double maxDistance = settings.getViewRange();
+        if (target instanceof Player player) {
+            double visibility = player.getAttributeValue(ModAttributes.VISIBILITY);
+            double threshold = StealthUtils.VISIBILITY_THRESHOLD;
+            double actualReduction = calculateReduction(visibility, threshold, CommonConfigs.DETECTION.visibilityDetectionRangeReductionModel.get());
+            maxDistance *= (1.0 - actualReduction);
+        }
         if (distanceSqr > maxDistance * maxDistance) return false;
         // 隐身快速失败
         if (target instanceof Player player) {

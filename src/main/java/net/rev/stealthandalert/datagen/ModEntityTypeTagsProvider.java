@@ -6,10 +6,14 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.compat.CompatHandler;
+import net.rev.stealthandalert.compat.dummmmmmy.DummmmmmyCompat;
+import net.rev.stealthandalert.compat.ironsspellbooks.IronsSpellbooksCompat;
 import net.rev.stealthandalert.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +23,11 @@ import java.util.concurrent.CompletableFuture;
 public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
     public ModEntityTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> provider, @Nullable ExistingFileHelper existingFileHelper) {
         super(output, provider, StealthAndAlert.MOD_ID, existingFileHelper);
+    }
+
+    @Override
+    public @NotNull IntrinsicTagAppender<EntityType<?>> tag(@NotNull TagKey<EntityType<?>> tag) {
+        return super.tag(tag);
     }
 
     @Override
@@ -50,6 +59,13 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
                 .add(EntityType.WOLF)
                 .add(EntityType.POLAR_BEAR)
                 .add(EntityType.IRON_GOLEM);
+
+        if (CompatHandler.HAS_IRONS_SPELLBOOKS) {
+            IronsSpellbooksCompat.addEntityTags(this);
+        }
+        if (CompatHandler.HAS_DUMMMMMMY) {
+            DummmmmmyCompat.addEntityTags(this);
+        }
 
         // 受保护的生物，受击后产生仇恨记忆
         tag(ModTags.Entities.PROTECTED)
