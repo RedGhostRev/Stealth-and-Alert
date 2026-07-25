@@ -4,20 +4,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.AlertSoundData;
@@ -30,7 +24,6 @@ import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
 import net.rev.stealthandalert.config.EntityAlertConditionSettings;
 import net.rev.stealthandalert.event.StealthSoundEvent;
 import net.rev.stealthandalert.network.S2CAlertDataPacket;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -38,48 +31,6 @@ public class StealthUtils {
     public static float VISIBILITY_THRESHOLD = CommonConfigs.DETECTION.visibilityThreshold.get().floatValue();
 
     private StealthUtils() {
-    }
-
-    // 视线检测：如果mob能看到target，则返回true
-    public static boolean hasLineOfSight(Mob observer, Entity target) {
-        // 距离快速失败
-        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
-        double distanceSqr = observer.distanceToSqr(target);
-        double maxDistance = settings.getViewRange();
-//        VisibilityData visData = target.getData(ModAttachments.VISIBILITY_DATA);
-//        if (visData.isVisible()) {
-//            maxDistance = maxDistance * visData.visibility();
-//            if (maxDistance < CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble()) {
-//                maxDistance = CommonConfigs.MIN_INVISIBLE_DISTANCE_TO_ENEMY_TRACKING.getAsDouble() + 0.5;
-//            }
-//        }
-
-        if (distanceSqr > maxDistance * maxDistance) return false;
-        // 隐身快速失败
-        if (target instanceof Player player) {
-            if (player.isInvisible() && isFullyNaked(player)) {
-                return false;
-            }
-        }
-
-        // 获取观察方向与目标向量
-        Vec3 eyePos = observer.getEyePosition();
-        Vec3 lookVec = observer.getViewVector(1.0F);
-        Vec3 targetVec = target.getEyePosition().subtract(eyePos);
-        Vec3 targetDir = targetVec.normalize();
-
-        // 水平与垂直FOV判定
-        if (!isWithinFOV(observer, lookVec, targetDir)) return false;
-
-        // 多点物理遮挡检查
-        return canSeeAnyPart(observer, target, eyePos);
-    }
-
-    public static boolean isFullyNaked(Player player) {
-        for (ItemStack armor : player.getArmorSlots()) {
-            if (!armor.isEmpty()) return false;
-        }
-        return true;
     }
 
     // 新感知系统
@@ -308,7 +259,7 @@ public class StealthUtils {
 
         boolean isTouching = mob.getBoundingBox().intersects(player.getBoundingBox().inflate(0.4));
         // 5.视线与碰撞检查
-        if (!isTouching && !StealthUtils.hasLineOfSight(mob, player)) {
+        if (!isTouching && !CommonUtils.hasLineOfSight(mob, player)) {
             return false;
         }
 
@@ -360,71 +311,9 @@ public class StealthUtils {
         );
     }
 
-    // 三点检查
-    private static boolean canSeeAnyPart(Mob observer, Entity target, Vec3 start) {
-        Vec3[] checkPoints = {
-                // 头
-                target.getEyePosition(),
-                // 胸
-                target.position().add(0, target.getBbHeight() / 2.0, 0),
-                // 脚
-                target.position().add(0, 0.1, 0)
-        };
-
-        for (Vec3 end : checkPoints) {
-            if (isLineClear(observer, start, end)) return true;
-        }
-        return false;
-    }
-
-    // 视线射线检测
-    private static boolean isLineClear(Mob observer, Vec3 start, Vec3 end) {
-        Level level = observer.level();
-        ClipContext context = new ClipContext(
-                start, end,
-                ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE,
-                observer
-        ) {
-            @Override
-            public @NotNull VoxelShape getBlockShape(BlockState blockState, @NotNull BlockGetter blockGetter, @NotNull BlockPos pos) {
-                if (blockState.is(ModTags.Blocks.SEE_THROUGHS)) {
-                    return Shapes.empty();
-                }
-                return super.getBlockShape(blockState, blockGetter, pos);
-            }
-        };
-        return level.clip(context).getType() == HitResult.Type.MISS;
-    }
-
-    // FOV判定
-    private static boolean isWithinFOV(Mob observer, Vec3 lookVec, Vec3 targetDir) {
-        boolean isVerticalLooking = Math.abs(lookVec.x) < 0.0001 && Math.abs(lookVec.z) < 0.0001;
-
-        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
-        // 水平角度判定
-        if (!isVerticalLooking) {
-            Vec3 lookHorizontal = new Vec3(lookVec.x, 0, lookVec.z).normalize();
-            Vec3 targetHorizontal = new Vec3(targetDir.x, 0, targetDir.z).normalize();
-
-            double horizontalDot = lookHorizontal.dot(targetHorizontal);
-            double horizontalThreshold = Math.cos(Math.toRadians(settings.getHorizontalFov()) / 2.0);
-
-            if (horizontalDot < horizontalThreshold) return false;
-        }
-
-        // 垂直角度判定
-        double pitchToTargetDegrees = Math.toDegrees(Math.asin(targetDir.y));
-
-        double maxUpPitch = settings.getMaxUpPitch();
-        double maxDownPitch = -settings.getMaxDownPitch();
-
-        return pitchToTargetDegrees >= maxDownPitch && pitchToTargetDegrees <= maxUpPitch;
-    }
-
     // 可见度计算
     public static double calculateVisibility(Player player) {
-        if (player.isInvisible() && isFullyNaked(player)) return 0.0;
+        if (player.isInvisible() && CommonUtils.isFullyNaked(player)) return 0.0;
         if (isFullyHiddenByEnvironment(player)) return 0.0;
 
         int skyDarken = player.level().getSkyDarken();

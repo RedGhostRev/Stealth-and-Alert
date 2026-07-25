@@ -1,6 +1,7 @@
 package net.rev.stealthandalert.item;
 
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -9,6 +10,7 @@ import net.rev.stealthandalert.component.ModDataComponents;
 import net.rev.stealthandalert.item.custom.DaggerItem;
 import net.rev.stealthandalert.item.custom.DebugWandItem;
 import net.rev.stealthandalert.item.custom.PebbleItem;
+import net.rev.stealthandalert.sound.ModSounds;
 
 import java.util.List;
 
@@ -35,6 +37,9 @@ public class ModItems {
             () -> new DaggerItem(ModTiers.SHADOW_CRYSTAL, new Item.Properties().
                     attributes(DaggerItem.createAttributes(ModTiers.SHADOW_CRYSTAL, 2F, -1.2F))
                     .component(ModDataComponents.ASSASSINATION_BASE_MULTIPLIER, 0.3F)));
+
+    public static final DeferredItem<Item> MUSIC_DISC_DAISY_BELL = ITEMS.register("music_disc_daisy_bell",
+            () -> new Item(new Item.Properties().jukeboxPlayable(ModSounds.DAISY_BELL_KEY).stacksTo(1).rarity(Rarity.RARE)));
 
     public static final DeferredItem<DebugWandItem> DEBUG_WAND = ITEMS.register("debug_wand",
             () -> new DebugWandItem(new Item.Properties().stacksTo(1)));

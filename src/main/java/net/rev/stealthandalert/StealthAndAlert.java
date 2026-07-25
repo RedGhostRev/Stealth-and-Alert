@@ -25,6 +25,7 @@ import net.rev.stealthandalert.entity.ModEntities;
 import net.rev.stealthandalert.event.StealthSoundEventHandler;
 import net.rev.stealthandalert.item.ModCreativeModeTabs;
 import net.rev.stealthandalert.item.ModItems;
+import net.rev.stealthandalert.loot.ModLootModifiers;
 import net.rev.stealthandalert.potion.ModPotions;
 import net.rev.stealthandalert.sound.ModSounds;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ public class StealthAndAlert {
         ModDataComponents.register(modEventBus);
         ModEnchantmentEffects.register(modEventBus);
         ModAttachments.register(modEventBus);
+        ModLootModifiers.register(modEventBus);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);

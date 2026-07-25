@@ -67,7 +67,7 @@ public class CommonConfigs {
             trackingTicks = builder
                     .comment("The duration before an enemy loses track of a player since unable to see them (in ticks)")
                     .translation(LangKeys.TRACKING_TICKS)
-                    .defineInRange("trackingTicks", 0, 30, 1200);
+                    .defineInRange("trackingTicks", 30, 0, 1200);
 
             patienceTicks = builder
                     .comment("The duration of patience before an enemy loses interest in an LKP(Last Known Position) (in ticks)")
@@ -159,6 +159,7 @@ public class CommonConfigs {
     }
 
     public static class Assassination {
+        public final ModConfigSpec.BooleanValue turnOn;
         public final ModConfigSpec.BooleanValue alwaysSuccess;
         public final ModConfigSpec.DoubleValue successChance;
 
@@ -173,6 +174,11 @@ public class CommonConfigs {
             builder.comment("Settings related to assassination mechanics")
                     .translation(LangKeys.ASSASSINATION_C)
                     .push("Assassination"); // 进入 Assassination 类别
+
+            turnOn = builder
+                    .comment("Whether to enable assassination feature")
+                    .translation(LangKeys.ASSASSINATION_TURN_ON)
+                    .define("assassination", true);
 
             alwaysSuccess = builder
                     .comment("Whether assassinations to SEEKERS can be performed successfully all the time")

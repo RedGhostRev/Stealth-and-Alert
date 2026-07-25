@@ -167,7 +167,7 @@ public class ModEvents {
                 if (Float.isInfinite(extraDamage)) {
                     extraDamage = Integer.MAX_VALUE;
                 }
-                if (extraDamage > 0 && target.isAlive() && target.getHealth() > 0) {
+                if (extraDamage > 0F && target.isAlive() && target.getHealth() > 0F) {
                     AssassinationDamageSource aSource = AssassinationDamageSource.getSource(attacker, target, LangKeys.ASSASSINATION, AssassinationHandler.AssassinateHand.RIGHT_HAND);
                     int delayTicks = 2;
                     float finalExtraDamage = extraDamage;

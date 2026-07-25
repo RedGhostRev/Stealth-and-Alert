@@ -20,7 +20,7 @@
 
 *当游戏启动时，本模组会自动扫描所有模组的该目录，并释放未存在的配置文件到玩家的 `config` 文件夹中。*
 
-或者，你也可以将预设的 JSON 文件放到本模组 JAR 包中对应目录下。作者允许你这么做。
+**对于整合包作者来说**，你也可以将预设的 JSON 文件放到本模组 JAR 包中对应目录下。
 
 ---
 
@@ -88,7 +88,7 @@
 "alert_conditions": {
   "<命名空间:警戒条件_1>": {
     "range": 32.0,
-    "items": ["minecraft:apple", "stealth_and_alert:shadow_crystal"]
+    "items": ["minecraft:apple", "stealth_and_alert:shadow_crystal"],
     "invert": false
   },
   "<命名空间:警戒条件_2>": { ... }

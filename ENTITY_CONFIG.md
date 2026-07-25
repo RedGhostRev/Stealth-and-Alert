@@ -24,7 +24,7 @@ If you are a mod developer who wishes to provide your mobs with default alert co
 *As the game launches, the mod scans such directory of all mods, 
 and copy files not existing in `config` directory to players' `config` directory.*
 
-Or you can put your JSON presets into my mod's JAR's corresponding directory. This action is permitted by me.
+**To modpack creators**, you can also put your JSON presets into my mod's JAR's corresponding directory.
 
 ---
 
@@ -93,7 +93,7 @@ Here's a full JSON template including all configurable settings.
 "alert_conditions": {
   "<namespace:condition_1>": {
     "range": 32.0,
-    "items": ["minecraft:apple", "stealth_and_alert:shadow_crystal"]
+    "items": ["minecraft:apple", "stealth_and_alert:shadow_crystal"],
     "invert": false
   },
   "<namespace:condition_2>": { ... }

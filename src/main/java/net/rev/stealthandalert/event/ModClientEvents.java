@@ -12,21 +12,22 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.AssassinationData;
 import net.rev.stealthandalert.attachment.ModAttachments;
-import net.rev.stealthandalert.client.gui.overlay.AlertIndicatorOverlay;
-import net.rev.stealthandalert.client.gui.overlay.AssassinationOverlay;
-import net.rev.stealthandalert.client.gui.overlay.SoundWaveOverlay;
-import net.rev.stealthandalert.client.gui.overlay.VisibilityBarOverlay;
+import net.rev.stealthandalert.client.gui.overlay.*;
 import net.rev.stealthandalert.client.key.ModKeyMappings;
+import net.rev.stealthandalert.client.renderer.ClientMarkManager;
 import net.rev.stealthandalert.config.ClientConfigs;
+import net.rev.stealthandalert.config.CommonConfigs;
 import net.rev.stealthandalert.datagen.LangKeys;
 import net.rev.stealthandalert.network.C2SAssassinationPacket;
 import net.rev.stealthandalert.network.C2SCrawlPacket;
 import net.rev.stealthandalert.util.AssassinationHandler;
+import net.rev.stealthandalert.util.ClientUtils;
 import net.rev.stealthandalert.util.ModTags;
 import org.lwjgl.glfw.GLFW;
 
@@ -35,48 +36,6 @@ import java.util.UUID;
 
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID, value = Dist.CLIENT)
 public class ModClientEvents {
-//    @SubscribeEvent
-//    public static void onItemTooltip(ItemTooltipEvent event) {
-//        ItemStack itemStack = event.getItemStack();
-//        if (itemStack.isEmpty()) {
-//            return;
-//        }
-//        if (itemStack.is(ModTags.Items.CAN_BACKSTAB)) {
-//            List<Component> lines = event.getToolTip();
-//            int index = -1;
-//
-//            MutableComponent tooltip = Component.translatable(LangKeys.TOOLTIP_CAN_STAB);
-//            MutableComponent mainHandComponent = Component.translatable("item.modifiers.mainhand");
-//            for (int i = 0; i < lines.size(); i++) {
-//                if (lines.get(i).contains(mainHandComponent)) {
-//                    index = i + 1;
-//                    break;
-//                }
-//            }
-//
-//            if (index < 0) {
-//                int enchantmentCount = itemStack.getTagEnchantments().size();
-//                for (int i = 0; i < lines.size(); i++) {
-//                    if (lines.get(i).getContents() instanceof TranslatableContents contents) {
-//                        if (contents.getKey().startsWith("enchantment.")) {
-//                            index = i + enchantmentCount;
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//            if (index < 0) {
-//                index = 1;
-//            }
-//
-//            if (index == lines.size()) {
-//                lines.add(tooltip);
-//            } else {
-//                lines.add(index, tooltip);
-//            }
-//        }
-//    }
-
     // 渲染HUD
     @SubscribeEvent
     public static void onRegisterOverlays(RegisterGuiLayersEvent event) {
@@ -88,34 +47,27 @@ public class ModClientEvents {
                 SoundWaveOverlay::render);
         event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "assassinate_hud"),
                 AssassinationOverlay::render);
+        event.registerBelow(VanillaGuiLayers.DEBUG_OVERLAY, ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "mark_hud"),
+                MarkOverlay::render);
+    }
+
+    @SubscribeEvent
+    public static void onEntityLeave(EntityLeaveLevelEvent event) {
+        if (event.getLevel().isClientSide()) {
+            ClientMarkManager.remove(event.getEntity().getId());
+        }
     }
 
     @SubscribeEvent
     public static void onPlayerRespawn(ClientPlayerNetworkEvent.Clone event) {
         // 清空 HUD 数据
-        AlertIndicatorOverlay.FULL_AWARENESS_TICKS.clear();
-        AlertIndicatorOverlay.ACTIVE_POOL.clear();
-        AlertIndicatorOverlay.EXPIRED_GHOSTS.clear();
-        SoundWaveOverlay.lastSoundTick = 0;
-        SoundWaveOverlay.targetAmplitude = 0.0;
-        SoundWaveOverlay.renderAmplitude = 0.0;
-        SoundWaveOverlay.timeTracker = 0.0;
-        SoundWaveOverlay.tickMaxAmplitude = 0.0;
-        SoundWaveOverlay.hasNewSoundThisTick = false;
+        ClientUtils.clearData();
     }
 
     @SubscribeEvent
     public static void onClientPlayerLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         // 清空 HUD 数据
-        AlertIndicatorOverlay.FULL_AWARENESS_TICKS.clear();
-        AlertIndicatorOverlay.ACTIVE_POOL.clear();
-        AlertIndicatorOverlay.EXPIRED_GHOSTS.clear();
-        SoundWaveOverlay.lastSoundTick = 0;
-        SoundWaveOverlay.targetAmplitude = 0.0;
-        SoundWaveOverlay.renderAmplitude = 0.0;
-        SoundWaveOverlay.timeTracker = 0.0;
-        SoundWaveOverlay.tickMaxAmplitude = 0.0;
-        SoundWaveOverlay.hasNewSoundThisTick = false;
+        ClientUtils.clearData();
     }
 
     // 按键注册
@@ -123,6 +75,7 @@ public class ModClientEvents {
     public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
         event.register(ModKeyMappings.CRAWL_KEY);
         event.register(ModKeyMappings.ASSASSINATE_KEY);
+        event.register(ModKeyMappings.MARK_KEY);
     }
 
     @SubscribeEvent
@@ -137,58 +90,24 @@ public class ModClientEvents {
                 mc.player.connection.send(new C2SCrawlPacket(!crawling));
             }
         }
-
-/*        if (event.getAction() == GLFW.GLFW_PRESS && Minecraft.getInstance().screen == null) {
-            if (event.getKey() == ModKeyMappings.ASSASSINATE_KEY.getKey().getValue()) {
-//                HitResult hit = mc.hitResult;
-//                if (hit instanceof EntityHitResult entityHit) {
-//                    PacketDistributor.sendToServer(new C2SAssassinatePacket(
-//                            Optional.of(mc.player.getUUID()),
-//                            entityHit.getEntity().getId()
-//                    ));
-//                }
-                int targetId = AssassinationHandler.canAssassinate(mc.player, Optional.of(mc.player.getUUID()),
-                        mc.player.getData(ModAttachments.ASSASSINATE_DATA).isAssassinating());
-                if (targetId > -1) {
-                    PacketDistributor.sendToServer(new C2SAssassinationPacket(
-                            Optional.of(mc.player.getUUID()), targetId));
-                }
-                // ClientAnimationHandler.playerAssassinate(mc.player);
-            }
-        }*/
     }
-
-//    @SubscribeEvent
-//    public static void onMouseButton(InputEvent.MouseButton.Pre event) {
-//        Minecraft mc = Minecraft.getInstance();
-//        if (mc.player == null || mc.screen != null) return;
-//        if (event.getAction() == GLFW.GLFW_PRESS) {
-//            if (event.getButton() == ModKeyMappings.ASSASSINATE_KEY.getKey().getValue()) {
-//                int targetId = AssassinationHandler.canAssassinate(mc.player, Optional.of(mc.player.getUUID()),
-//                        mc.player.getData(ModAttachments.ASSASSINATION_DATA).isAssassinating());
-//                if (targetId > -1) {
-//                    PacketDistributor.sendToServer(new C2SAssassinationPacket(
-//                            Optional.of(mc.player.getUUID()), targetId));
-//                    event.setCanceled(true);
-//                }
-//            }
-//        }
-//    }
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Pre event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.screen != null) return;
         AssassinationData data = mc.player.getData(ModAttachments.ASSASSINATION_DATA);
-        if (ModKeyMappings.ASSASSINATE_KEY.consumeClick()) {
-            int targetId = AssassinationHandler.canAssassinate(mc.player, Optional.of(mc.player.getUUID()),
-                    data.isAssassinating());
-            if (targetId > -1) {
-                PacketDistributor.sendToServer(new C2SAssassinationPacket(
-                        Optional.of(mc.player.getUUID()), targetId));
-                while (mc.options.keySwapOffhand.consumeClick()) {
+        if (CommonConfigs.ASSASSINATION.turnOn.get()) {
+            if (ModKeyMappings.ASSASSINATE_KEY.consumeClick()) {
+                int targetId = AssassinationHandler.canAssassinate(mc.player, Optional.of(mc.player.getUUID()),
+                        data.isAssassinating());
+                if (targetId > -1) {
+                    PacketDistributor.sendToServer(new C2SAssassinationPacket(
+                            Optional.of(mc.player.getUUID()), targetId));
+                    while (mc.options.keySwapOffhand.consumeClick()) {
+                    }
+                    mc.options.keySwapOffhand.setDown(false);
                 }
-                mc.options.keySwapOffhand.setDown(false);
             }
         }
 
@@ -205,12 +124,17 @@ public class ModClientEvents {
                 }
             }
         }
+
+        while (ModKeyMappings.MARK_KEY.consumeClick()) {
+            ClientMarkManager.mark();
+        }
     }
 
     // DEBUG内容
     @SubscribeEvent
     public static void onRenderNameTag(RenderNameTagEvent event) {
-        if (!(event.getEntity() instanceof Mob mob) || (!mob.getType().is(ModTags.Entities.SEEKERS) && !mob.getType().is(ModTags.Entities.PROTECTED))) return;
+        if (!(event.getEntity() instanceof Mob mob) || (!mob.getType().is(ModTags.Entities.SEEKERS) && !mob.getType().is(ModTags.Entities.PROTECTED)))
+            return;
         if (!ClientConfigs.DEBUG_MODE.turnOn.get()) return;
 
         Player self = Minecraft.getInstance().player;

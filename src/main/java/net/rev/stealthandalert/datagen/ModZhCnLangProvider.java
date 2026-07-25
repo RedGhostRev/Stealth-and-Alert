@@ -18,6 +18,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.SHADOW_CRYSTAL_SHARD, "暗影水晶碎片");
         add(LangKeys.SHADOW_BERRIES, "暗影浆果");
         add(LangKeys.SHADOW_CRYSTAL_DAGGER, "暗影水晶匕首");
+        add(LangKeys.MUSIC_DISC_DAISY_BELL, "音乐唱片");
         add(LangKeys.DEBUG_WAND, "调试手杖");
 
         // 方块
@@ -46,6 +47,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "可施展刺杀");
         add(LangKeys.TOOLTIP_DEBUG_WAND, "右键以开关调试模式");
         add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "调试模式：显示带有SEEKERS标签的生物的警戒数据：§c\n全局警戒状态\n观测状态\n主目标\n记忆时长\n警戒值\n警戒状态切换计时\n耐心时长");
+        add(LangKeys.TOOLTIP_MUSIC_DISC_DAISY_BELL, "Harry Dacre - Daisy Bell");
 
         // 创造模式物品栏
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "潜行与警戒 - 物品");
@@ -55,6 +57,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.CATEGORY, "潜行与警戒");
         add(LangKeys.CRAWL, "匍匐");
         add(LangKeys.ASSASSINATE, "刺杀");
+        add(LangKeys.MARK, "用望远镜标记");
 
         // 字幕
         add(LangKeys.PEBBLE_LAND, "石子：落地");
@@ -87,6 +90,8 @@ public class ModZhCnLangProvider extends LanguageProvider {
 
         // GUI
         add(LangKeys.GUI_ASSASSINATE, "[%s] 刺杀");
+        add(LangKeys.GUI_MARK, "[%s] 标记");
+        add(LangKeys.GUI_UNMARK, "[%s] 取消标记");
 
         // 命令
         add(LangKeys.COMMAND_MOD_ID, "[潜行与警戒]");
@@ -157,6 +162,8 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.DECREASE_SUSPICIOUS_FACTOR_TOOLTIP, "敌人的怀疑状态对警戒值下降速率的影响程度");
         add(LangKeys.DECREASE_SEARCHING_FACTOR, "下降速率搜寻状态影响因子");
         add(LangKeys.DECREASE_SEARCHING_FACTOR_TOOLTIP, "敌人的搜寻状态对警戒值下降速率的影响程度");
+        add(LangKeys.ASSASSINATION_TURN_ON, "开启刺杀");
+        add(LangKeys.ASSASSINATION_TURN_ON_TOOLTIP, "是否开启刺杀功能");
         add(LangKeys.ALWAYS_SUCCESS, "必定成功");
         add(LangKeys.ALWAYS_SUCCESS_TOOLTIP, "刺杀SEEKERS是否每次都能成功");
         add(LangKeys.SUCCESS_CHANCE, "成功几率");
@@ -180,8 +187,10 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.VISIBILITY_INDICATOR_TOOLTIP, "标示玩家当前可见度的可见度指示器HUD相关设置");
         add(LangKeys.SOUND_WAVE_INDICATOR, "声波指示器");
         add(LangKeys.SOUND_WAVE_INDICATOR_TOOLTIP, "标示玩家自身产生声音的声波指示器HUD相关设置");
-        add(LangKeys.ALERT_SYMBOL, "警戒标记");
-        add(LangKeys.ALERT_SYMBOL_TOOLTIP, "标示敌人当前警戒状态的世界中警戒标记相关设置");
+        add(LangKeys.ALERT_SYMBOL, "警戒标志");
+        add(LangKeys.ALERT_SYMBOL_TOOLTIP, "标示敌人当前警戒状态的世界中警戒标志相关设置");
+        add(LangKeys.MARK_C, "望远镜标记");
+        add(LangKeys.MARK_C_TOOLTIP, "使用望远镜标记生物的相关设置");
         add(LangKeys.DEBUG_MODE, "调试模式");
         add(LangKeys.DEBUG_MODE_TOOLTIP, "调试模式相关设置");
         add(LangKeys.ALERT_INDICATOR_TURN_ON, "开启警戒指示器");
@@ -212,10 +221,24 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.SOUND_WAVE_INDICATOR_POSITION_Y_TOOLTIP, "声波指示器在屏幕上位置的Y偏移");
         add(LangKeys.SOUND_BOSS_BAR, "随BOSS血条偏移");
         add(LangKeys.SOUND_BOSS_BAR_TOOLTIP, "屏幕上增加BOSS血条时，声波指示器是否随之偏移；当你已经调整过指示器位置时，建议关闭");
-        add(LangKeys.ALERT_SYMBOL_TURN_ON, "开启警戒标记");
-        add(LangKeys.ALERT_SYMBOL_TURN_ON_TOOLTIP, "是否在敌人头顶显示警戒标记");
+        add(LangKeys.ALERT_SYMBOL_TURN_ON, "开启警戒标志");
+        add(LangKeys.ALERT_SYMBOL_TURN_ON_TOOLTIP, "是否在敌人头顶显示警戒标志");
         add(LangKeys.ALERT_SYMBOL_SCALE, "缩放");
-        add(LangKeys.ALERT_SYMBOL_SCALE_TOOLTIP, "警戒标记的缩放大小");
+        add(LangKeys.ALERT_SYMBOL_SCALE_TOOLTIP, "警戒标志的缩放大小");
+        add(LangKeys.MARK_TURN_ON, "开启望远镜标记");
+        add(LangKeys.MARK_TURN_ON_TOOLTIP, "是否开启使用望远镜时的标记功能");
+        add(LangKeys.MARK_MAX_DISTANCE, "最大标记距离");
+        add(LangKeys.MARK_MAX_DISTANCE_TOOLTIP, "能标记生物的最大距离");
+        add(LangKeys.HOSTILE_COLOR, "敌对生物颜色");
+        add(LangKeys.HOSTILE_COLOR_TOOLTIP, "敌对生物的标记颜色");
+        add(LangKeys.NEUTRAL_COLOR, "中立生物颜色");
+        add(LangKeys.NEUTRAL_COLOR_TOOLTIP, "中立生物的标记颜色");
+        add(LangKeys.ALLY_COLOR, "友军颜色");
+        add(LangKeys.ALLY_COLOR_TOOLTIP, "玩家友军的标记颜色，如玩家创造的铁傀儡，以及雪傀儡，和宠物（仅对其主人而言）");
+        add(LangKeys.NPC_COLOR, "NPC颜色");
+        add(LangKeys.NPC_COLOR_TOOLTIP, "NPC的标记颜色，如村民和流浪商人");
+        add(LangKeys.PASSIVE_COLOR, "被动生物颜色");
+        add(LangKeys.PASSIVE_COLOR_TOOLTIP, "被动生物的标记颜色，如普通动物");
         add(LangKeys.DEBUG_TURN_ON, "开启调试模式");
         add(LangKeys.DEBUG_TURN_ON_TOOLTIP, "是否在敌人头顶显示警戒状态详细信息");
     }

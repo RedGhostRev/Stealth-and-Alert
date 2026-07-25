@@ -12,6 +12,7 @@ public class LangKeys {
     public static final String SHADOW_CRYSTAL_SHARD = "item." + MOD_ID + ".shadow_crystal_shard";
     public static final String SHADOW_BERRIES = "item." + MOD_ID + ".shadow_berries";
     public static final String SHADOW_CRYSTAL_DAGGER = "item." + MOD_ID + ".shadow_crystal_dagger";
+    public static final String MUSIC_DISC_DAISY_BELL = "item." + MOD_ID + ".music_disc_daisy_bell";
     public static final String DEBUG_WAND = "item." + MOD_ID + ".debug_wand";
 
     // Blocks
@@ -40,6 +41,7 @@ public class LangKeys {
     public static final String TOOLTIP_CAN_ASSASSINATE = "tooltip." + MOD_ID + ".can_assassinate";
     public static final String TOOLTIP_DEBUG_WAND = "tooltip." + MOD_ID + ".debug_wand";
     public static final String TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC = "tooltip." + MOD_ID + ".debug_wand.debug_mode_desc";
+    public static final String TOOLTIP_MUSIC_DISC_DAISY_BELL = "jukebox_song." + MOD_ID + ".daisy_bell";
 
     // Creative Tabs
     public static final String STEALTH_AND_ALERT_ITEMS_TAB = "itemGroup." + MOD_ID + ".items_tab";
@@ -49,6 +51,7 @@ public class LangKeys {
     public static final String CATEGORY = "category." + MOD_ID + "stealth_and_alert";
     public static final String CRAWL = "key." + MOD_ID + ".crawl";
     public static final String ASSASSINATE = "key." + MOD_ID + ".assassinate";
+    public static final String MARK = "key." + MOD_ID + ".mark";
 
     // Subtitles
     public static final String PEBBLE_LAND = "subtitles." + MOD_ID + ".pebble_land";
@@ -80,6 +83,8 @@ public class LangKeys {
     public static final String SWORD_THRUST_ITEM_DUAL = SWORD_THRUST + ".item.dual";
     // GUI Texts
     public static final String GUI_ASSASSINATE = "gui." + MOD_ID + "assassinate";
+    public static final String GUI_MARK = "gui." + MOD_ID + "mark";
+    public static final String GUI_UNMARK = "gui." + MOD_ID + "unmark";
 
     // Command Texts
     public static final String COMMAND_MOD_ID = command("mod_id");
@@ -106,11 +111,11 @@ public class LangKeys {
 
     // Config Texts
     // common
-    public static final String DETECTION = config("Detection");
+    public static final String DETECTION = config("detection");
     public static final String DETECTION_TOOLTIP = tooltip(DETECTION);
-    public static final String AWARENESS = config("Awareness");
+    public static final String AWARENESS = config("awareness");
     public static final String AWARENESS_TOOLTIP = tooltip(AWARENESS);
-    public static final String ASSASSINATION_C = config("Assassination");
+    public static final String ASSASSINATION_C = config("assassination");
     public static final String ASSASSINATION_C_TOOLTIP = tooltip(ASSASSINATION_C);
     public static final String MAX_DETECTION_RANGE = config("maxDetectionRange");
     public static final String MAX_DETECTION_RANGE_TOOLTIP = tooltip(MAX_DETECTION_RANGE);
@@ -150,6 +155,8 @@ public class LangKeys {
     public static final String DECREASE_SUSPICIOUS_FACTOR_TOOLTIP = tooltip(DECREASE_SUSPICIOUS_FACTOR);
     public static final String DECREASE_SEARCHING_FACTOR = config("decreaseSearchingFactor");
     public static final String DECREASE_SEARCHING_FACTOR_TOOLTIP = tooltip(DECREASE_SEARCHING_FACTOR);
+    public static final String ASSASSINATION_TURN_ON = ASSASSINATION_C + ".turnOn";
+    public static final String ASSASSINATION_TURN_ON_TOOLTIP = tooltip(ASSASSINATION_TURN_ON);
     public static final String ALWAYS_SUCCESS = config("alwaysSuccess");
     public static final String ALWAYS_SUCCESS_TOOLTIP = tooltip(ALWAYS_SUCCESS);
     public static final String SUCCESS_CHANCE = config("successChance");
@@ -175,6 +182,8 @@ public class LangKeys {
     public static final String SOUND_WAVE_INDICATOR_TOOLTIP = tooltip(SOUND_WAVE_INDICATOR);
     public static final String ALERT_SYMBOL = config("alertSymbol");
     public static final String ALERT_SYMBOL_TOOLTIP = tooltip(ALERT_SYMBOL);
+    public static final String MARK_C = config("spyglass_mark");
+    public static final String MARK_C_TOOLTIP = tooltip(MARK_C);
     public static final String DEBUG_MODE = config("debugMode");
     public static final String DEBUG_MODE_TOOLTIP = tooltip(DEBUG_MODE);
     public static final String ALERT_INDICATOR_TURN_ON = ALERT_INDICATOR + ".turnOn";
@@ -209,6 +218,20 @@ public class LangKeys {
     public static final String ALERT_SYMBOL_TURN_ON_TOOLTIP = tooltip(ALERT_SYMBOL_TURN_ON);
     public static final String ALERT_SYMBOL_SCALE = ALERT_SYMBOL + ".scale";
     public static final String ALERT_SYMBOL_SCALE_TOOLTIP = tooltip(ALERT_SYMBOL_SCALE);
+    public static final String MARK_TURN_ON = MARK_C + ".turnOn";
+    public static final String MARK_TURN_ON_TOOLTIP = tooltip(MARK_TURN_ON);
+    public static final String MARK_MAX_DISTANCE = MARK_C + ".maxDistance";
+    public static final String MARK_MAX_DISTANCE_TOOLTIP = tooltip(MARK_MAX_DISTANCE);
+    public static final String HOSTILE_COLOR = MARK_C + ".hostileColor";
+    public static final String HOSTILE_COLOR_TOOLTIP = tooltip(HOSTILE_COLOR);
+    public static final String NEUTRAL_COLOR = MARK_C + ".neutralColor";
+    public static final String NEUTRAL_COLOR_TOOLTIP = tooltip(NEUTRAL_COLOR);
+    public static final String ALLY_COLOR = MARK_C + ".allyColor";
+    public static final String ALLY_COLOR_TOOLTIP = tooltip(ALLY_COLOR);
+    public static final String NPC_COLOR = MARK_C + ".npcColor";
+    public static final String NPC_COLOR_TOOLTIP = tooltip(NPC_COLOR);
+    public static final String PASSIVE_COLOR = MARK_C + ".passiveColor";
+    public static final String PASSIVE_COLOR_TOOLTIP = tooltip(PASSIVE_COLOR);
     public static final String DEBUG_TURN_ON = DEBUG_MODE + ".turnOn";
     public static final String DEBUG_TURN_ON_TOOLTIP = tooltip(DEBUG_TURN_ON);
 

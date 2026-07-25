@@ -305,26 +305,27 @@ public class AssassinationClientEvents {
         float baseDamage = CommonUtils.getWeaponBaseDamage(stack);
         float totalMultiplier = CommonUtils.getAssassinationTotalMultiplier(stack);
         float assassinationDamage = CommonUtils.getAssassinationDamage(baseDamage, totalMultiplier);
-        if (assassinationDamage <= 0F) return;
-        for (int i = 0; i < tooltip.size(); i++) {
-            String text = tooltip.get(i).getString();
-            String attackDamageTranslation = Component.translatable("attribute.name.generic.attack_damage").getString();
-            if (text.contains(attackDamageTranslation)) {
-                String displayAssassination = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(assassinationDamage);
-                MutableComponent assassinateComponent = Component.literal(" ")
-                        .append(Component.literal(displayAssassination))
-                        .append(CommonComponents.SPACE)
-                        .append(Component.translatable(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE))
-                        .withStyle(ChatFormatting.DARK_GREEN);
-                if (event.getFlags().isAdvanced()) {
-                    String displayBase = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(baseDamage);
-                    String displayMultiplier = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(totalMultiplier);
-                    Component formulaComponent = Component.literal(" [" + displayBase + " * " + displayMultiplier + "]")
-                            .withStyle(ChatFormatting.GRAY);
-                    assassinateComponent.append(formulaComponent);
+        if (assassinationDamage > 0F) {
+            for (int i = 0; i < tooltip.size(); i++) {
+                String text = tooltip.get(i).getString();
+                String attackDamageTranslation = Component.translatable("attribute.name.generic.attack_damage").getString();
+                if (text.contains(attackDamageTranslation)) {
+                    String displayAssassination = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(assassinationDamage);
+                    MutableComponent assassinateComponent = Component.literal(" ")
+                            .append(Component.literal(displayAssassination))
+                            .append(CommonComponents.SPACE)
+                            .append(Component.translatable(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE))
+                            .withStyle(ChatFormatting.DARK_GREEN);
+                    if (event.getFlags().isAdvanced()) {
+                        String displayBase = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(baseDamage);
+                        String displayMultiplier = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(totalMultiplier);
+                        Component formulaComponent = Component.literal(" [" + displayBase + " * " + displayMultiplier + "]")
+                                .withStyle(ChatFormatting.GRAY);
+                        assassinateComponent.append(formulaComponent);
+                    }
+                    tooltip.add(i + 1, assassinateComponent);
+                    break;
                 }
-                tooltip.add(i + 1, assassinateComponent);
-                break;
             }
         }
 

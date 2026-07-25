@@ -55,6 +55,8 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
                 .addTag(Tags.Blocks.GLASS_BLOCKS)
                 .addTag(Tags.Blocks.GLASS_PANES)
                 .addTag(Tags.Blocks.CHAINS)
+                .addTag(Tags.Blocks.FENCES)
+                .addTag(Tags.Blocks.FENCE_GATES)
                 .add(Blocks.IRON_BARS);
     }
 }

@@ -18,6 +18,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.SHADOW_CRYSTAL_SHARD, "Shadow Crystal Shard");
         add(LangKeys.SHADOW_BERRIES, "Shadow Berries");
         add(LangKeys.SHADOW_CRYSTAL_DAGGER, "Shadow Crystal Dagger");
+        add(LangKeys.MUSIC_DISC_DAISY_BELL, "Music Disc");
         add(LangKeys.DEBUG_WAND, "Debug Wand");
 
         // Blocks
@@ -46,6 +47,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "Assassination-Capable");
         add(LangKeys.TOOLTIP_DEBUG_WAND, "Right-click to toggle debug mode");
         add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "Debug Mode: Displays alert information for mobs with the SEEKERS tag:§c\nGlobal Alert State\nObservation State\nPrimary Target\nMemory Ticks\nAwareness Progress\nState Transition Ticks\nPatience Ticks");
+        add(LangKeys.TOOLTIP_MUSIC_DISC_DAISY_BELL, "Harry Dacre - Daisy Bell");
 
         // Creative Tabs
         add(LangKeys.STEALTH_AND_ALERT_ITEMS_TAB, "Stealth and Alert - Items");
@@ -55,6 +57,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.CATEGORY, "Stealth and Alert");
         add(LangKeys.CRAWL, "Crawl");
         add(LangKeys.ASSASSINATE, "Assassinate");
+        add(LangKeys.MARK, "Mark with Spyglass");
 
         // Subtitles
         add(LangKeys.PEBBLE_LAND, "Pebble lands");
@@ -87,6 +90,8 @@ public class ModEnUsLangProvider extends LanguageProvider {
 
         // GUI
         add(LangKeys.GUI_ASSASSINATE, "[%s] Assassinate");
+        add(LangKeys.GUI_MARK, "[%s] Mark");
+        add(LangKeys.GUI_UNMARK, "[%s] Unmark");
 
         // Commands
         add(LangKeys.COMMAND_MOD_ID, "[Stealth & Alert]");
@@ -157,6 +162,8 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.DECREASE_SUSPICIOUS_FACTOR_TOOLTIP, "The factor by which the enemy's suspicious state affects the awareness decrease rate");
         add(LangKeys.DECREASE_SEARCHING_FACTOR, "Decrease Searching Factor");
         add(LangKeys.DECREASE_SEARCHING_FACTOR_TOOLTIP, "The factor by which the enemy's searching state affects the awareness decrease rate");
+        add(LangKeys.ASSASSINATION_TURN_ON, "Enable Assassination");
+        add(LangKeys.ASSASSINATION_TURN_ON_TOOLTIP, "Whether to enable assassination feature");
         add(LangKeys.ALWAYS_SUCCESS, "Always Success");
         add(LangKeys.ALWAYS_SUCCESS_TOOLTIP, "Whether assassinations to SEEKERS can be performed successfully all the time");
         add(LangKeys.SUCCESS_CHANCE, "Success Chance");
@@ -182,6 +189,8 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.SOUND_WAVE_INDICATOR_TOOLTIP, "Settings for the sound wave indicator HUD, which displays the sound you are producing");
         add(LangKeys.ALERT_SYMBOL, "Alert Symbol");
         add(LangKeys.ALERT_SYMBOL_TOOLTIP, "Settings for the world-space alert symbol, which displays the current alert status of enemies");
+        add(LangKeys.MARK_C, "Spyglass Mark");
+        add(LangKeys.MARK_C_TOOLTIP, "Settings for marking mobs through spyglass");
         add(LangKeys.DEBUG_MODE, "Debug Mode");
         add(LangKeys.DEBUG_MODE_TOOLTIP, "Settings for Debug Mode");
         add(LangKeys.ALERT_INDICATOR_TURN_ON, "Enable Alert Indicator");
@@ -216,6 +225,20 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.ALERT_SYMBOL_TURN_ON_TOOLTIP, "Whether to display the alert symbol above enemies' heads");
         add(LangKeys.ALERT_SYMBOL_SCALE, "Scale");
         add(LangKeys.ALERT_SYMBOL_SCALE_TOOLTIP, "The scale of the alert symbol");
+        add(LangKeys.MARK_TURN_ON, "Enable Spyglass Mark");
+        add(LangKeys.MARK_TURN_ON_TOOLTIP, "Whether to turn on mark feature when using spyglass");
+        add(LangKeys.MARK_MAX_DISTANCE, "Max Mark Distance");
+        add(LangKeys.MARK_MAX_DISTANCE_TOOLTIP, "The maximum distance at which a mob can be marked");
+        add(LangKeys.HOSTILE_COLOR, "Hostile Color");
+        add(LangKeys.HOSTILE_COLOR_TOOLTIP, "Mark's color for hostile mobs");
+        add(LangKeys.NEUTRAL_COLOR, "Neutral Color");
+        add(LangKeys.NEUTRAL_COLOR_TOOLTIP, "Mark's color for neutral mobs");
+        add(LangKeys.ALLY_COLOR, "Ally Color");
+        add(LangKeys.ALLY_COLOR_TOOLTIP, "Mark's color for allies of players, such as Iron Golems created by players, Snow Golems, and pets (only to their owners)");
+        add(LangKeys.NPC_COLOR, "NPC Color");
+        add(LangKeys.NPC_COLOR_TOOLTIP, "Mark's color for NPCs, such as Villagers and Wandering Traders");
+        add(LangKeys.PASSIVE_COLOR, "Passive Color");
+        add(LangKeys.PASSIVE_COLOR_TOOLTIP, "Mark's color for passive mobs, such as normal animals");
         add(LangKeys.DEBUG_TURN_ON, "Enable Debug Mode");
         add(LangKeys.DEBUG_TURN_ON_TOOLTIP, "Whether to display detailed alert status information above enemies' heads");
     }

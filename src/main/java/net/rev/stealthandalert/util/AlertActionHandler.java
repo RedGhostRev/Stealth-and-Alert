@@ -58,7 +58,7 @@ public class AlertActionHandler {
 
                 // 但是，若目标处于非生存模式，则无视这些条件
                 if (primary instanceof Player player) {
-                    if ((player.isInvisible() && StealthUtils.isFullyNaked(player)) || player.isCreative() || player.isSpectator()) {
+                    if ((player.isInvisible() && CommonUtils.isFullyNaked(player)) || player.isCreative() || player.isSpectator()) {
                         mob.setTarget(null);
                     }
                 } else if (data.state() < AlertData.FIGHTING && data.targetStates().getOrDefault(primary.getUUID(), AlertData.UNTRACKED) < AlertData.TRACKING) {
@@ -200,7 +200,6 @@ public class AlertActionHandler {
         while (mutable.getY() >= minHeight && scanDepth < 4) {
             BlockState currentState = mob.level().getBlockState(mutable);
 
-            // 现代原版判定：方块是否属于固体
             if (!currentState.isAir() && !currentState.getCollisionShape(mob.level(), mutable).isEmpty()) {
                 foundFloorNearby = true;
                 break;

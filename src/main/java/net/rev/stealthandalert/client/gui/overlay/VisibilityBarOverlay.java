@@ -39,6 +39,7 @@ public class VisibilityBarOverlay {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         if (mc.player == null) return;
+        if (mc.player.isSpectator()) return;
         double visibility = 0;
         if (!mc.isPaused()) {
             AttributeInstance attribute = mc.player.getAttribute(ModAttributes.VISIBILITY);

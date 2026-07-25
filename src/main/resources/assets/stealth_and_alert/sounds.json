@@ -5,5 +5,13 @@
     "sounds": [
       "stealth_and_alert:pebble_land"
     ]
+  },
+  "daisy_bell": {
+    "sounds": [
+      {
+        "name": "stealth_and_alert:daisy_bell",
+        "stream": true
+      }
+    ]
   }
 }

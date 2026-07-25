@@ -9,6 +9,7 @@ public class ClientConfigs {
     public static final VisibilityIndicator VISIBILITY_INDICATOR;
     public static final SoundWaveIndicator SOUND_WAVE_INDICATOR;
     public static final AlertSymbol ALERT_SYMBOL;
+    public static final Mark MARK;
     public static final DebugMode DEBUG_MODE;
 
     static {
@@ -18,6 +19,7 @@ public class ClientConfigs {
         VISIBILITY_INDICATOR = new VisibilityIndicator(builder);
         SOUND_WAVE_INDICATOR = new SoundWaveIndicator(builder);
         ALERT_SYMBOL = new AlertSymbol(builder);
+        MARK = new Mark(builder);
         DEBUG_MODE = new DebugMode(builder);
 
         SPEC = builder.build();
@@ -128,6 +130,47 @@ public class ClientConfigs {
             scale = builder.comment("The scale of the alert symbol")
                     .translation(LangKeys.ALERT_SYMBOL_SCALE)
                     .defineInRange("alertSymbolScale", 0.005, 0.001, 0.01);
+
+            builder.pop();
+        }
+    }
+
+    public static class Mark {
+        public final ModConfigSpec.BooleanValue turnOn;
+        public final ModConfigSpec.DoubleValue maxDistance;
+        public final ModConfigSpec.IntValue hostileColor;
+        public final ModConfigSpec.IntValue neutralColor;
+        public final ModConfigSpec.IntValue allyColor;
+        public final ModConfigSpec.IntValue npcColor;
+        public final ModConfigSpec.IntValue passiveColor;
+
+        public Mark(ModConfigSpec.Builder builder) {
+            builder.comment("Settings for marking mobs through spyglass")
+                    .translation(LangKeys.MARK_C)
+                    .push("spyglass_mark");
+            turnOn = builder.comment("Whether to turn on mark feature when using spyglass")
+                    .translation(LangKeys.MARK_TURN_ON)
+                    .define("spyglass_mark", true);
+
+            maxDistance = builder.comment("The maximum distance at which a mob can be marked")
+                    .translation(LangKeys.MARK_MAX_DISTANCE)
+                    .defineInRange("max_distance", 128.0, 16.0, 2048.0);
+
+            hostileColor = builder.comment("Mark's color for hostile mobs")
+                    .translation(LangKeys.HOSTILE_COLOR)
+                    .defineInRange("hostileColor", 0xFF0000, 0x000000, 0xFFFFFF);
+            neutralColor = builder.comment("Mark's color for neutral mobs")
+                    .translation(LangKeys.NEUTRAL_COLOR)
+                    .defineInRange("neutralColor", 0xFF8C00, 0x000000, 0xFFFFFF);
+            allyColor = builder.comment("Mark's color for allies of players, such as Iron Golems created by players, Snow Golems, and pets (only to their owners)")
+                    .translation(LangKeys.ALLY_COLOR)
+                    .defineInRange("allyColor", 0x0000FF, 0x000000, 0xFFFFFF);
+            npcColor = builder.comment("Mark's color for NPCs, such as Villagers and Wandering Traders")
+                    .translation(LangKeys.NPC_COLOR)
+                    .defineInRange("npcColor", 0x00FF00, 0x000000, 0xFFFFFF);
+            passiveColor = builder.comment("Mark's color for passive mobs, such as normal animals")
+                    .translation(LangKeys.PASSIVE_COLOR)
+                    .defineInRange("passiveColor", 0xFFFFFF, 0x000000, 0xFFFFFF);
 
             builder.pop();
         }

@@ -3,6 +3,8 @@
     "#c:glass_blocks",
     "#c:glass_panes",
     "#c:chains",
+    "#c:fences",
+    "#c:fence_gates",
     "minecraft:iron_bars"
   ]
 }

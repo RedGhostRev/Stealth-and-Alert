@@ -30,6 +30,7 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
                 .addTag(EntityTypeTags.SKELETONS)
                 .remove(EntityType.SKELETON_HORSE)
                 .addTag(EntityTypeTags.ILLAGER)
+                .add(EntityType.RAVAGER)
                 .add(EntityType.CREEPER)
                 .add(EntityType.SLIME)
                 .add(EntityType.MAGMA_CUBE)

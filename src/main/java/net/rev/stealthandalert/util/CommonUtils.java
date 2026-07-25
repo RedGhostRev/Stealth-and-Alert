@@ -1,19 +1,34 @@
 package net.rev.stealthandalert.util;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.ConditionalEffect;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.LevelBasedValue;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.rev.stealthandalert.component.ModDataComponents;
+import net.rev.stealthandalert.config.EntityAlertConditionConfigLoader;
+import net.rev.stealthandalert.config.EntityAlertConditionSettings;
 import net.rev.stealthandalert.enchantment.ModEnchantmentEffects;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -57,14 +72,136 @@ public class CommonUtils {
     }
 
     public static boolean isPlayerPet(Entity entity, Player player, boolean withGolem) {
+        if (player == null) return false;
         if (entity instanceof OwnableEntity ownable) {
             return player.getUUID().equals(ownable.getOwnerUUID());
         }
-        if (entity instanceof IronGolem golem) {
-            if (withGolem) {
+        if (entity instanceof AbstractHorse horse) {
+            return player.getUUID().equals(horse.getOwnerUUID());
+        }
+        if (withGolem) {
+            if (entity instanceof IronGolem golem) {
                 return golem.isPlayerCreated();
+            }
+            if (entity instanceof SnowGolem) {
+                return true;
             }
         }
         return false;
+    }
+
+    // 视线检测：如果mob能看到target，则返回true
+    public static boolean hasLineOfSight(Mob observer, Entity target) {
+        // 距离快速失败
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
+        double distanceSqr = observer.distanceToSqr(target);
+        double maxDistance = settings.getViewRange();
+        if (distanceSqr > maxDistance * maxDistance) return false;
+        // 隐身快速失败
+        if (target instanceof Player player) {
+            if (player.isInvisible() && isFullyNaked(player)) {
+                return false;
+            }
+        }
+
+        // 获取观察方向与目标向量
+        Vec3 eyePos = observer.getEyePosition();
+        Vec3 lookVec = observer.getViewVector(1.0F);
+        Vec3 targetVec = target.getEyePosition().subtract(eyePos);
+        Vec3 targetDir = targetVec.normalize();
+
+        // 水平与垂直FOV判定
+        if (!isWithinFOV(observer, lookVec, targetDir)) return false;
+
+        // 多点物理遮挡检查
+        return canSeeAnyPart(observer, target, eyePos);
+    }
+
+    public static boolean isFullyNaked(Player player) {
+        for (ItemStack armor : player.getArmorSlots()) {
+            if (!armor.isEmpty()) return false;
+        }
+        return true;
+    }
+
+    // 三点检查
+    private static boolean canSeeAnyPart(Mob observer, Entity target, Vec3 start) {
+        // 获取碰撞箱宽度的一半
+        double halfW = target.getBbWidth() / 2.0 * 0.8;
+        double chestY = target.getY() + target.getBbHeight() * 0.5;
+        double footY = target.getY() + 0.1;
+
+        Vec3[] checkPoints = {
+                target.getEyePosition(),
+                new Vec3(target.getX(), chestY, target.getZ()),
+                new Vec3(target.getX(), footY, target.getZ()),
+
+                new Vec3(target.getX() + halfW, chestY, target.getZ() + halfW),
+                new Vec3(target.getX() - halfW, chestY, target.getZ() - halfW),
+                new Vec3(target.getX() + halfW, chestY, target.getZ() - halfW),
+                new Vec3(target.getX() - halfW, chestY, target.getZ() + halfW)
+        };
+
+        for (Vec3 end : checkPoints) {
+            if (isLineClear(observer, start, end)) return true;
+        }
+        return false;
+    }
+
+    // 视线射线检测
+    private static boolean isLineClear(Mob observer, Vec3 start, Vec3 end) {
+        Level level = observer.level();
+        ClipContext context = getClipContext(observer, start, end);
+        return level.clip(context).getType() == HitResult.Type.MISS;
+    }
+
+    // 射线上下文获取
+    public static ClipContext getClipContext(@NotNull Entity beginner, Vec3 start, Vec3 end) {
+        return new ClipContext(
+                start, end,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                beginner
+        ) {
+            @Override
+            public @NotNull VoxelShape getBlockShape(@NotNull BlockState blockState, @NotNull BlockGetter level, @NotNull BlockPos pos) {
+                if (blockState.is(ModTags.Blocks.SEE_THROUGHS)) {
+                    return Shapes.empty();
+                }
+                return super.getBlockShape(blockState, level, pos);
+            }
+        };
+    }
+
+    // FOV判定
+    private static boolean isWithinFOV(Mob observer, Vec3 lookVec, Vec3 targetDir) {
+        boolean isVerticalLooking = Math.abs(lookVec.x) < 0.0001 && Math.abs(lookVec.z) < 0.0001;
+
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
+        // 水平角度判定
+        if (!isVerticalLooking) {
+            Vec3 lookHorizontal = new Vec3(lookVec.x, 0, lookVec.z).normalize();
+            Vec3 targetHorizontal = new Vec3(targetDir.x, 0, targetDir.z).normalize();
+
+            double horizontalDot = lookHorizontal.dot(targetHorizontal);
+            double horizontalThreshold = Math.cos(Math.toRadians(settings.getHorizontalFov()) / 2.0);
+
+            if (horizontalDot < horizontalThreshold) return false;
+        }
+
+        // 垂直角度判定
+        // 1. 获取目标相对于水平面的绝对仰角
+        double targetPitchDegrees = Math.toDegrees(Math.asin(targetDir.y));
+        // 2. 获取观察者当前视线相对于水平面的绝对仰角
+        double observerPitchDegrees = Math.toDegrees(Math.asin(lookVec.y));
+
+        // 3. 计算相对仰角 (目标在视线上方为正，下方为负)
+        double relativePitch = targetPitchDegrees - observerPitchDegrees;
+
+        double maxUpPitch = settings.getMaxUpPitch();
+        double maxDownPitch = settings.getMaxDownPitch();
+
+        // 判断相对角度是否在 FOV 限制内
+        return relativePitch >= -maxDownPitch && relativePitch <= maxUpPitch;
     }
 }

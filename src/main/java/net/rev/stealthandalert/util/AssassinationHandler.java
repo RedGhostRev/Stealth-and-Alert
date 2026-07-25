@@ -96,6 +96,7 @@ public class AssassinationHandler {
 
     @Nullable
     public static ModTags.PriorityCategory canAssassinate(Player player, Optional<UUID> playerUUID, int targetId, boolean isAssassinating) {
+        if (!CommonConfigs.ASSASSINATION.turnOn.get()) return null;
         if (playerUUID.isEmpty() || targetId < 0 || isAssassinating) return null;
         if (player.isUsingItem()) return null;
         if (isTargetLocked(player.level(), targetId) || isTargetLocked(player.level(), player.getId())) return null;
@@ -145,6 +146,7 @@ public class AssassinationHandler {
     }
 
     public static int canAssassinate(Player player, Optional<UUID> playerUUID, boolean isAssassinating) {
+        if (!CommonConfigs.ASSASSINATION.turnOn.get()) return -1;
         if (playerUUID.isEmpty() || isAssassinating) return -1;
         if (player.isUsingItem()) return -1;
         if (!player.getUUID().equals(playerUUID.get())) return -1;

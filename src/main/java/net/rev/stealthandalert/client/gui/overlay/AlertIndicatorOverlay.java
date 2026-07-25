@@ -54,6 +54,7 @@ public class AlertIndicatorOverlay {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         if (mc.player == null || mc.level == null) return;
+        if (mc.player.isSpectator()) return;
 
         UUID myUUID = mc.player.getUUID();
         int radius = ClientConfigs.ALERT_INDICATOR.radius.getAsInt();
