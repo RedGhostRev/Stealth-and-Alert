@@ -2,12 +2,12 @@
   "required": true,
   "package": "net.rev.stealthandalert.mixin",
   "mixins": [
-    "EntityMixin",
     "PlayerMixin",
     "TargetConditionsMixin"
   ],
   "client": [
-    "MinecraftMixin"
+    "MinecraftMixin",
+    "EntityMixin"
   ],
   "server": [
   ],
