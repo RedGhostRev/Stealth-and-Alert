@@ -1,14 +1,5 @@
 {
   "values": [
-    "minecraft:spider",
-    "minecraft:cave_spider",
-    "minecraft:piglin",
-    "minecraft:enderman",
-    "minecraft:zombified_piglin",
-    "minecraft:dolphin",
-    "minecraft:wolf",
-    "minecraft:polar_bear",
-    "minecraft:iron_golem",
     {
       "id": "irons_spellbooks:priest",
       "required": false
@@ -36,6 +27,19 @@
     {
       "id": "irons_spellbooks:summoned_skeleton",
       "required": false
-    }
+    },
+    {
+      "id": "guardvillagers:guard",
+      "required": false
+    },
+    "minecraft:spider",
+    "minecraft:cave_spider",
+    "minecraft:piglin",
+    "minecraft:enderman",
+    "minecraft:zombified_piglin",
+    "minecraft:dolphin",
+    "minecraft:wolf",
+    "minecraft:polar_bear",
+    "minecraft:iron_golem"
   ]
 }

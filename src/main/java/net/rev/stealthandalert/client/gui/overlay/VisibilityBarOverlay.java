@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attribute.ModAttributes;
-import net.rev.stealthandalert.compat.CompatHandler;
+import net.rev.stealthandalert.compat.SupportedMods;
 import net.rev.stealthandalert.compat.jade.JadeCompat;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.event.ModClientEvents;
@@ -33,7 +33,7 @@ public class VisibilityBarOverlay {
     public static double displayedVisibility = 0;
 
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        if (!ClientConfigs.VISIBILITY_INDICATOR.turnOn.get()) return;
+        if (!ClientConfigs.VISIBILITY_INDICATOR.enable.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         if (mc.player == null) return;
@@ -63,7 +63,7 @@ public class VisibilityBarOverlay {
                     maxYOffset = ModClientEvents.bossbarHeight - 5;
                 }
             }
-            if (CompatHandler.HAS_JADE) {
+            if (SupportedMods.JADE.isLoaded()) {
                 if (ClientConfigs.VISIBILITY_INDICATOR.canOffsetFromJade.get()) {
                     if (JadeCompat.isJadeOverlayVisible()) {
                         int jadeHeight = JadeCompat.getJadeOverlayBottomY();

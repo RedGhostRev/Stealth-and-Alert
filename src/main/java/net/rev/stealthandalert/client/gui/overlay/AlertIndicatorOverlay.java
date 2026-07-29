@@ -50,7 +50,7 @@ public class AlertIndicatorOverlay {
     }
 
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        if (!ClientConfigs.ALERT_INDICATOR.turnOn.get()) return;
+        if (!ClientConfigs.ALERT_INDICATOR.enable.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         if (mc.player == null || mc.level == null) return;

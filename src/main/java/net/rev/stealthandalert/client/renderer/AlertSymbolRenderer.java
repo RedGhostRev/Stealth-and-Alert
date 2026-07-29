@@ -44,7 +44,7 @@ public class AlertSymbolRenderer {
 
     @SubscribeEvent
     public static void onRenderAlertSymbol(RenderNameTagEvent event) {
-        if (!ClientConfigs.ALERT_SYMBOL.turnOn.get()) return;
+        if (!ClientConfigs.ALERT_SYMBOL.enable.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         if (!(event.getEntity() instanceof Mob mob) || !mob.getType().is(ModTags.Entities.SEEKERS)) return;
@@ -58,7 +58,7 @@ public class AlertSymbolRenderer {
         poseStack.pushPose();
 
         float yOffset = mob.getBbHeight();
-        float base = ClientConfigs.DEBUG_MODE.turnOn.get() ? 1.0F : 0.5F;
+        float base = ClientConfigs.DEBUG_MODE.enable.get() ? 1.0F : 0.5F;
         yOffset += base;
 
         boolean hasName = mob.hasCustomName();

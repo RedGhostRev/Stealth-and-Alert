@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.rev.stealthandalert.attribute.ModAttributes;
-import net.rev.stealthandalert.compat.CompatHandler;
+import net.rev.stealthandalert.compat.SupportedMods;
 import net.rev.stealthandalert.compat.ironsspellbooks.IronsSpellbooksCompat;
 import net.rev.stealthandalert.component.ModDataComponents;
 import net.rev.stealthandalert.config.CommonConfigs;
@@ -78,7 +78,7 @@ public class CommonUtils {
 
     public static boolean isPlayerPet(Entity entity, Player player, boolean withGolem) {
         if (player == null) return false;
-        if (CompatHandler.HAS_IRONS_SPELLBOOKS) {
+        if (SupportedMods.IRONS_SPELLBOOKS.isLoaded()) {
             UUID ownerUuid = IronsSpellbooksCompat.getOwnerUuid(entity);
             if (player.getUUID().equals(ownerUuid)) return true;
         }
@@ -132,13 +132,6 @@ public class CommonUtils {
             maxDistance *= (1.0 - actualReduction);
         }
         if (distanceSqr > maxDistance * maxDistance) return false;
-        // 隐身快速失败
-        if (target instanceof Player player) {
-            if (player.isInvisible() && isFullyNaked(player)) {
-                return false;
-            }
-        }
-
         // 获取观察方向与目标向量
         Vec3 eyePos = observer.getEyePosition();
         Vec3 lookVec = observer.getViewVector(1.0F);

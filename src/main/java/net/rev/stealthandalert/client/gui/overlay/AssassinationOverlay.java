@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class AssassinationOverlay {
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        if (!CommonConfigs.ASSASSINATION.turnOn.get()) return;
+        if (!CommonConfigs.ASSASSINATION.enable.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         LocalPlayer player = mc.player;

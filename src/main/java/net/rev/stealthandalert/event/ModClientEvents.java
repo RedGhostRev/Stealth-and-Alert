@@ -108,7 +108,7 @@ public class ModClientEvents {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.screen != null) return;
         AssassinationData data = mc.player.getData(ModAttachments.ASSASSINATION_DATA);
-        if (CommonConfigs.ASSASSINATION.turnOn.get()) {
+        if (CommonConfigs.ASSASSINATION.enable.get()) {
             if (ModKeyMappings.ASSASSINATE_KEY.consumeClick()) {
                 int targetId = AssassinationHandler.canAssassinate(mc.player, Optional.of(mc.player.getUUID()),
                         data.isAssassinating());
@@ -153,7 +153,7 @@ public class ModClientEvents {
     public static void onRenderNameTag(RenderNameTagEvent event) {
         if (!(event.getEntity() instanceof Mob mob) || (!mob.getType().is(ModTags.Entities.SEEKERS) && !mob.getType().is(ModTags.Entities.PROTECTED)))
             return;
-        if (!ClientConfigs.DEBUG_MODE.turnOn.get()) return;
+        if (!ClientConfigs.DEBUG_MODE.enable.get()) return;
 
         Player self = Minecraft.getInstance().player;
         if (self == null) return;

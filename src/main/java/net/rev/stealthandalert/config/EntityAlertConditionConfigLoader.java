@@ -61,7 +61,6 @@ public class EntityAlertConditionConfigLoader {
         }
     }
 
-    // 更新后的生成逻辑
     private static void generateDefaultPresets(Path configDir, boolean forceOverride) {
         for (var modFileInfo : ModList.get().getModFiles()) {
             IModFile modFile = modFileInfo.getFile();
@@ -74,6 +73,8 @@ public class EntityAlertConditionConfigLoader {
                     try {
                         Path relativePath = presetsRoot.relativize(sourcePath);
                         Path targetPath = configDir.resolve(relativePath.toString());
+                        String namespace = relativePath.getParent().toString();
+                        if (!ModList.get().isLoaded(namespace)) return;
 
                         // 如果是强制覆盖，或者目标文件不存在，则执行复制
                         if (forceOverride || !Files.exists(targetPath)) {

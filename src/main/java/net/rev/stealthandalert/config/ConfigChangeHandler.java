@@ -13,14 +13,14 @@ public class ConfigChangeHandler {
     @SubscribeEvent
     public static void onConfigLoad(ModConfigEvent.Loading event) {
         if (event.getConfig().getSpec() == ClientConfigs.SPEC) {
-            wasMarkEnabled = ClientConfigs.MARK.turnOn.get();
+            wasMarkEnabled = ClientConfigs.SPYGLASS_MARK.enable.get();
         }
     }
 
     @SubscribeEvent
     public static void onConfigReload(ModConfigEvent.Reloading event) {
         if (event.getConfig().getSpec() == ClientConfigs.SPEC) {
-            boolean isNowEnabled = ClientConfigs.MARK.turnOn.get();
+            boolean isNowEnabled = ClientConfigs.SPYGLASS_MARK.enable.get();
             if (wasMarkEnabled && !isNowEnabled) {
                 ClientMarkManager.clear();
             }

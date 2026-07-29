@@ -4,19 +4,6 @@
     "minecraft:skeleton_horse"
   ],
   "values": [
-    "#stealth_and_alert:conditional_seekers",
-    "#minecraft:zombies",
-    "#minecraft:skeletons",
-    "#minecraft:illager",
-    "minecraft:ravager",
-    "minecraft:creeper",
-    "minecraft:slime",
-    "minecraft:magma_cube",
-    "minecraft:witch",
-    "minecraft:silverfish",
-    "minecraft:piglin_brute",
-    "minecraft:hoglin",
-    "minecraft:blaze",
     {
       "id": "irons_spellbooks:necromancer",
       "required": false
@@ -40,6 +27,19 @@
     {
       "id": "irons_spellbooks:citadel_keeper",
       "required": false
-    }
+    },
+    "#stealth_and_alert:conditional_seekers",
+    "#minecraft:zombies",
+    "#minecraft:skeletons",
+    "#minecraft:illager",
+    "minecraft:ravager",
+    "minecraft:creeper",
+    "minecraft:slime",
+    "minecraft:magma_cube",
+    "minecraft:witch",
+    "minecraft:silverfish",
+    "minecraft:piglin_brute",
+    "minecraft:hoglin",
+    "minecraft:blaze"
   ]
 }

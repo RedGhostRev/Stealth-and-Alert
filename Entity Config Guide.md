@@ -1,4 +1,4 @@
-[简体中文](ENTITY_CONFIG.zh-CN.md)
+[简体中文](实体配置指南.md)
 
 # Entity Configuration Guide
 
@@ -199,5 +199,5 @@ Here's a full JSON template including all configurable settings.
     "range": 32.0
   }
   ```
-- `threshold` (`Int`) specifies a threshold. When the reputation of nearby villagers with a player is less than or equal to this value, the entity becomes alert towards the player. Defaults to `-15` when omitted.
+- `threshold` (`Int`) specifies a threshold. When the reputation of nearby villagers with a player is less than or equal to this value, the entity becomes alert towards the player. Defaults to `-100` when omitted.
 - `range` specifies the radius within which villagers' reputations are checked. Defaults to `16.0` when omitted.

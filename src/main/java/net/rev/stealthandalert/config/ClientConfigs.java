@@ -1,7 +1,7 @@
 package net.rev.stealthandalert.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.rev.stealthandalert.datagen.LangKeys;
+import net.rev.stealthandalert.datagen.ConfigKeys;
 
 public class ClientConfigs {
     public static final ModConfigSpec SPEC;
@@ -9,7 +9,7 @@ public class ClientConfigs {
     public static final VisibilityIndicator VISIBILITY_INDICATOR;
     public static final SoundWaveIndicator SOUND_WAVE_INDICATOR;
     public static final AlertSymbol ALERT_SYMBOL;
-    public static final Mark MARK;
+    public static final SpyglassMark SPYGLASS_MARK;
     public static final DebugMode DEBUG_MODE;
 
     static {
@@ -19,33 +19,33 @@ public class ClientConfigs {
         VISIBILITY_INDICATOR = new VisibilityIndicator(builder);
         SOUND_WAVE_INDICATOR = new SoundWaveIndicator(builder);
         ALERT_SYMBOL = new AlertSymbol(builder);
-        MARK = new Mark(builder);
+        SPYGLASS_MARK = new SpyglassMark(builder);
         DEBUG_MODE = new DebugMode(builder);
 
         SPEC = builder.build();
     }
 
     public static class AlertIndicator {
-        public final ModConfigSpec.BooleanValue turnOn;
+        public final ModConfigSpec.BooleanValue enable;
         public final ModConfigSpec.IntValue radius;
 
         public AlertIndicator(ModConfigSpec.Builder builder) {
             builder.comment("Settings for the alert indicator HUD, which displays the alert level of surrounding enemies")
-                    .translation(LangKeys.ALERT_INDICATOR)
+                    .translation(ConfigKeys.AlertIndicator.ALERT_INDICATOR.key())
                     .push("alertIndicator");
-            turnOn = builder.comment("Whether to display the alert indicator around the crosshair")
-                    .translation(LangKeys.ALERT_INDICATOR_TURN_ON)
-                    .define("alertIndicator", true);
+            enable = builder.comment("Whether to display the alert indicator around the crosshair")
+                    .translation(ConfigKeys.AlertIndicator.ENABLE.key())
+                    .define("enable", true);
             radius = builder.comment("The distance between the alert indicator and the crosshair")
-                    .translation(LangKeys.RADIUS)
-                    .defineInRange("alertIndicatorRadius", 100, 60, 200);
+                    .translation(ConfigKeys.AlertIndicator.RADIUS.key())
+                    .defineInRange("radius", 100, 60, 200);
 
             builder.pop();
         }
     }
 
     public static class VisibilityIndicator {
-        public final ModConfigSpec.BooleanValue turnOn;
+        public final ModConfigSpec.BooleanValue enable;
         public final ModConfigSpec.DoubleValue scale;
         public final ModConfigSpec.IntValue x;
         public final ModConfigSpec.IntValue y;
@@ -54,37 +54,37 @@ public class ClientConfigs {
 
         public VisibilityIndicator(ModConfigSpec.Builder builder) {
             builder.comment("Settings for the visibility indicator HUD, which displays your current visibility")
-                    .translation(LangKeys.VISIBILITY_INDICATOR)
+                    .translation(ConfigKeys.VisibilityIndicator.VISIBILITY_INDICATOR.key())
                     .push("visibilityIndicator");
-            turnOn = builder.comment("Whether to display the visibility indicator on the screen")
-                    .translation(LangKeys.VISIBILITY_INDICATOR_TURN_ON)
-                    .define("visibilityIndicator", true);
+            enable = builder.comment("Whether to display the visibility indicator on the screen")
+                    .translation(ConfigKeys.VisibilityIndicator.TURN_ON.key())
+                    .define("enable", true);
             scale = builder.comment("The scale of the visibility indicator")
-                    .translation(LangKeys.VISIBILITY_SCALE)
+                    .translation(ConfigKeys.VisibilityIndicator.SCALE.key())
                     .defineInRange("visibilityIndicatorScale", 0.7, 0.2, 2.0);
             builder.comment("The position offset of the visibility indicator on the screen")
-                    .translation(LangKeys.VISIBILITY_INDICATOR_POSITION)
-                    .push("visibilityIndicatorPosition");
+                    .translation(ConfigKeys.VisibilityIndicator.POSITION.key())
+                    .push("position");
             x = builder.comment("The X offset of the visibility indicator on the screen")
-                    .translation(LangKeys.VISIBILITY_INDICATOR_POSITION_X)
-                    .defineInRange("visibilityIndicatorPositionX", 0, -32768, 32767);
+                    .translation(ConfigKeys.VisibilityIndicator.POSITION_X.key())
+                    .defineInRange("x", 0, -32768, 32767);
             y = builder.comment("The Y offset of the visibility indicator on the screen")
-                    .translation(LangKeys.VISIBILITY_INDICATOR_POSITION_Y)
-                    .defineInRange("visibilityIndicatorPositionY", 0, -32768, 32767);
+                    .translation(ConfigKeys.VisibilityIndicator.POSITION_Y.key())
+                    .defineInRange("y", 0, -32768, 32767);
             builder.pop();
             canOffsetFromBossBar = builder.comment("Whether the visibility indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted position or scale of indicator")
-                    .translation(LangKeys.VISIBILITY_INDICATOR_BOSS_BAR)
-                    .define("visibilityIndicatorCanOffsetFromBossBar", true);
+                    .translation(ConfigKeys.VisibilityIndicator.OFFSET_FROM_BOSS_BAR.key())
+                    .define("canOffsetFromBossBar", true);
             canOffsetFromJade = builder.comment("Whether the visibility indicator offsets when Jade mod's tooltip is visible. Recommended to turn off if you have manually adjusted position or scale of indicator or Jade tooltip")
-                    .translation(LangKeys.VISIBILITY_INDICATOR_JADE)
-                    .define("visibilityIndicatorCanOffsetFromJade", true);
+                    .translation(ConfigKeys.VisibilityIndicator.OFFSET_FROM_JADE.key())
+                    .define("canOffsetFromJade", true);
 
             builder.pop();
         }
     }
 
     public static class SoundWaveIndicator {
-        public final ModConfigSpec.BooleanValue turnOn;
+        public final ModConfigSpec.BooleanValue enable;
         public final ModConfigSpec.DoubleValue scale;
         public final ModConfigSpec.IntValue x;
         public final ModConfigSpec.IntValue y;
@@ -93,58 +93,58 @@ public class ClientConfigs {
 
         public SoundWaveIndicator(ModConfigSpec.Builder builder) {
             builder.comment("Settings for the sound wave indicator HUD, which displays the sound you are producing")
-                    .translation(LangKeys.SOUND_WAVE_INDICATOR)
+                    .translation(ConfigKeys.SoundWaveIndicator.SOUND_WAVE_INDICATOR.key())
                     .push("soundWaveIndicator");
-            turnOn = builder.comment("Whether to display the sound wave indicator on the screen")
-                    .translation(LangKeys.SOUND_WAVE_INDICATOR_TURN_ON)
-                    .define("soundWaveIndicator", true);
+            enable = builder.comment("Whether to display the sound wave indicator on the screen")
+                    .translation(ConfigKeys.SoundWaveIndicator.TURN_ON.key())
+                    .define("enable", true);
             scale = builder.comment("The scale of the sound wave indicator")
-                    .translation(LangKeys.SOUND_SCALE)
-                    .defineInRange("soundWaveIndicatorScale", 0.7, 0.2, 2.0);
+                    .translation(ConfigKeys.SoundWaveIndicator.SCALE.key())
+                    .defineInRange("scale", 0.7, 0.2, 2.0);
 
             builder.comment("The position offset of the sound wave indicator on the screen")
-                    .translation(LangKeys.SOUND_WAVE_INDICATOR_POSITION)
-                    .push("soundWaveIndicatorPosition");
+                    .translation(ConfigKeys.SoundWaveIndicator.POSITION.key())
+                    .push("position");
             x = builder.comment("The X offset of the sound wave indicator on the screen")
-                    .translation(LangKeys.SOUND_WAVE_INDICATOR_POSITION_X)
-                    .defineInRange("soundWaveIndicatorPositionX", 0, -32768, 32767);
+                    .translation(ConfigKeys.SoundWaveIndicator.POSITION_X.key())
+                    .defineInRange("x", 0, -32768, 32767);
             y = builder.comment("The Y offset of the sound wave indicator on the screen")
-                    .translation(LangKeys.SOUND_WAVE_INDICATOR_POSITION_Y)
-                    .defineInRange("soundWaveIndicatorPositionY", 0, -32768, 32767);
+                    .translation(ConfigKeys.SoundWaveIndicator.POSITION_Y.key())
+                    .defineInRange("y", 0, -32768, 32767);
             builder.pop();
 
             canOffsetFromBossBar = builder.comment("Whether the sound wave indicator offsets when a boss bar is visible. Recommended to turn off if you have manually adjusted position or scale of indicator")
-                    .translation(LangKeys.SOUND_BOSS_BAR)
-                    .define("soundWaveIndicatorCanOffsetFromBossBar", true);
+                    .translation(ConfigKeys.SoundWaveIndicator.OFFSET_FROM_BOSS_BAR.key())
+                    .define("canOffsetFromBossBar", true);
             canOffsetFromJade = builder.comment("Whether the sound wave indicator offsets when Jade mod's tooltip is visible. Recommended to turn off if you have manually adjusted position or scale of indicator or Jade tooltip")
-                    .translation(LangKeys.SOUND_JADE)
-                    .define("soundWaveIndicatorCanOffsetFromJade", true);
+                    .translation(ConfigKeys.SoundWaveIndicator.OFFSET_FROM_JADE.key())
+                    .define("canOffsetFromJade", true);
 
             builder.pop();
         }
     }
 
     public static class AlertSymbol {
-        public final ModConfigSpec.BooleanValue turnOn;
+        public final ModConfigSpec.BooleanValue enable;
         public final ModConfigSpec.DoubleValue scale;
 
         public AlertSymbol(ModConfigSpec.Builder builder) {
             builder.comment("Settings for the world-space alert symbol, which displays the current alert status of enemies")
-                    .translation(LangKeys.ALERT_SYMBOL)
+                    .translation(ConfigKeys.AlertSymbol.ALERT_SYMBOL.key())
                     .push("alertSymbol");
-            turnOn = builder.comment("Whether to display the alert symbol above enemies' heads")
-                    .translation(LangKeys.ALERT_SYMBOL_TURN_ON)
-                    .define("alertSymbol", true);
+            enable = builder.comment("Whether to display the alert symbol above enemies' heads")
+                    .translation(ConfigKeys.AlertSymbol.ENABLE.key())
+                    .define("enable", true);
             scale = builder.comment("The scale of the alert symbol")
-                    .translation(LangKeys.ALERT_SYMBOL_SCALE)
-                    .defineInRange("alertSymbolScale", 0.005, 0.001, 0.01);
+                    .translation(ConfigKeys.AlertSymbol.SCALE.key())
+                    .defineInRange("scale", 0.005, 0.001, 0.01);
 
             builder.pop();
         }
     }
 
-    public static class Mark {
-        public final ModConfigSpec.BooleanValue turnOn;
+    public static class SpyglassMark {
+        public final ModConfigSpec.BooleanValue enable;
         public final ModConfigSpec.DoubleValue maxDistance;
         public final ModConfigSpec.IntValue hostileColor;
         public final ModConfigSpec.IntValue neutralColor;
@@ -152,32 +152,32 @@ public class ClientConfigs {
         public final ModConfigSpec.IntValue npcColor;
         public final ModConfigSpec.IntValue passiveColor;
 
-        public Mark(ModConfigSpec.Builder builder) {
+        public SpyglassMark(ModConfigSpec.Builder builder) {
             builder.comment("Settings for marking mobs through spyglass")
-                    .translation(LangKeys.MARK_C)
-                    .push("spyglass_mark");
-            turnOn = builder.comment("Whether to turn on mark feature when using spyglass")
-                    .translation(LangKeys.MARK_TURN_ON)
-                    .define("spyglass_mark", true);
+                    .translation(ConfigKeys.SpyglassMark.SPYGLASS_MARK.key())
+                    .push("spyglassMark");
+            enable = builder.comment("Whether to turn on mark feature when using spyglass")
+                    .translation(ConfigKeys.SpyglassMark.ENABLE.key())
+                    .define("enable", true);
 
             maxDistance = builder.comment("The maximum distance at which a mob can be marked")
-                    .translation(LangKeys.MARK_MAX_DISTANCE)
-                    .defineInRange("max_distance", 128.0, 16.0, 2048.0);
+                    .translation(ConfigKeys.SpyglassMark.MAX_DISTANCE.key())
+                    .defineInRange("maxDistance", 128.0, 16.0, 2048.0);
 
             hostileColor = builder.comment("Mark's color for hostile mobs")
-                    .translation(LangKeys.HOSTILE_COLOR)
+                    .translation(ConfigKeys.SpyglassMark.HOSTILE_COLOR.key())
                     .defineInRange("hostileColor", 0xFF0000, 0x000000, 0xFFFFFF);
             neutralColor = builder.comment("Mark's color for neutral mobs")
-                    .translation(LangKeys.NEUTRAL_COLOR)
+                    .translation(ConfigKeys.SpyglassMark.NEUTRAL_COLOR.key())
                     .defineInRange("neutralColor", 0xFF8C00, 0x000000, 0xFFFFFF);
             allyColor = builder.comment("Mark's color for allies of players, such as Iron Golems created by players, Snow Golems, and pets (only to their owners)")
-                    .translation(LangKeys.ALLY_COLOR)
+                    .translation(ConfigKeys.SpyglassMark.ALLY_COLOR.key())
                     .defineInRange("allyColor", 0x0000FF, 0x000000, 0xFFFFFF);
             npcColor = builder.comment("Mark's color for NPCs, such as Villagers and Wandering Traders")
-                    .translation(LangKeys.NPC_COLOR)
+                    .translation(ConfigKeys.SpyglassMark.NPC_COLOR.key())
                     .defineInRange("npcColor", 0x00FF00, 0x000000, 0xFFFFFF);
             passiveColor = builder.comment("Mark's color for passive mobs, such as normal animals")
-                    .translation(LangKeys.PASSIVE_COLOR)
+                    .translation(ConfigKeys.SpyglassMark.PASSIVE_COLOR.key())
                     .defineInRange("passiveColor", 0xFFFFFF, 0x000000, 0xFFFFFF);
 
             builder.pop();
@@ -185,15 +185,15 @@ public class ClientConfigs {
     }
 
     public static class DebugMode {
-        public final ModConfigSpec.BooleanValue turnOn;
+        public final ModConfigSpec.BooleanValue enable;
 
         public DebugMode(ModConfigSpec.Builder builder) {
             builder.comment("Settings for Debug Mode")
-                    .translation(LangKeys.DEBUG_MODE)
+                    .translation(ConfigKeys.DebugMode.DEBUG_MODE.key())
                     .push("debugMode");
-            turnOn = builder.comment("Whether to display detailed alert status information above enemies' heads")
-                    .translation(LangKeys.DEBUG_TURN_ON)
-                    .define("debugMode", false);
+            enable = builder.comment("Whether to display detailed alert status information above enemies' heads")
+                    .translation(ConfigKeys.DebugMode.ENABLE.key())
+                    .define("enable", false);
 
             builder.pop();
         }

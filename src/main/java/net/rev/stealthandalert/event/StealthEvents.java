@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -51,7 +52,7 @@ public class StealthEvents {
     // 拦截原版setTarget事件
     // 当且仅当生物的待设定攻击目标有 DETECTABLE 标签时，才根据条件拦截
     // 如果生物有主目标，且生物为 FIGHTING 状态，主目标为 TRACKING 状态，则拦截生物对其他任何生物的目标设定，强制将待设定目标设置为主目标
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void onMobTarget(LivingChangeTargetEvent event) {
         LivingEntity target = event.getNewAboutToBeSetTarget();
         if (target == null) return;
@@ -69,7 +70,7 @@ public class StealthEvents {
             } else {
                 // 接下来，生物待设目标是 DETECTABLE
                 // 生物无主目标时，无论如何也不应锁定当前待设目标，直到主目标设立
-                event.setNewAboutToBeSetTarget(null);
+                event.setCanceled(true);
                 return;
             }
         }
@@ -83,8 +84,8 @@ public class StealthEvents {
             if ((data.state() == AlertData.FIGHTING && data.targetStates().getOrDefault(data.primaryTarget().get(), AlertData.UNTRACKED) == AlertData.TRACKING)) {
                 ServerLevel level = ((ServerLevel) mob.level());
                 Entity entity = level.getEntity(data.primaryTarget().get());
-                if (entity instanceof LivingEntity livingEntity) {
-                    event.setNewAboutToBeSetTarget(livingEntity);
+                if (entity instanceof LivingEntity) {
+//                    event.setNewAboutToBeSetTarget(livingEntity);
                     return;
                 }
             } else {
@@ -93,7 +94,7 @@ public class StealthEvents {
                     return;
                 } else {
                     // 如果待设目标是 DETECTABLE，由于待设目标不是主目标，无论如何也不应被锁定
-                    event.setNewAboutToBeSetTarget(null);
+                    event.setCanceled(true);
                     return;
                 }
             }
@@ -105,13 +106,13 @@ public class StealthEvents {
 
         // 锁定要求：生物处于 FIGHTING 状态且主目标处于 TRACKING 状态
         if (data.state() < AlertData.FIGHTING) {
-            event.setNewAboutToBeSetTarget(null);
+            event.setCanceled(true);
             return;
         }
 
         int pState = data.targetStates().getOrDefault(target.getUUID(), AlertData.UNTRACKED);
         if (pState < AlertData.TRACKING) {
-            event.setNewAboutToBeSetTarget(null);
+            event.setCanceled(true);
         }
     }
 

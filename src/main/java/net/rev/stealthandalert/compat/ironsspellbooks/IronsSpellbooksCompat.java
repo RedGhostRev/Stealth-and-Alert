@@ -1,13 +1,13 @@
 package net.rev.stealthandalert.compat.ironsspellbooks;
 
 import io.redspace.ironsspellbooks.capabilities.magic.SummonManager;
-import io.redspace.ironsspellbooks.registries.EntityRegistry;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attribute.ModAttributes;
+import net.rev.stealthandalert.compat.SupportedMods;
 import net.rev.stealthandalert.datagen.ModEntityTypeTagsProvider;
 import net.rev.stealthandalert.util.ModTags;
 
@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class IronsSpellbooksCompat {
+    public static final SupportedMods mod = SupportedMods.IRONS_SPELLBOOKS;
+
     public static void init() {
         MobEffectRegistry.TRUE_INVISIBILITY.get().addAttributeModifier(
                 ModAttributes.VISIBILITY,
@@ -55,21 +57,21 @@ public class IronsSpellbooksCompat {
 
     public static void addEntityTags(ModEntityTypeTagsProvider provider) {
         provider.tag(ModTags.Entities.SEEKERS)
-                .addOptional(EntityRegistry.NECROMANCER.getId())
-                .addOptional(EntityRegistry.ARCHEVOKER.getId())
-                .addOptional(EntityRegistry.ICE_SPIDER.getId())
-                .addOptional(EntityRegistry.CATACOMBS_ZOMBIE.getId())
-                .addOptional(EntityRegistry.MAGEHUNTER_VINDICATOR.getId())
-                .addOptional(EntityRegistry.KEEPER.getId());
+                .addOptional(mod.rl("necromancer"))
+                .addOptional(mod.rl("archevoker"))
+                .addOptional(mod.rl("ice_spider"))
+                .addOptional(mod.rl("catacombs_zombie"))
+                .addOptional(mod.rl("magehunter_vindicator"))
+                .addOptional(mod.rl("citadel_keeper"));
         provider.tag(ModTags.Entities.CONDITIONAL_SEEKERS)
-                .addOptional(EntityRegistry.PRIEST.getId())
-                .addOptional(EntityRegistry.APOTHECARIST.getId())
-                .addOptional(EntityRegistry.CRYOMANCER.getId())
-                .addOptional(EntityRegistry.PYROMANCER.getId())
-                .addOptional(EntityRegistry.SUMMONED_POLAR_BEAR.getId())
-                .addOptional(EntityRegistry.SUMMONED_ZOMBIE.getId())
-                .addOptional(EntityRegistry.SUMMONED_SKELETON.getId());
+                .addOptional(mod.rl("priest"))
+                .addOptional(mod.rl("apothecarist"))
+                .addOptional(mod.rl("cryomancer"))
+                .addOptional(mod.rl("pyromancer"))
+                .addOptional(mod.rl("summoned_polar_bear"))
+                .addOptional(mod.rl("summoned_zombie"))
+                .addOptional(mod.rl("summoned_skeleton"));
         provider.tag(ModTags.Entities.CAN_BE_ASSASSINATED)
-                .remove(EntityRegistry.PRIEST.getId());
+                .remove(mod.rl("priest"));
     }
 }

@@ -43,7 +43,7 @@ public class ClientMarkManager {
     }
 
     public static int canSeeAny(@NotNull Player player) {
-        double maxDistance = ClientConfigs.MARK.maxDistance.get();
+        double maxDistance = ClientConfigs.SPYGLASS_MARK.maxDistance.get();
         Vec3 eyePos = player.getEyePosition(1.0F);
         Vec3 lookVec = player.getViewVector(1.0F);
         Vec3 endPos = eyePos.add(lookVec.scale(maxDistance));
@@ -78,12 +78,12 @@ public class ClientMarkManager {
     }
 
     public static void mark() {
-        if (!ClientConfigs.MARK.turnOn.get()) return;
+        if (!ClientConfigs.SPYGLASS_MARK.enable.get()) return;
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null || !player.isUsingItem() || !player.getUseItem().is(Items.SPYGLASS)) return;
 
-        double maxDistance = ClientConfigs.MARK.maxDistance.get();
+        double maxDistance = ClientConfigs.SPYGLASS_MARK.maxDistance.get();
         Vec3 eyePos = player.getEyePosition(1.0F);
         Vec3 lookVec = player.getViewVector(1.0F);
         Vec3 endPos = eyePos.add(lookVec.scale(maxDistance));

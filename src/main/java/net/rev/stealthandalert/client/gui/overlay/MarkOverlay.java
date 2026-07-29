@@ -15,7 +15,7 @@ import net.rev.stealthandalert.datagen.LangKeys;
 
 public class MarkOverlay {
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        if (!ClientConfigs.MARK.turnOn.get()) return;
+        if (!ClientConfigs.SPYGLASS_MARK.enable.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         LocalPlayer player = mc.player;

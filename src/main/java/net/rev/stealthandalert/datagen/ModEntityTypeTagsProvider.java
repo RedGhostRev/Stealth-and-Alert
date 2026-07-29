@@ -12,13 +12,12 @@ import net.minecraft.world.entity.MobCategory;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.compat.CompatHandler;
-import net.rev.stealthandalert.compat.dummmmmmy.DummmmmmyCompat;
-import net.rev.stealthandalert.compat.ironsspellbooks.IronsSpellbooksCompat;
 import net.rev.stealthandalert.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
     public ModEntityTypeTagsProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> provider, @Nullable ExistingFileHelper existingFileHelper) {
@@ -32,6 +31,10 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider provider) {
+        for (Consumer<ModEntityTypeTagsProvider> consumer : CompatHandler.ENTITY_TAGS) {
+            consumer.accept(this);
+        }
+
         tag(ModTags.Entities.SEEKERS)
                 .addTag(ModTags.Entities.CONDITIONAL_SEEKERS)
                 .addTag(EntityTypeTags.ZOMBIES)
@@ -59,13 +62,6 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
                 .add(EntityType.WOLF)
                 .add(EntityType.POLAR_BEAR)
                 .add(EntityType.IRON_GOLEM);
-
-        if (CompatHandler.HAS_IRONS_SPELLBOOKS) {
-            IronsSpellbooksCompat.addEntityTags(this);
-        }
-        if (CompatHandler.HAS_DUMMMMMMY) {
-            DummmmmmyCompat.addEntityTags(this);
-        }
 
         // 受保护的生物，受击后产生仇恨记忆
         tag(ModTags.Entities.PROTECTED)

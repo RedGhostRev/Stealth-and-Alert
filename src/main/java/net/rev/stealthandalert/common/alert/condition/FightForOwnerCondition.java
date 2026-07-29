@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
-import net.rev.stealthandalert.compat.CompatHandler;
+import net.rev.stealthandalert.compat.SupportedMods;
 import net.rev.stealthandalert.compat.ironsspellbooks.IronsSpellbooksCompat;
 
 import java.util.Map;
@@ -20,7 +20,7 @@ public class FightForOwnerCondition implements IAlertCondition {
     @Override
     public boolean test(Mob mob, Player player, Map<String, JsonElement> params) {
         Entity owner = null;
-        if (CompatHandler.HAS_IRONS_SPELLBOOKS) {
+        if (SupportedMods.IRONS_SPELLBOOKS.isLoaded()) {
             owner = IronsSpellbooksCompat.getOwner(mob);
         }
         if (mob instanceof OwnableEntity ownable) {

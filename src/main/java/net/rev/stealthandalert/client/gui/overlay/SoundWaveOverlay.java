@@ -11,7 +11,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.rev.stealthandalert.StealthAndAlert;
-import net.rev.stealthandalert.compat.CompatHandler;
+import net.rev.stealthandalert.compat.SupportedMods;
 import net.rev.stealthandalert.compat.jade.JadeCompat;
 import net.rev.stealthandalert.config.ClientConfigs;
 import net.rev.stealthandalert.event.ModClientEvents;
@@ -70,7 +70,7 @@ public class SoundWaveOverlay {
     }
 
     public static void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        if (!ClientConfigs.SOUND_WAVE_INDICATOR.turnOn.get()) return;
+        if (!ClientConfigs.SOUND_WAVE_INDICATOR.enable.get()) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
         LocalPlayer player = mc.player;
@@ -142,7 +142,7 @@ public class SoundWaveOverlay {
                     maxYOffset = ModClientEvents.bossbarHeight - 5;
                 }
             }
-            if (CompatHandler.HAS_JADE) {
+            if (SupportedMods.JADE.isLoaded()) {
                 if (ClientConfigs.VISIBILITY_INDICATOR.canOffsetFromJade.get()) {
                     if (JadeCompat.isJadeOverlayVisible()) {
                         int jadeHeight = JadeCompat.getJadeOverlayBottomY();

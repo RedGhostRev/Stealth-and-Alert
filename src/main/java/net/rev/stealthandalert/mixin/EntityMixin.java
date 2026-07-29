@@ -18,27 +18,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public class EntityMixin {
     @Inject(method = "getTeamColor", at = @At("HEAD"), cancellable = true)
-    private void forceRedOutline(CallbackInfoReturnable<Integer> cir) {
+    private void stealth_and_alert$setMarkColor(CallbackInfoReturnable<Integer> cir) {
         Entity entity = (Entity) (Object) this;
         if (entity.level().isClientSide() && ClientMarkManager.isMarked(entity.getId())) {
             if (CommonUtils.isPlayerPet(entity, Minecraft.getInstance().player, true)) {
-                cir.setReturnValue(ClientConfigs.MARK.allyColor.get());
+                cir.setReturnValue(ClientConfigs.SPYGLASS_MARK.allyColor.get());
                 return;
             }
             if (entity.getType().is(ModTags.Entities.CONDITIONAL_SEEKERS) || entity instanceof NeutralMob) {
-                cir.setReturnValue(ClientConfigs.MARK.neutralColor.get());
+                cir.setReturnValue(ClientConfigs.SPYGLASS_MARK.neutralColor.get());
                 return;
             }
             if (entity.getType().is(ModTags.Entities.SEEKERS) || entity instanceof Enemy) {
-                cir.setReturnValue(ClientConfigs.MARK.hostileColor.get());
+                cir.setReturnValue(ClientConfigs.SPYGLASS_MARK.hostileColor.get());
                 return;
             }
             if (entity instanceof Npc) {
-                cir.setReturnValue(ClientConfigs.MARK.npcColor.get());
+                cir.setReturnValue(ClientConfigs.SPYGLASS_MARK.npcColor.get());
                 return;
             }
             if (entity.getType().is(ModTags.Entities.ANIMALS) || entity instanceof Animal) {
-                cir.setReturnValue(ClientConfigs.MARK.passiveColor.get());
+                cir.setReturnValue(ClientConfigs.SPYGLASS_MARK.passiveColor.get());
             }
         }
     }
