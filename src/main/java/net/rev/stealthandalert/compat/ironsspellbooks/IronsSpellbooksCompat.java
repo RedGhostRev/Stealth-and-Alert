@@ -29,7 +29,7 @@ public class IronsSpellbooksCompat {
         MobEffectRegistry.GUIDING_BOLT.get().addAttributeModifier(
                 ModAttributes.VISIBILITY,
                 ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "guided"),
-                1.0,
+                1000.0,
                 AttributeModifier.Operation.ADD_VALUE
         );
     }

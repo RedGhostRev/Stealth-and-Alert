@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -48,7 +49,7 @@ import java.util.UUID;
 @EventBusSubscriber(modid = StealthAndAlert.MOD_ID)
 public class StealthSoundEvents {
     public static IEventBus bus = NeoForge.EVENT_BUS;
-    public static final HashMap<UUID, OpenedContainerInfo> activeContainers = new HashMap<UUID, OpenedContainerInfo>();
+    public static final HashMap<UUID, OpenedContainerInfo> activeContainers = new HashMap<>();
 
     public record OpenedContainerInfo(BlockPos pos, BlockEntity blockEntity) {
     }
@@ -155,6 +156,7 @@ public class StealthSoundEvents {
     public static void onProjectileImpact(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (projectile.getOwner() instanceof ServerPlayer player && !player.isCreative() && !player.isSpectator()) {
+            if (event.getRayTraceResult().getType() == HitResult.Type.ENTITY) return;
             if (projectile instanceof Snowball) {
                 bus.post(new StealthSoundEvent(StealthSoundEvent.Type.ENVIRONMENT, projectile.position(), player, 42.0, 5.0, AlertSoundData.LOW));
             } else if (projectile instanceof ThrownEgg) {

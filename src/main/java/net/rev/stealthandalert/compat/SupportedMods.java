@@ -4,9 +4,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.loading.LoadingModList;
 import net.rev.stealthandalert.compat.ironsspellbooks.IronsSpellbooksCompat;
 
+@SuppressWarnings("Convert2MethodRef")
+// 若使用方法引用，会导致提前加载类文件，使得 KubeJS 注入失败
 public enum SupportedMods {
     JADE,
-    IRONS_SPELLBOOKS(IronsSpellbooksCompat::init),
+    IRONS_SPELLBOOKS(() -> IronsSpellbooksCompat.init()),
     DUMMMMMMY,
     GUARDVILLAGERS;
 

@@ -76,7 +76,7 @@ public class GlobalVisibilityModifier {
         MobEffects.GLOWING.value().addAttributeModifier(
                 ModAttributes.VISIBILITY,
                 ResourceLocation.fromNamespaceAndPath(StealthAndAlert.MOD_ID, "glowing"),
-                1.0,
+                1000.0,
                 AttributeModifier.Operation.ADD_VALUE
         );
     }

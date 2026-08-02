@@ -13,8 +13,11 @@ import net.minecraft.world.phys.Vec3;
 import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.InvestigateLkpData;
 import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.ModAttributes;
 
 import java.util.Optional;
+
+import static net.rev.stealthandalert.util.StealthUtils.VISIBILITY_THRESHOLD;
 
 
 public class AlertActionHandler {
@@ -58,7 +61,7 @@ public class AlertActionHandler {
 
                 // 但是，若目标处于非生存模式，则无视这些条件
                 if (primary instanceof Player player) {
-                    if ((player.isInvisible() && CommonUtils.isFullyNaked(player)) || player.isCreative() || player.isSpectator()) {
+                    if (player.getAttributeValue(ModAttributes.VISIBILITY) <= VISIBILITY_THRESHOLD + 0.0001 || player.isCreative() || player.isSpectator()) {
                         mob.setTarget(null);
                     }
                 } else if (data.state() < AlertData.FIGHTING && data.targetStates().getOrDefault(primary.getUUID(), AlertData.UNTRACKED) < AlertData.TRACKING) {
