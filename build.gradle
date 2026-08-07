@@ -191,6 +191,10 @@ dependencies {
     compileOnly "curse.maven:guard-villagers-360203:8230345"
     localRuntime "curse.maven:guard-villagers-360203:8230345"
 
+    // Foundry Veil - 渲染库 (Modrinth slug: veil)
+    localRuntime "maven.modrinth:veil:${veil_version}"
+    compileOnly "maven.modrinth:veil:${veil_version}"
+
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

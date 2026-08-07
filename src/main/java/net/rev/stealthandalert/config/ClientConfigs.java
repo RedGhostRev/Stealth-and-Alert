@@ -10,6 +10,7 @@ public class ClientConfigs {
     public static final SoundWaveIndicator SOUND_WAVE_INDICATOR;
     public static final AlertSymbol ALERT_SYMBOL;
     public static final SpyglassMark SPYGLASS_MARK;
+    public static final Heatmap HEATMAP;
     public static final DebugMode DEBUG_MODE;
 
     static {
@@ -20,6 +21,7 @@ public class ClientConfigs {
         SOUND_WAVE_INDICATOR = new SoundWaveIndicator(builder);
         ALERT_SYMBOL = new AlertSymbol(builder);
         SPYGLASS_MARK = new SpyglassMark(builder);
+        HEATMAP = new Heatmap(builder);
         DEBUG_MODE = new DebugMode(builder);
 
         SPEC = builder.build();
@@ -179,6 +181,33 @@ public class ClientConfigs {
             passiveColor = builder.comment("Mark's color for passive mobs, such as normal animals")
                     .translation(ConfigKeys.SpyglassMark.PASSIVE_COLOR.key())
                     .defineInRange("passiveColor", 0xFFFFFF, 0x000000, 0xFFFFFF);
+
+            builder.pop();
+        }
+    }
+
+    public static class Heatmap {
+        public final ModConfigSpec.BooleanValue enable;
+        public final ModConfigSpec.DoubleValue searchRange;
+        public final ModConfigSpec.DoubleValue maxOpacity;
+        public final ModConfigSpec.DoubleValue debugForceY;
+
+        public Heatmap(ModConfigSpec.Builder builder) {
+            builder.comment("Settings for the danger heatmap visualization, which displays danger levels in enemy vision cones")
+                    .translation(ConfigKeys.Heatmap.HEATMAP.key())
+                    .push("heatmap");
+            enable = builder.comment("Whether to display the danger heatmap in enemy vision cones")
+                    .translation(ConfigKeys.Heatmap.ENABLE.key())
+                    .define("enable", true);
+            searchRange = builder.comment("The maximum search range to find enemies and display their heatmaps")
+                    .translation(ConfigKeys.Heatmap.SEARCH_RANGE.key())
+                    .defineInRange("searchRange", 32.0, 8.0, 128.0);
+            maxOpacity = builder.comment("The maximum opacity of heatmap cells (0=transparent, 1=fully opaque)")
+                    .translation(ConfigKeys.Heatmap.MAX_OPACITY.key())
+                    .defineInRange("maxOpacity", 0.4, 0.05, 1.0);
+            debugForceY = builder.comment("Debug: force all vision cone vertices to this Y (e.g. 100) to verify shader projection is working. Set to -9999 to disable.")
+                    .translation(ConfigKeys.Heatmap.DEBUG_FORCE_Y.key())
+                    .defineInRange("debugForceY", -9999.0, -10000.0, 10000.0);
 
             builder.pop();
         }

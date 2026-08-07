@@ -286,6 +286,30 @@ public class ConfigKeys {
         }
     }
 
+    public enum Heatmap {
+        HEATMAP,
+        ENABLE,
+        SEARCH_RANGE,
+        MAX_OPACITY,
+        DEBUG_FORCE_Y;
+
+        private final String key;
+        private final String tooltip;
+
+        public String key() {
+            return key;
+        }
+
+        public String tooltip() {
+            return tooltip;
+        }
+
+        Heatmap() {
+            key = getKey(this, "HEATMAP");
+            tooltip = getTooltip(key);
+        }
+    }
+
     private static String config(String category, String id) {
         return "config." + StealthAndAlert.MOD_ID + "." + category + "." + id;
     }
