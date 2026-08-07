@@ -268,6 +268,15 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(ConfigKeys.SpyglassMark.PASSIVE_COLOR.key(), "被动生物颜色");
         add(ConfigKeys.SpyglassMark.PASSIVE_COLOR.tooltip(), "被动生物的标记颜色，如普通动物");
 
+        add(ConfigKeys.Heatmap.HEATMAP.key(), "危险度热力图");
+        add(ConfigKeys.Heatmap.HEATMAP.tooltip(), "危险度热力图可视化的相关设置");
+        add(ConfigKeys.Heatmap.ENABLE.key(), "开启热力图");
+        add(ConfigKeys.Heatmap.ENABLE.tooltip(), "是否在敌人视野锥中显示危险度热力图");
+        add(ConfigKeys.Heatmap.SEARCH_RANGE.key(), "搜索范围");
+        add(ConfigKeys.Heatmap.SEARCH_RANGE.tooltip(), "寻找敌人并显示其热力图的最大搜索范围");
+        add(ConfigKeys.Heatmap.MAX_OPACITY.key(), "最大不透明度");
+        add(ConfigKeys.Heatmap.MAX_OPACITY.tooltip(), "热力图方格的最大不透明度（0=透明，1=完全不透明）");
+
         add(ConfigKeys.DebugMode.DEBUG_MODE.key(), "调试模式");
         add(ConfigKeys.DebugMode.DEBUG_MODE.tooltip(), "调试模式相关设置");
         add(ConfigKeys.DebugMode.ENABLE.key(), "开启调试模式");

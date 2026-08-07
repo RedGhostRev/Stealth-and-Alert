@@ -268,6 +268,15 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(ConfigKeys.SpyglassMark.PASSIVE_COLOR.key(), "Passive Color");
         add(ConfigKeys.SpyglassMark.PASSIVE_COLOR.tooltip(), "Mark's color for passive mobs, such as normal animals");
 
+        add(ConfigKeys.Heatmap.HEATMAP.key(), "Danger Heatmap");
+        add(ConfigKeys.Heatmap.HEATMAP.tooltip(), "Settings for the danger heatmap visualization");
+        add(ConfigKeys.Heatmap.ENABLE.key(), "Enable Heatmap");
+        add(ConfigKeys.Heatmap.ENABLE.tooltip(), "Whether to display the danger heatmap in enemy vision cones");
+        add(ConfigKeys.Heatmap.SEARCH_RANGE.key(), "Search Range");
+        add(ConfigKeys.Heatmap.SEARCH_RANGE.tooltip(), "The maximum search range to find enemies and display their heatmaps");
+        add(ConfigKeys.Heatmap.MAX_OPACITY.key(), "Max Opacity");
+        add(ConfigKeys.Heatmap.MAX_OPACITY.tooltip(), "The maximum opacity of heatmap cells (0=transparent, 1=fully opaque)");
+
         add(ConfigKeys.DebugMode.DEBUG_MODE.key(), "Debug Mode");
         add(ConfigKeys.DebugMode.DEBUG_MODE.tooltip(), "Settings for Debug Mode");
         add(ConfigKeys.DebugMode.ENABLE.key(), "Enable Debug Mode");
