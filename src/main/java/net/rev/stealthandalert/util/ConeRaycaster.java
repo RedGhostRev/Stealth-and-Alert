@@ -48,6 +48,15 @@ public final class ConeRaycaster {
     }
 
     /**
+     * 计算生物视锥的地面投影网格，可指定视距（例如玩家可见度修正后的有效视距）。
+     *
+     * @param range 射线最长距离（格）；传入 0 或负数时退回生物原始视距
+     */
+    public static OccludedConeData compute(Mob mob, Level level, double range) {
+        return compute(mob, level, false, range, CONE_RAYS, PITCH_STEPS);
+    }
+
+    /**
      * 计算生物视锥的地面投影网格（默认采样密度）。
      *
      * @param includeUp 为 {@code true} 时包含向上视野角（verticalUpFov），供危险热力图
@@ -68,11 +77,27 @@ public final class ConeRaycaster {
      */
     public static OccludedConeData compute(Mob mob, Level level, boolean includeUp,
                                            int coneRays, int pitchSteps) {
+        return compute(mob, level, includeUp,
+                EntityAlertConditionConfigLoader.get(mob.getType()).getViewRange(),
+                coneRays, pitchSteps);
+    }
+
+    /**
+     * 计算生物视锥的地面投影网格，可指定采样密度与视距。
+     *
+     * @param includeUp  为 {@code true} 时包含向上视野角（verticalUpFov）
+     * @param range      射线最长距离（格）；传入 0 或负数时退回生物原始视距
+     * @param coneRays   水平方向（yaw）射线采样数
+     * @param pitchSteps 垂直方向（pitch）射线采样数
+     * @return 视锥网格数据（grid 永不为空）
+     */
+    public static OccludedConeData compute(Mob mob, Level level, boolean includeUp, double range,
+                                           int coneRays, int pitchSteps) {
         Vec3 eye = mob.getEyePosition(1.0F);
         Vec3 look = mob.getViewVector(1.0F).normalize();
 
         EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(mob.getType());
-        double range = settings.getViewRange();
+        if (range <= 0) range = settings.getViewRange();
         double halfHFov = Math.toRadians(settings.getHorizontalFov() / 2.0);
         double maxDown = Math.toRadians(settings.getMaxDownPitch());
         double maxUp = includeUp ? Math.toRadians(settings.getMaxUpPitch()) : 0.0;

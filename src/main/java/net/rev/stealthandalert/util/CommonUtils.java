@@ -119,18 +119,28 @@ public class CommonUtils {
         }
     }
 
+    /**
+     * 计算生物对指定玩家的“可见度修正后”的有效视距。
+     * 玩家越隐蔽（可见度越低），有效视距越短；
+     * 与 {@link #hasLineOfSight} 共用同一逻辑，保证检测与显示一致。
+     */
+    public static double getCorrectedViewRange(Mob observer, Player target) {
+        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
+        double maxDistance = settings.getViewRange();
+        double visibility = target.getAttributeValue(ModAttributes.VISIBILITY);
+        double threshold = StealthUtils.VISIBILITY_THRESHOLD;
+        double actualReduction = calculateReduction(visibility, threshold,
+                CommonConfigs.DETECTION.visibilityDetectionRangeReductionModel.get());
+        return maxDistance * (1.0 - actualReduction);
+    }
+
     // 视线检测：如果mob能看到target，则返回true
     public static boolean hasLineOfSight(Mob observer, Entity target) {
         // 距离快速失败
-        EntityAlertConditionSettings settings = EntityAlertConditionConfigLoader.get(observer.getType());
         double distanceSqr = observer.distanceToSqr(target);
-        double maxDistance = settings.getViewRange();
-        if (target instanceof Player player) {
-            double visibility = player.getAttributeValue(ModAttributes.VISIBILITY);
-            double threshold = StealthUtils.VISIBILITY_THRESHOLD;
-            double actualReduction = calculateReduction(visibility, threshold, CommonConfigs.DETECTION.visibilityDetectionRangeReductionModel.get());
-            maxDistance *= (1.0 - actualReduction);
-        }
+        double maxDistance = target instanceof Player player
+                ? getCorrectedViewRange(observer, player)
+                : EntityAlertConditionConfigLoader.get(observer.getType()).getViewRange();
         if (distanceSqr > maxDistance * maxDistance) return false;
         // 获取观察方向与目标向量
         Vec3 eyePos = observer.getEyePosition();

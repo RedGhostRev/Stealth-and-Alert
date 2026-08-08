@@ -26,6 +26,7 @@ import net.rev.stealthandalert.attachment.AlertData;
 import net.rev.stealthandalert.attachment.ModAttachments;
 import net.rev.stealthandalert.client.heatmap.HeatmapComputer;
 import net.rev.stealthandalert.config.ClientConfigs;
+import net.rev.stealthandalert.util.CommonUtils;
 import net.rev.stealthandalert.util.ConeRaycaster;
 import net.rev.stealthandalert.util.ModTags;
 import org.joml.Matrix4f;
@@ -104,7 +105,9 @@ public class VisionConeRenderer {
         List<ConeRaycaster.OccludedConeData> cones = new ArrayList<>();
 
         for (Mob mob : mobs) {
-            var cone = ConeRaycaster.compute(mob, level);
+            // 使用玩家可见度修正后的有效视距：玩家越隐蔽，显示出的视锥越短，
+            // 与实际 hasLineOfSight 检测距离保持一致
+            var cone = ConeRaycaster.compute(mob, level, CommonUtils.getCorrectedViewRange(mob, player));
             if (cone == null || cone.grid().isEmpty()) continue;
             any = true;
             cones.add(cone);
