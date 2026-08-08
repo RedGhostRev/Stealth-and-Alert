@@ -20,7 +20,8 @@ public class ModAttributes {
                     .setSyncable(true));
 
     public static final DeferredHolder<Attribute, Attribute> ASSASSINATION_DAMAGE = ATTRIBUTES.register("assassination_damage",
-            () -> new AssassinationDamageAttribute(LangKeys.ASSASSINATION_DAMAGE, 0.0, 0.0, Integer.MAX_VALUE));
+            () -> new AssassinationDamageAttribute(LangKeys.ASSASSINATION_DAMAGE, 0.0, 0.0, Integer.MAX_VALUE)
+                    .setSyncable(true));
 
     public static void register(IEventBus eventBus) {
         ATTRIBUTES.register(eventBus);
