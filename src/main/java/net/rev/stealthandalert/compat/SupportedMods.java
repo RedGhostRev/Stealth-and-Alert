@@ -10,7 +10,10 @@ public enum SupportedMods {
     JADE,
     IRONS_SPELLBOOKS(() -> IronsSpellbooksCompat.init()),
     DUMMMMMMY,
-    GUARDVILLAGERS;
+    GUARDVILLAGERS,
+    POWERFUL_DUMMY,
+    TWILIGHTFOREST,
+    CURIOS;
 
     private final String id;
     private final boolean isLoaded;

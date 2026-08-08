@@ -5,7 +5,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -37,19 +36,33 @@ public class ModEntityTypeTagsProvider extends EntityTypeTagsProvider {
 
         tag(ModTags.Entities.SEEKERS)
                 .addTag(ModTags.Entities.CONDITIONAL_SEEKERS)
-                .addTag(EntityTypeTags.ZOMBIES)
-                .remove(EntityType.ZOMBIE_HORSE)
-                .addTag(EntityTypeTags.SKELETONS)
-                .remove(EntityType.SKELETON_HORSE)
-                .addTag(EntityTypeTags.ILLAGER)
+                // 僵尸
+                .add(EntityType.ZOMBIE)
+                .add(EntityType.ZOMBIE_VILLAGER)
+                .add(EntityType.ZOMBIFIED_PIGLIN)
+                .add(EntityType.DROWNED)
+                .add(EntityType.HUSK)
+                // 骷髅
+                .add(EntityType.SKELETON)
+                .add(EntityType.WITHER_SKELETON)
+                .add(EntityType.STRAY)
+                .add(EntityType.BOGGED)
+                // 掠夺者
+                .add(EntityType.EVOKER)
+                .add(EntityType.ILLUSIONER)
+                .add(EntityType.PILLAGER)
+                .add(EntityType.VINDICATOR)
+
                 .add(EntityType.RAVAGER)
                 .add(EntityType.CREEPER)
-                .add(EntityType.SLIME)
                 .add(EntityType.MAGMA_CUBE)
                 .add(EntityType.WITCH)
                 .add(EntityType.SILVERFISH)
                 .add(EntityType.PIGLIN_BRUTE)
                 .add(EntityType.HOGLIN)
+
+                // 史莱姆
+                .add(EntityType.SLIME)
                 .add(EntityType.BLAZE);
         // 带有条件的生物，触发特定条件后，才会执行警戒
         tag(ModTags.Entities.CONDITIONAL_SEEKERS)

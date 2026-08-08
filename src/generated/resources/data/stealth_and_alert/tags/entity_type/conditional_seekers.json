@@ -32,6 +32,10 @@
       "id": "guardvillagers:guard",
       "required": false
     },
+    {
+      "id": "twilightforest:loyal_zombie",
+      "required": false
+    },
     "minecraft:spider",
     "minecraft:cave_spider",
     "minecraft:piglin",

@@ -1,0 +1,24 @@
+{
+  "values": {
+    "minecraft:leather_helmet": 0.04,
+    "minecraft:leather_chestplate": 0.14,
+    "minecraft:leather_leggings": 0.09,
+    "minecraft:leather_boots": 0.01,
+    "minecraft:chainmail_helmet": 0.05,
+    "minecraft:chainmail_chestplate": 0.15,
+    "minecraft:chainmail_leggings": 0.10,
+    "minecraft:chainmail_boots": 0.02,
+    "minecraft:iron_helmet": 0.05,
+    "minecraft:iron_chestplate": 0.15,
+    "minecraft:iron_leggings": 0.10,
+    "minecraft:iron_boots": 0.02,
+    "minecraft:golden_helmet": 0.10,
+    "minecraft:golden_chestplate": 0.30,
+    "minecraft:golden_leggings": 0.20,
+    "minecraft:golden_boots": 0.04,
+    "minecraft:diamond_helmet": 0.07,
+    "minecraft:diamond_chestplate": 0.17,
+    "minecraft:diamond_leggings": 0.12,
+    "minecraft:diamond_boots": 0.04
+  }
+}

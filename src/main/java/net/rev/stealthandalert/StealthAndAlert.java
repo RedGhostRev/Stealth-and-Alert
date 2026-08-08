@@ -7,6 +7,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -45,6 +46,7 @@ public class StealthAndAlert {
     public StealthAndAlert(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::registerCapabilities);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
@@ -83,6 +85,10 @@ public class StealthAndAlert {
             AssassinationRegistry.init();
             CompatHandler.init();
         });
+    }
+
+    private void registerCapabilities(RegisterCapabilitiesEvent event) {
+        CompatHandler.registerCapabilities(event);
     }
 
     // Add the example block item to the building blocks tab

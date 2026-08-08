@@ -20,6 +20,7 @@ public class ModZhCnLangProvider extends LanguageProvider {
         add(LangKeys.SHADOW_CRYSTAL_DAGGER, "暗影水晶匕首");
         add(LangKeys.MUSIC_DISC_DAISY_BELL, "音乐唱片");
         add(LangKeys.DEBUG_WAND, "调试手杖");
+        add(LangKeys.FLAW_SEEKING_RING, "寻隙之戒");
 
         // 方块
         add(LangKeys.PEBBLE_BLOCK, "石子块");
@@ -38,13 +39,18 @@ public class ModZhCnLangProvider extends LanguageProvider {
         // 附魔
         add(LangKeys.VITAL_PIERCE, "贯命");
 
+        // 附魔描述
+        add(LangKeys.VITAL_PIERCE_DESC, "提高武器的刺杀伤害倍率。");
+
         // 属性
         add(LangKeys.VISIBILITY, "可见度");
         add(LangKeys.SOUND_MULTIPLIER, "声音系数");
+        add(LangKeys.ASSASSINATION_DAMAGE, "刺杀伤害");
 
         // 工具提示
         add(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE, "刺杀伤害");
         add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "可施展刺杀");
+        add(LangKeys.TOOLTIP_NEED_CURIOS, "需要安装Curios模组以使用该物品");
         add(LangKeys.TOOLTIP_DEBUG_WAND, "右键以开关调试模式");
         add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "调试模式：显示带有SEEKERS标签的生物的警戒数据：§c\n全局警戒状态\n观测状态\n主目标\n记忆时长\n警戒值\n警戒状态切换计时\n耐心时长");
         add(LangKeys.TOOLTIP_MUSIC_DISC_DAISY_BELL, "Harry Dacre - Daisy Bell");

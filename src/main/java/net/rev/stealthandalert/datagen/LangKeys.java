@@ -14,6 +14,7 @@ public class LangKeys {
     public static final String SHADOW_CRYSTAL_DAGGER = "item." + MOD_ID + ".shadow_crystal_dagger";
     public static final String MUSIC_DISC_DAISY_BELL = "item." + MOD_ID + ".music_disc_daisy_bell";
     public static final String DEBUG_WAND = "item." + MOD_ID + ".debug_wand";
+    public static final String FLAW_SEEKING_RING = "item." + MOD_ID + ".flaw_seeking_ring";
 
     // Blocks
     public static final String PEBBLE_BLOCK = "block." + MOD_ID + ".pebble_block";
@@ -32,13 +33,18 @@ public class LangKeys {
     // Enchantments
     public static final String VITAL_PIERCE = "enchantment." + MOD_ID + ".vital_pierce";
 
+    // Enchantment Descriptions
+    public static final String VITAL_PIERCE_DESC = VITAL_PIERCE + ".desc";
+
     // Attributes
     public static final String VISIBILITY = "attribute.name." + MOD_ID + ".visibility";
     public static final String SOUND_MULTIPLIER = "attribute.name." + MOD_ID + ".sound_multiplier";
+    public static final String ASSASSINATION_DAMAGE = "attribute.name" + MOD_ID + ".assassination_damage";
 
     // Tooltips
     public static final String TOOLTIP_ASSASSINATION_DAMAGE = "tooltip." + MOD_ID + ".assassination_damage";
     public static final String TOOLTIP_CAN_ASSASSINATE = "tooltip." + MOD_ID + ".can_assassinate";
+    public static final String TOOLTIP_NEED_CURIOS = "tooltip." + MOD_ID + ".need_curios";
     public static final String TOOLTIP_DEBUG_WAND = "tooltip." + MOD_ID + ".debug_wand";
     public static final String TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC = "tooltip." + MOD_ID + ".debug_wand.debug_mode_desc";
     public static final String TOOLTIP_MUSIC_DISC_DAISY_BELL = "jukebox_song." + MOD_ID + ".daisy_bell";

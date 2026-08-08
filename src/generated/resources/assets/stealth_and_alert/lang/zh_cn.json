@@ -1,6 +1,7 @@
 {
   "attribute.name.stealth_and_alert.sound_multiplier": "声音系数",
   "attribute.name.stealth_and_alert.visibility": "可见度",
+  "attribute.namestealth_and_alert.assassination_damage": "刺杀伤害",
   "block.stealth_and_alert.deepslate_shadow_crystal_ore": "深层暗影水晶矿石",
   "block.stealth_and_alert.pebble_block": "石子块",
   "block.stealth_and_alert.shadow_crystal_ore": "暗影水晶矿石",
@@ -189,6 +190,7 @@
   "debug.stealth_and_alerttarget_alert_state_untracked": "§7未察觉",
   "effect.stealth_and_alert.ethereal": "幽虚",
   "enchantment.stealth_and_alert.vital_pierce": "贯命",
+  "enchantment.stealth_and_alert.vital_pierce.desc": "提高武器的刺杀伤害倍率。",
   "gui.stealth_and_alertassassinate": "[%s] 刺杀",
   "gui.stealth_and_alertmark": "[%s] 标记",
   "gui.stealth_and_alertunmark": "[%s] 取消标记",
@@ -198,6 +200,7 @@
   "item.minecraft.tipped_arrow.effect.stealth_and_alert.ethereal": "幽虚之箭",
   "item.stealth_and_alert.clamor_bell": "喧闹铃铛 [未完成]",
   "item.stealth_and_alert.debug_wand": "调试手杖",
+  "item.stealth_and_alert.flaw_seeking_ring": "寻隙之戒",
   "item.stealth_and_alert.music_disc_daisy_bell": "音乐唱片",
   "item.stealth_and_alert.pebble": "石子",
   "item.stealth_and_alert.shadow_berries": "暗影浆果",
@@ -215,5 +218,6 @@
   "tooltip.stealth_and_alert.assassination_damage": "刺杀伤害",
   "tooltip.stealth_and_alert.can_assassinate": "可施展刺杀",
   "tooltip.stealth_and_alert.debug_wand": "右键以开关调试模式",
-  "tooltip.stealth_and_alert.debug_wand.debug_mode_desc": "调试模式：显示带有SEEKERS标签的生物的警戒数据：§c\n全局警戒状态\n观测状态\n主目标\n记忆时长\n警戒值\n警戒状态切换计时\n耐心时长"
+  "tooltip.stealth_and_alert.debug_wand.debug_mode_desc": "调试模式：显示带有SEEKERS标签的生物的警戒数据：§c\n全局警戒状态\n观测状态\n主目标\n记忆时长\n警戒值\n警戒状态切换计时\n耐心时长",
+  "tooltip.stealth_and_alert.need_curios": "需要安装Curios模组以使用该物品"
 }

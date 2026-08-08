@@ -32,7 +32,10 @@ import net.rev.stealthandalert.damagetype.ModDamageTypes;
 import net.rev.stealthandalert.datagen.LangKeys;
 import net.rev.stealthandalert.item.ModItems;
 import net.rev.stealthandalert.potion.ModPotions;
-import net.rev.stealthandalert.util.*;
+import net.rev.stealthandalert.util.AssassinationHandler;
+import net.rev.stealthandalert.util.ModTags;
+import net.rev.stealthandalert.util.SpeedHandler;
+import net.rev.stealthandalert.util.StealthEventListener;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -102,6 +105,7 @@ public class ModEvents {
     public static void onEntityAttributeModification(EntityAttributeModificationEvent event) {
         event.add(EntityType.PLAYER, ModAttributes.VISIBILITY);
         event.add(EntityType.PLAYER, ModAttributes.SOUND_MULTIPLIER);
+        event.add(EntityType.PLAYER, ModAttributes.ASSASSINATION_DAMAGE);
     }
 
     @SubscribeEvent
@@ -156,6 +160,7 @@ public class ModEvents {
             return;
         }
         if (source.getDirectEntity() instanceof LivingEntity attacker) {
+            if (attacker.getAttribute(ModAttributes.ASSASSINATION_DAMAGE) == null) return;
             if (source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.MOB_ATTACK)) {
                 if (attacker instanceof Player player) {
                     if (player.getAttackStrengthScale(0.5F) < 1F) {
@@ -163,7 +168,8 @@ public class ModEvents {
                     }
                 }
 
-                float extraDamage = CommonUtils.getAssassinationDamage(source.getWeaponItem());
+//                float extraDamage = CommonUtils.getAssassinationDamage(source.getWeaponItem());
+                float extraDamage = (float) attacker.getAttributeValue(ModAttributes.ASSASSINATION_DAMAGE);
                 if (Float.isInfinite(extraDamage)) {
                     extraDamage = Integer.MAX_VALUE;
                 }

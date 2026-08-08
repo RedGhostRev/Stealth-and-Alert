@@ -1,6 +1,7 @@
 {
   "attribute.name.stealth_and_alert.sound_multiplier": "Sound Multiplier",
   "attribute.name.stealth_and_alert.visibility": "Visibility",
+  "attribute.namestealth_and_alert.assassination_damage": "Assassination Damage",
   "block.stealth_and_alert.deepslate_shadow_crystal_ore": "Deepslate Shadow Crystal Ore",
   "block.stealth_and_alert.pebble_block": "Pebble Block",
   "block.stealth_and_alert.shadow_crystal_ore": "Shadow Crystal Ore",
@@ -189,6 +190,7 @@
   "debug.stealth_and_alerttarget_alert_state_untracked": "§7UNTRACKED",
   "effect.stealth_and_alert.ethereal": "Ethereal",
   "enchantment.stealth_and_alert.vital_pierce": "Vital Pierce",
+  "enchantment.stealth_and_alert.vital_pierce.desc": "Increase the assassination damage multiplier of the weapon.",
   "gui.stealth_and_alertassassinate": "[%s] Assassinate",
   "gui.stealth_and_alertmark": "[%s] Mark",
   "gui.stealth_and_alertunmark": "[%s] Unmark",
@@ -198,6 +200,7 @@
   "item.minecraft.tipped_arrow.effect.stealth_and_alert.ethereal": "Arrow of Ethereal",
   "item.stealth_and_alert.clamor_bell": "Clamor Bell [WIP]",
   "item.stealth_and_alert.debug_wand": "Debug Wand",
+  "item.stealth_and_alert.flaw_seeking_ring": "Flaw-Seeking Ring",
   "item.stealth_and_alert.music_disc_daisy_bell": "Music Disc",
   "item.stealth_and_alert.pebble": "Pebble",
   "item.stealth_and_alert.shadow_berries": "Shadow Berries",
@@ -215,5 +218,6 @@
   "tooltip.stealth_and_alert.assassination_damage": "Assassination Damage",
   "tooltip.stealth_and_alert.can_assassinate": "Assassination-Capable",
   "tooltip.stealth_and_alert.debug_wand": "Right-click to toggle debug mode",
-  "tooltip.stealth_and_alert.debug_wand.debug_mode_desc": "Debug Mode: Displays alert information for mobs with the SEEKERS tag:§c\nGlobal Alert State\nObservation State\nPrimary Target\nMemory Ticks\nAwareness Progress\nState Transition Ticks\nPatience Ticks"
+  "tooltip.stealth_and_alert.debug_wand.debug_mode_desc": "Debug Mode: Displays alert information for mobs with the SEEKERS tag:§c\nGlobal Alert State\nObservation State\nPrimary Target\nMemory Ticks\nAwareness Progress\nState Transition Ticks\nPatience Ticks",
+  "tooltip.stealth_and_alert.need_curios": "Need Curios mod to use this item"
 }

@@ -8,6 +8,30 @@
       "id": "dummmmmmy:target_dummy",
       "required": false
     },
+    {
+      "id": "powerful_dummy:test_dummy",
+      "required": false
+    },
+    {
+      "id": "powerful_dummy:test_dummy_undead",
+      "required": false
+    },
+    {
+      "id": "powerful_dummy:test_dummy_arthropod",
+      "required": false
+    },
+    {
+      "id": "powerful_dummy:test_dummy_water",
+      "required": false
+    },
+    {
+      "id": "powerful_dummy:test_dummy_illager",
+      "required": false
+    },
+    {
+      "id": "twilightforest:lich",
+      "required": false
+    },
     "#stealth_and_alert:seekers",
     "#stealth_and_alert:animals",
     "minecraft:villager",

@@ -1,16 +1,23 @@
 package net.rev.stealthandalert.item;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.compat.SupportedMods;
 import net.rev.stealthandalert.component.ModDataComponents;
+import net.rev.stealthandalert.datagen.LangKeys;
 import net.rev.stealthandalert.item.custom.DaggerItem;
 import net.rev.stealthandalert.item.custom.DebugWandItem;
 import net.rev.stealthandalert.item.custom.PebbleItem;
 import net.rev.stealthandalert.sound.ModSounds;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -40,6 +47,17 @@ public class ModItems {
 
     public static final DeferredItem<Item> MUSIC_DISC_DAISY_BELL = ITEMS.register("music_disc_daisy_bell",
             () -> new Item(new Item.Properties().jukeboxPlayable(ModSounds.DAISY_BELL_KEY).stacksTo(1).rarity(Rarity.RARE)));
+
+    public static final DeferredItem<Item> FLAW_SEEKING_RING = ITEMS.register("flaw_seeking_ring",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)) {
+                @Override
+                public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
+                    if (!SupportedMods.CURIOS.isLoaded()) {
+                        tooltipComponents.add(Component.translatable(LangKeys.TOOLTIP_NEED_CURIOS).withStyle(ChatFormatting.DARK_RED));
+                    }
+                    super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+                }
+            });
 
     public static final DeferredItem<DebugWandItem> DEBUG_WAND = ITEMS.register("debug_wand",
             () -> new DebugWandItem(new Item.Properties().stacksTo(1)));

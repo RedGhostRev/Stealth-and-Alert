@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -19,6 +20,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.rev.stealthandalert.StealthAndAlert;
 import net.rev.stealthandalert.attachment.AssassinationData;
 import net.rev.stealthandalert.attachment.ModAttachments;
+import net.rev.stealthandalert.attribute.GlobalVisibilityModifier;
 import net.rev.stealthandalert.client.camera.CameraShakeManager;
 import net.rev.stealthandalert.common.animation.AssassinationManager;
 import net.rev.stealthandalert.datagen.LangKeys;
@@ -304,25 +306,40 @@ public class AssassinationClientEvents {
 
         float baseDamage = CommonUtils.getWeaponBaseDamage(stack);
         float totalMultiplier = CommonUtils.getAssassinationTotalMultiplier(stack);
-        float assassinationDamage = CommonUtils.getAssassinationDamage(baseDamage, totalMultiplier);
+        float assassinationDamage = 0F;
+        for (ItemAttributeModifiers.Entry entry : stack.getAttributeModifiers().modifiers()) {
+            if (entry.modifier().is(GlobalVisibilityModifier.WEAPON_ASSASSINATION_ID)) {
+                assassinationDamage = (float) entry.modifier().amount();
+                break;
+            }
+        }
         if (assassinationDamage > 0F) {
+            Component attackDamageTranslation = Component.translatable(Attributes.ATTACK_DAMAGE.value().getDescriptionId());
+            Component assassinationTranslation = Component.translatable(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE);
+
+            tooltip.removeIf(component -> component.contains(Component.translatable(LangKeys.ASSASSINATION_DAMAGE)));
+
             for (int i = 0; i < tooltip.size(); i++) {
-                String text = tooltip.get(i).getString();
-                String attackDamageTranslation = Component.translatable("attribute.name.generic.attack_damage").getString();
+                Component text = tooltip.get(i);
+
                 if (text.contains(attackDamageTranslation)) {
                     String displayAssassination = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(assassinationDamage);
+
                     MutableComponent assassinateComponent = Component.literal(" ")
                             .append(Component.literal(displayAssassination))
                             .append(CommonComponents.SPACE)
-                            .append(Component.translatable(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE))
+                            .append(assassinationTranslation)
                             .withStyle(ChatFormatting.DARK_GREEN);
+
                     if (event.getFlags().isAdvanced()) {
                         String displayBase = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(baseDamage);
                         String displayMultiplier = ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(totalMultiplier);
+
                         Component formulaComponent = Component.literal(" [" + displayBase + " * " + displayMultiplier + "]")
                                 .withStyle(ChatFormatting.GRAY);
                         assassinateComponent.append(formulaComponent);
                     }
+
                     tooltip.add(i + 1, assassinateComponent);
                     break;
                 }

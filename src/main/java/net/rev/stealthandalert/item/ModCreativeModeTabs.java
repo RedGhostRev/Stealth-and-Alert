@@ -27,6 +27,7 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.SHADOW_CRYSTAL_SHARD);
                         output.accept(ModItems.SHADOW_BERRIES);
                         output.accept(ModItems.SHADOW_CRYSTAL_DAGGER);
+                        output.accept(ModItems.FLAW_SEEKING_RING);
                         output.accept(ModItems.MUSIC_DISC_DAISY_BELL);
                         output.accept(ModItems.DEBUG_WAND);
                     }).build());

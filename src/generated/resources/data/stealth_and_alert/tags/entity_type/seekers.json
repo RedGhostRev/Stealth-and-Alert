@@ -1,8 +1,4 @@
 {
-  "remove": [
-    "minecraft:zombie_horse",
-    "minecraft:skeleton_horse"
-  ],
   "values": [
     {
       "id": "irons_spellbooks:necromancer",
@@ -28,18 +24,136 @@
       "id": "irons_spellbooks:citadel_keeper",
       "required": false
     },
+    {
+      "id": "twilightforest:snow_guardian",
+      "required": false
+    },
+    {
+      "id": "twilightforest:mosquito_swarm",
+      "required": false
+    },
+    {
+      "id": "twilightforest:troll",
+      "required": false
+    },
+    {
+      "id": "twilightforest:hostile_wolf",
+      "required": false
+    },
+    {
+      "id": "twilightforest:goblin_knight_upper",
+      "required": false
+    },
+    {
+      "id": "twilightforest:goblin_knight_lower",
+      "required": false
+    },
+    {
+      "id": "twilightforest:tower_golem",
+      "required": false
+    },
+    {
+      "id": "twilightforest:tower_termite",
+      "required": false
+    },
+    {
+      "id": "twilightforest:tower_ghast",
+      "required": false
+    },
+    {
+      "id": "twilightforest:mini_ghast",
+      "required": false
+    },
+    {
+      "id": "twilightforest:king_spider",
+      "required": false
+    },
+    {
+      "id": "twilightforest:skeleton_druid",
+      "required": false
+    },
+    {
+      "id": "twilightforest:redcap",
+      "required": false
+    },
+    {
+      "id": "twilightforest:redcap_sapper",
+      "required": false
+    },
+    {
+      "id": "twilightforest:winter_wolf",
+      "required": false
+    },
+    {
+      "id": "twilightforest:swarm_spider",
+      "required": false
+    },
+    {
+      "id": "twilightforest:helmet_crab",
+      "required": false
+    },
+    {
+      "id": "twilightforest:tower_broodling",
+      "required": false
+    },
+    {
+      "id": "twilightforest:pinch_beetle",
+      "required": false
+    },
+    {
+      "id": "twilightforest:blockchain_goblin",
+      "required": false
+    },
+    {
+      "id": "twilightforest:maze_slime",
+      "required": false
+    },
+    {
+      "id": "twilightforest:mist_wolf",
+      "required": false
+    },
+    {
+      "id": "twilightforest:slime_beetle",
+      "required": false
+    },
+    {
+      "id": "twilightforest:minotaur",
+      "required": false
+    },
+    {
+      "id": "twilightforest:fire_beetle",
+      "required": false
+    },
+    {
+      "id": "twilightforest:hedge_spider",
+      "required": false
+    },
+    {
+      "id": "twilightforest:yeti",
+      "required": false
+    },
     "#stealth_and_alert:conditional_seekers",
-    "#minecraft:zombies",
-    "#minecraft:skeletons",
-    "#minecraft:illager",
+    "minecraft:zombie",
+    "minecraft:zombie_villager",
+    "minecraft:zombified_piglin",
+    "minecraft:drowned",
+    "minecraft:husk",
+    "minecraft:skeleton",
+    "minecraft:wither_skeleton",
+    "minecraft:stray",
+    "minecraft:bogged",
+    "minecraft:evoker",
+    "minecraft:illusioner",
+    "minecraft:pillager",
+    "minecraft:vindicator",
     "minecraft:ravager",
     "minecraft:creeper",
-    "minecraft:slime",
     "minecraft:magma_cube",
     "minecraft:witch",
     "minecraft:silverfish",
     "minecraft:piglin_brute",
     "minecraft:hoglin",
+    "minecraft:slime",
     "minecraft:blaze"
   ]
 }

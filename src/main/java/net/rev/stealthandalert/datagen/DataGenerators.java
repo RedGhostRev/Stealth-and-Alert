@@ -11,6 +11,8 @@ import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.rev.stealthandalert.StealthAndAlert;
+import net.rev.stealthandalert.compat.SupportedMods;
+import net.rev.stealthandalert.compat.curios.CuriosProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -48,5 +50,9 @@ public class DataGenerators {
 
         generator.addProvider(event.includeClient(), new ModEnUsLangProvider(packOutput, "en_us"));
         generator.addProvider(event.includeClient(), new ModZhCnLangProvider(packOutput, "zh_cn"));
+
+        if (SupportedMods.CURIOS.isLoaded()) {
+            generator.addProvider(event.includeServer(), new CuriosProvider(packOutput, existingFileHelper, lookupProvider));
+        }
     }
 }

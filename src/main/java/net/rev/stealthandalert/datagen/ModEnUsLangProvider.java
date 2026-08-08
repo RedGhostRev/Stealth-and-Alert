@@ -20,6 +20,7 @@ public class ModEnUsLangProvider extends LanguageProvider {
         add(LangKeys.SHADOW_CRYSTAL_DAGGER, "Shadow Crystal Dagger");
         add(LangKeys.MUSIC_DISC_DAISY_BELL, "Music Disc");
         add(LangKeys.DEBUG_WAND, "Debug Wand");
+        add(LangKeys.FLAW_SEEKING_RING, "Flaw-Seeking Ring");
 
         // Blocks
         add(LangKeys.PEBBLE_BLOCK, "Pebble Block");
@@ -38,13 +39,18 @@ public class ModEnUsLangProvider extends LanguageProvider {
         // Enchantments
         add(LangKeys.VITAL_PIERCE, "Vital Pierce");
 
+        //Enchantment Descriptions
+        add(LangKeys.VITAL_PIERCE_DESC, "Increase the assassination damage multiplier of the weapon.");
+
         // Attributes
         add(LangKeys.VISIBILITY, "Visibility");
         add(LangKeys.SOUND_MULTIPLIER, "Sound Multiplier");
+        add(LangKeys.ASSASSINATION_DAMAGE, "Assassination Damage");
 
         // Tooltips
         add(LangKeys.TOOLTIP_ASSASSINATION_DAMAGE, "Assassination Damage");
         add(LangKeys.TOOLTIP_CAN_ASSASSINATE, "Assassination-Capable");
+        add(LangKeys.TOOLTIP_NEED_CURIOS, "Need Curios mod installed to use this item");
         add(LangKeys.TOOLTIP_DEBUG_WAND, "Right-click to toggle debug mode");
         add(LangKeys.TOOLTIP_DEBUG_WAND_DEBUG_MODE_DESC, "Debug Mode: Displays alert information for mobs with the SEEKERS tag:§c\nGlobal Alert State\nObservation State\nPrimary Target\nMemory Ticks\nAwareness Progress\nState Transition Ticks\nPatience Ticks");
         add(LangKeys.TOOLTIP_MUSIC_DISC_DAISY_BELL, "Harry Dacre - Daisy Bell");
